@@ -2,10 +2,8 @@ package com.faizanbrothers.claims;
 
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -13,7 +11,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -55,8 +52,6 @@ public class MainActivity extends Activity {
     TextView statusTv;
     String apkUrl;
     int latestVersion = 0;
-    long downloadId = -1;
-    BroadcastReceiver downloadReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +59,6 @@ public class MainActivity extends Activity {
         setContentView(buildUi());
         checkForUpdate(false);
         if (savedInstanceState == null) openClaims();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (downloadReceiver != null) {
-            try { unregisterReceiver(downloadReceiver); } catch (Exception ignored) { }
-        }
-        super.onDestroy();
     }
 
     // ---------------------------------------------------------------- UI
@@ -307,61 +294,22 @@ public class MainActivity extends Activity {
             checkForUpdate(true);
             return;
         }
+        // Open the new APK link in the browser; the phone downloads it and the
+        // user installs it from the download notification (data stays safe).
+        Uri uri = Uri.parse(apkUrl);
+        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+        String pkg = null;
+        try { pkg = CustomTabsClient.getPackageName(this, null); } catch (Exception ignored) { }
+        if (pkg != null) i.setPackage(pkg);
         try {
-            DownloadManager dm = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-            DownloadManager.Request req = new DownloadManager.Request(Uri.parse(apkUrl));
-            req.setTitle("FB Claims update 1." + latestVersion);
-            req.setDescription("Naya app update download ho raha hai");
-            req.setMimeType("application/vnd.android.package-archive");
-            req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            req.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, "FB-Claims-1." + latestVersion + ".apk");
-            registerDownloadReceiver();
-            downloadId = dm.enqueue(req);
-            setStatus("Update download ho raha hai… mukammal hote hi install screen khulegi.");
-            toast("Update download ho raha hai…");
+            startActivity(i);
+            setStatus("Naya APK download ho raha hai. Notification se kholein aur \"Update\" dabayein.");
         } catch (Exception e) {
-            // Fall back to the browser download page.
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RELEASES_PAGE)));
             } catch (Exception ignored) {
-                toast("Update download nahi hua");
+                toast("Browser nahi khula");
             }
-        }
-    }
-
-    void registerDownloadReceiver() {
-        if (downloadReceiver != null) return;
-        downloadReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context ctx, Intent intent) {
-                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                if (id != downloadId) return;
-                installDownloaded(id);
-            }
-        };
-        IntentFilter f = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(downloadReceiver, f, Context.RECEIVER_EXPORTED);
-        } else {
-            registerReceiver(downloadReceiver, f);
-        }
-    }
-
-    void installDownloaded(long id) {
-        try {
-            DownloadManager dm = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-            Uri apk = dm.getUriForDownloadedFile(id);
-            if (apk == null) {
-                setStatus("Download mukammal nahi hua. Dobara koshish karein.");
-                return;
-            }
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setDataAndType(apk, "application/vnd.android.package-archive");
-            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-            setStatus("Install screen par \"Update\" dabayein. Aapka data mehfooz rahega.");
-        } catch (Exception e) {
-            setStatus("Install screen nahi khuli. Notification se download hui file kholein.");
         }
     }
 

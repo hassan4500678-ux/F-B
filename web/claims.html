@@ -1,0 +1,1164 @@
+<title>Faizan &amp; Brothers Claims</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: ledger-style operations console — sticky navy bar with tabs, filter strip, KPI band, then stacked panels. Palette taken from the existing Excel summary. */
+:root{
+  --bg:#eef1f6; --surface:#ffffff; --surface-2:#f5f7fb; --line:#d6dce8; --fg:#16223a; --muted:#5a6680;
+  --navy:#1f3864; --navy-ink:#ffffff; --blue:#2e75b6; --teal:#00897b; --green:#2e7d32; --orange:#e65100; --amber:#c98a00; --red:#c62828; --yellow:#b8a000;
+  --tint-green:#e6f4ea; --tint-amber:#fff6dc; --tint-red:#fdeaea; --tint-blue:#e7f0fa;
+  --f-display:"Archivo","Arial Narrow",Arial,sans-serif; --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-num:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1422; --surface:#151f33; --surface-2:#1b2740; --line:#2a3854; --fg:#e4e9f3; --muted:#9aa7c0;
+  --navy:#1a2c50; --navy-ink:#ffffff; --blue:#5ea3e6; --teal:#3fbfae; --green:#5cbf63; --orange:#ff8a3d; --amber:#e8b33a; --red:#f06262; --yellow:#d9c64a;
+  --tint-green:#173323; --tint-amber:#3a2f12; --tint-red:#3d1a1d; --tint-blue:#172b45; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1422; --surface:#151f33; --surface-2:#1b2740; --line:#2a3854; --fg:#e4e9f3; --muted:#9aa7c0;
+  --navy:#1a2c50; --navy-ink:#ffffff; --blue:#5ea3e6; --teal:#3fbfae; --green:#5cbf63; --orange:#ff8a3d; --amber:#e8b33a; --red:#f06262; --yellow:#d9c64a;
+  --tint-green:#173323; --tint-amber:#3a2f12; --tint-red:#3d1a1d; --tint-blue:#172b45; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--navy)}
+.wrap{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--navy);color:var(--navy-ink)}
+.top .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;flex-direction:column;line-height:1.1;margin-right:auto}
+.brand b{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.02em;text-transform:uppercase}
+.brand span{font-size:11.5px;opacity:.75;letter-spacing:.04em}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.tabs a{color:var(--navy-ink);text-decoration:none;padding:8px 12px;border-radius:4px;font-weight:600;font-size:13px;white-space:nowrap;opacity:.78}
+.tabs a:hover{opacity:1;background:rgba(255,255,255,.08)}
+.tabs a[aria-current="page"]{opacity:1;background:rgba(255,255,255,.16);box-shadow:inset 0 -2px 0 #fff}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:8px 13px;border-radius:var(--r);font-weight:600;font-size:13px}
+.btn:hover{border-color:var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.danger{color:var(--red);border-color:var(--red)}
+.btn.ghost{background:transparent}
+.top .btn{background:#fff;color:#1f3864;border-color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* filter strip */
+.filters{background:var(--surface);border-bottom:1px solid var(--line)}
+.filters .wrap{display:flex;gap:10px;flex-wrap:wrap;align-items:end;padding-block:10px}
+.fld{display:flex;flex-direction:column;gap:3px;min-width:0}
+.fld label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+.fld select,.fld input,.fld textarea{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:7px 9px;min-width:0;width:100%}
+.filters .fld{flex:1 1 130px;max-width:200px}
+.filters .spacer{flex:1 1 0}
+.yearbox select{background:#fff8b0;color:#1f3864;font-weight:700}
+:root[data-theme="dark"] .yearbox select{background:#3a3510;color:#fff2a0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .yearbox select{background:#3a3510;color:#fff2a0}}
+
+main{padding-block:18px 60px;display:flex;flex-direction:column;gap:18px}
+.banner{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--tint-amber);border:1px solid var(--amber);border-radius:var(--r);padding:10px 14px;font-size:13px}
+.banner b{color:var(--fg)}
+.banner .btn{margin-left:auto}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.ph{background:var(--navy);color:var(--navy-ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px}
+.ph h2{margin:0;font-family:var(--f-display);font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.ph small{opacity:.75;font-size:11.5px}
+.ph .act{margin-left:auto;display:flex;gap:6px}
+.ph .btn{padding:5px 10px;font-size:12px;background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
+.pb{padding:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.grid2>*{min-width:0}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{border-radius:var(--r);padding:12px 14px;color:#fff;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .l{font-family:var(--f-display);font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;opacity:.92}
+.kpi .v{font-family:var(--f-num);font-weight:700;font-size:clamp(17px,2.4vw,25px);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s{font-size:11.5px;opacity:.85}
+.k-blue{background:#2e75b6}.k-teal{background:#00897b}.k-green{background:#2e7d32}.k-orange{background:#e65100}.k-navy{background:#1f3864}
+.k-red{background:#b71c1c}.k-amber{background:#a86b00}.k-slate{background:#455a7a}.k-purple{background:#5b3f8f}.k-cyan{background:#006f8a}
+
+/* reconciliation */
+.recon{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px}
+@media (max-width:760px){.recon{grid-template-columns:1fr}}
+.ledger{width:100%;border-collapse:collapse}
+.ledger td{padding:7px 4px;border-bottom:1px dashed var(--line)}
+.ledger td:last-child{text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums;font-weight:700}
+.ledger tr.sum td{border-top:2px solid var(--fg);border-bottom:none;font-weight:800}
+.ledger .op{color:var(--muted);width:22px;font-family:var(--f-num)}
+.formula{font-size:12px;color:var(--muted);background:var(--surface-2);border-radius:var(--r);padding:10px 12px;margin-top:10px;line-height:1.6}
+.formula code{font-family:var(--f-num);color:var(--fg);font-size:11.5px}
+
+/* charts */
+svg.chart{width:100%;height:auto;display:block}
+.c-grid{stroke:var(--line);stroke-width:1}
+.c-axis{fill:var(--muted);font:11px var(--f-body)}
+.c-val{fill:var(--fg);font:600 10.5px var(--f-num)}
+.c-claim{fill:var(--blue);opacity:.35}
+.c-recv{fill:var(--teal)}
+.c-appr{fill:var(--green)}
+.c-unpaid{fill:var(--amber)}
+.c-await{fill:var(--orange)}
+.c-rej{fill:var(--red)}
+.c-track{fill:none;stroke:var(--surface-2);stroke-width:16}
+.c-arc{fill:none;stroke:var(--teal);stroke-width:16;stroke-linecap:round}
+.c-big{fill:var(--fg);font:700 26px var(--f-num)}
+.c-sub{fill:var(--muted);font:11px var(--f-body)}
+.b-g{fill:var(--green)}.b-y{fill:var(--yellow)}.b-o{fill:var(--orange)}.b-r{fill:var(--red)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+/* aging buckets */
+.buckets{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:700px){.buckets{grid-template-columns:repeat(2,1fr)}}
+.bucket{border:1px solid var(--line);border-left:5px solid var(--c);border-radius:var(--r);padding:10px 12px;background:var(--surface);text-align:left;display:flex;flex-direction:column;gap:2px}
+.bucket .t{font-size:12px;font-weight:700;color:var(--c)}
+.bucket .n{font-family:var(--f-num);font-size:22px;font-weight:700}
+.bucket .a{font-family:var(--f-num);font-size:12px;color:var(--muted)}
+.bucket[aria-pressed="true"]{background:var(--surface-2);box-shadow:0 0 0 2px var(--c) inset}
+
+/* action center */
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.alist{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;min-width:0}
+.alist h3{margin:0;padding:8px 12px;font-size:12.5px;font-family:var(--f-display);letter-spacing:.05em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.alist h3 .cnt{font-family:var(--f-num);background:var(--c);color:#fff;border-radius:10px;padding:1px 8px;font-size:11.5px}
+.alist ul{list-style:none;margin:0;padding:0;max-height:260px;overflow:auto}
+.alist li{display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.alist li:hover{background:var(--surface-2)}
+.alist li:last-child{border-bottom:none}
+.alist .id{font-family:var(--f-num);font-size:12px;font-weight:700;color:var(--blue);white-space:nowrap}
+.alist .mid{flex:1;min-width:0;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alist .mid small{display:block;color:var(--muted);font-size:11px}
+.alist .amt{font-family:var(--f-num);font-size:12px;font-weight:700;white-space:nowrap}
+.empty-li{color:var(--muted);font-size:12.5px;padding:14px 12px}
+
+/* tables */
+.tscroll{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+table.t th{background:var(--blue);color:#fff;font-weight:700;font-size:12px;padding:7px 9px;text-align:left;white-space:nowrap;position:sticky;top:0}
+table.t th.r,table.t td.r{text-align:right}
+table.t td{padding:7px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t td.num,table.t td.r{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+table.t tbody tr:nth-child(even) td{background:var(--surface-2)}
+table.t tfoot td{background:var(--navy);color:#fff;font-weight:700;font-family:var(--f-num)}
+table.t tfoot td:first-child{font-family:var(--f-body)}
+table.t tr.click{cursor:pointer}
+table.t tr.click:hover td{background:var(--tint-blue)}
+.wrapcell{white-space:normal!important;min-width:180px;max-width:280px}
+
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.st-Pending{background:var(--tint-red);color:var(--red)}
+.st-Partially{background:var(--tint-amber);color:var(--amber)}
+.st-Fully{background:var(--tint-green);color:var(--green)}
+.st-Settled{background:var(--tint-blue);color:var(--blue)}
+.st-Rejected{background:var(--surface-2);color:var(--muted);text-decoration:line-through}
+.flag{display:inline-block;font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:3px;margin-left:4px;vertical-align:1px;color:#fff;background:var(--red)}
+.flag.amber{background:var(--amber)}
+.agedot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--c)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;padding:12px 14px;border-bottom:1px solid var(--line)}
+.toolbar .fld{flex:1 1 220px}
+
+/* register cards on phones */
+@media (max-width:680px){
+  table.reg thead{display:none}
+  table.reg,table.reg tbody,table.reg tr,table.reg td{display:block;width:100%}
+  table.reg tr{border-bottom:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px}
+  table.reg tbody tr:nth-child(even) td{background:none}
+  table.reg td{border:none;padding:2px 0;white-space:normal}
+  table.reg td::before{content:attr(data-l);display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-family:var(--f-body);font-weight:700}
+  table.reg td.r{text-align:left}
+  table.reg td.full{grid-column:1/-1}
+  table.reg tfoot{display:none}
+}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(10,18,35,.55);z-index:50;display:flex;justify-content:center;align-items:flex-start;overflow:auto;padding:max(16px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 40px max(12px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--surface);border-radius:8px;width:100%;max-width:900px;margin-top:10px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.sheet .ph{border-radius:8px 8px 0 0}
+.sheet .ph h2{font-size:15px}
+.fgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.fgrid .w2{grid-column:span 2}.fgrid .w4{grid-column:1/-1}
+.fsec{font-family:var(--f-display);font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:700;grid-column:1/-1;border-bottom:1px solid var(--line);padding-bottom:4px;margin-top:6px}
+.calcline{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;background:var(--surface-2);border-radius:var(--r);padding:10px}
+@media (max-width:760px){.calcline{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.calcline div{display:flex;flex-direction:column;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.calcline b{font-family:var(--f-num);font-size:15px;color:var(--fg);text-transform:none;letter-spacing:0}
+.rec-row{display:grid;grid-template-columns:140px 140px 1fr 1fr 36px;gap:8px;align-items:center;margin-bottom:6px}
+@media (max-width:760px){.rec-row{grid-template-columns:1fr 1fr;}.rec-row .x{justify-self:end}}
+.rec-row input{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:7px 8px;min-width:0;width:100%}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);width:34px;height:34px;color:var(--red);font-weight:700}
+.docs{display:flex;flex-wrap:wrap;gap:8px}
+.chk{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:5px 11px;font-size:13px;cursor:pointer}
+.chk input{accent-color:var(--green)}
+.chk.req{border-color:var(--amber)}
+.files{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.files a{color:var(--blue);font-size:13px}
+.foot{display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid var(--line);align-items:center}
+.foot .sp{flex:1}
+.warn{grid-column:1/-1;font-size:12.5px;color:var(--red);background:var(--tint-red);border-radius:var(--r);padding:8px 10px}
+.note{font-size:12.5px;color:var(--muted)}
+.confirm{background:var(--tint-red);border:1px solid var(--red);border-radius:var(--r);padding:8px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+
+/* settings */
+.slist{display:flex;flex-direction:column;gap:6px}
+.srow{display:flex;gap:8px;align-items:center}
+.srow input[type=text]{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:7px 9px;min-width:0}
+.srow .tog{font-size:12px;white-space:nowrap}
+.srow.off input[type=text]{opacity:.5;text-decoration:line-through}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:var(--r);font-weight:600;z-index:80;font-size:13px;max-width:calc(100% - 32px)}
+.state{padding:40px 20px;text-align:center;color:var(--muted)}
+.state h3{color:var(--fg);font-family:var(--f-display);margin:0 0 6px}
+.yoy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.yoy{grid-template-columns:1fr}}
+.yoy div{background:var(--surface-2);border-radius:var(--r);padding:10px 12px}
+.yoy small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.yoy b{font-family:var(--f-num);font-size:17px}
+.yoy em{font-style:normal;font-family:var(--f-num);font-size:12px;margin-left:6px}
+.up{color:var(--green)}.down{color:var(--red)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><b>Faizan &amp; Brothers</b><span>VIP Claim Management · EBM / Peak Freans</span></div>
+    <nav class="tabs" id="tabs">
+      <a href="#dashboard" data-v="dashboard">Dashboard</a>
+      <a href="#register" data-v="register">Claim Register</a>
+      <a href="#receive" data-v="receive">Receive Payment</a>
+      <a href="#reports" data-v="reports">Reports</a>
+      <a href="#scorecard" data-v="scorecard">Scorecard</a>
+      <a href="#settings" data-v="settings">Settings</a>
+    </nav>
+    <button class="btn" data-action="new" id="btnNew">+ Naya Claim</button>
+  </div>
+</header>
+
+<section class="filters" id="filters">
+  <div class="wrap">
+    <div class="fld yearbox"><label for="fYear">Report Year</label><select id="fYear"></select></div>
+    <div class="fld"><label for="fMonth">Month</label><select id="fMonth"></select></div>
+    <div class="fld"><label for="fCompany">Company</label><select id="fCompany"></select></div>
+    <div class="fld"><label for="fCategory">Category</label><select id="fCategory"></select></div>
+    <div class="fld"><label for="fStatus">Status</label><select id="fStatus"></select></div>
+    <div class="spacer"></div>
+    <button class="btn primary" data-action="pdf" id="btnPdf">⤓ Report / Export PDF</button>
+  </div>
+</section>
+
+<main class="wrap" id="view">
+  <div class="state"><h3>Claims load ho rahe hain…</h3><p>Saved data aa raha hai.</p></div>
+</main>
+
+<div id="modal"></div>
+<div id="toastHost"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+(function(){
+"use strict";
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MSHORT=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const STATUSES=["Pending","Partially Approved","Fully Approved","Settled","Rejected"];
+const STATUS_LABEL={"Pending":"Not Approved Yet","Partially Approved":"Partially Approved","Fully Approved":"Fully Approved","Settled":"Settled (Paid)","Rejected":"Rejected"};
+const DEFAULT_CONFIG={
+  categories:[
+    {name:"Range Display Biscuit",active:true,hint:"Biscuit range display claim"},
+    {name:"Range Display Cake",active:true,hint:"Cake range display claim"},
+    {name:"Range Display",active:true,hint:"Doosri range display"},
+    {name:"Pipers Gold (PG) Display",active:true,hint:"PG display claim"},
+    {name:"Display Core",active:true,hint:"Core display (jaise 3 month)"},
+    {name:"Display VAB Biscuit",active:true,hint:"VAB biscuit display"},
+    {name:"Display VAB Cake",active:true,hint:"VAB cake display"},
+    {name:"Display VAB Piper",active:true,hint:"VAB piper display"},
+    {name:"Gandola",active:true,hint:"Gandola display / rent"},
+    {name:"CPRN",active:true,hint:"CPRN claim"},
+    {name:"OB/MO Incentive",active:true,hint:"Order booker / MO incentive"},
+    {name:"Annual Incentive",active:true,hint:"Saalana incentive (jaise 25-26)"},
+    {name:"Yearly Incentives Staff",active:true,hint:"Staff ke saalana incentives"},
+    {name:"Education Fund",active:true,hint:"Education fund claim"},
+    {name:"Damage / Expiry Stock",active:true,hint:"Damage ya expired stock"},
+    {name:"Market Damage",active:true,hint:"Market mein damaged biscuits"},
+    {name:"Expiry Claims",active:true,hint:"Expired ya near-expiry stock"},
+    {name:"Shortage Claims",active:true,hint:"Stock quantity mein kami"},
+    {name:"Breakage Claims",active:true,hint:"Transport/handling mein toota stock"},
+    {name:"Rate Difference",active:true,hint:"Invoice aur company rate ka farq"},
+    {name:"Scheme / Incentive Claims",active:true,hint:"Schemes ya incentives ki outstanding"},
+    {name:"Return Claims",active:true,hint:"Company ko stock return"},
+    {name:"Other Claims",active:true,hint:"Doosri claim types"}],
+  companies:[{name:"EBM / Peak Freans",active:true}],
+  branches:[{name:"Latifabad",active:true}],
+  handlers:[{name:"Hassan Khan",active:true}],
+  docTypes:["Invoice","Photos","Claim Form","Debit Note","Delivery Challan"],
+  requiredDocs:["Invoice","Claim Form"],
+  thresholds:[7,14,30],
+  agingBase:"claimDate"
+};
+
+const S={claims:[],config:clone(DEFAULT_CONFIG),loaded:false,stale:false,db:null,user:null,assets:null,downloads:null,
+  canWrite:true,view:"dashboard",filters:{year:String(new Date().getFullYear()),month:"all",company:"all",category:"all",status:"all"},
+  search:"",rcv:{sel:{},amt:{},date:"",ref:"",q:"",confirm:false},bucket:null,regSort:"date",editing:null,localOnly:false};
+
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function n(v){const x=Number(v);return isFinite(x)?x:0}
+function money(v){return Math.round(n(v)).toLocaleString("en-US")}
+function rs(v){return "Rs. "+money(v)}
+function dash(v){return n(v)===0?"-":money(v)}
+function pct(a,b){return b>0?(a/b*100):0}
+function pctS(a,b){return pct(a,b).toFixed(1)+"%"}
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parseD(s){if(!s)return null;const [y,m,d]=s.split("-").map(Number);if(!y)return null;return new Date(y,m-1,d)}
+function days(a,b){const A=parseD(a),B=parseD(b);if(!A||!B)return null;return Math.round((B-A)/86400000)}
+function fmtD(s){const d=parseD(s);if(!d)return "-";return String(d.getDate()).padStart(2,"0")+"-"+MSHORT[d.getMonth()]+"-"+d.getFullYear()}
+function active(list){return (list||[]).filter(x=>x.active!==false).map(x=>x.name)}
+function allNames(list){return (list||[]).map(x=>x.name)}
+
+/* ---------- calculations ---------- */
+function calc(c){
+  const today=todayStr();
+  const claim=n(c.claimAmount); let approved=Math.min(n(c.approvedAmount),claim); const rejected=Math.min(n(c.rejectedAmount),Math.max(claim-approved,0));
+  const recs=(c.recoveries||[]).filter(r=>n(r.amount)!==0);
+  const received=recs.reduce((s,r)=>s+n(r.amount),0);
+  if(received>approved)approved=Math.min(received,Math.max(claim-rejected,0));
+  const unpaid=Math.max(approved-received,0);
+  const awaiting=Math.max(claim-approved-rejected,0);
+  const outstanding=Math.max(claim-rejected-received,0);
+  let status;
+  if(claim>0 && rejected>=claim) status="Rejected";
+  else if(claim>0 && awaiting===0 && unpaid===0) status="Settled";
+  else if(approved>0 && approved+rejected>=claim) status="Fully Approved";
+  else if(approved>0) status="Partially Approved";
+  else status="Pending";
+  const open=!(status==="Settled"||status==="Rejected");
+  const base=S.config.agingBase==="receivingDate"?(c.receivingDate||c.claimDate):c.claimDate;
+  let lastRec=null;recs.forEach(r=>{if(r.date&&(!lastRec||r.date>lastRec))lastRec=r.date});
+  const closeDate=status==="Rejected"?(c.approvalDate||lastRec||null):lastRec;
+  const ageDays=open?Math.max(days(base,today)||0,0):null;
+  const settleDays=!open&&closeDate?Math.max(days(base,closeDate)||0,0):null;
+  const overdue=open&&((c.nextFollowUp&&c.nextFollowUp<today)||(c.expectedSettlement&&c.expectedSettlement<today));
+  const req=S.config.requiredDocs||[];const have=c.docs||[];
+  const missing=req.filter(d=>!have.includes(d));
+  return {claim,approved,rejected,received,unpaid,awaiting,outstanding,status,open,ageDays,settleDays,overdue,missing,base,lastRec};
+}
+function bucketOf(age){
+  const t=[...S.config.thresholds].map(Number).sort((a,b)=>a-b);
+  if(age<=t[0])return 0; if(age<=t[1])return 1; if(age<=t[2])return 2; return 3;
+}
+function bucketMeta(){
+  const t=[...S.config.thresholds].map(Number).sort((a,b)=>a-b);
+  return [
+    {k:0,label:"0–"+t[0]+" din",c:"var(--green)",cls:"b-g",tag:"🟢"},
+    {k:1,label:(t[0]+1)+"–"+t[1]+" din",c:"var(--yellow)",cls:"b-y",tag:"🟡"},
+    {k:2,label:(t[1]+1)+"–"+t[2]+" din",c:"var(--orange)",cls:"b-o",tag:"🟠"},
+    {k:3,label:t[2]+"+ din",c:"var(--red)",cls:"b-r",tag:"🔴"}];
+}
+function dupMap(){
+  const m={};
+  S.claims.forEach(c=>{const inv=String(c.invoiceNo||"").trim().toUpperCase();if(!inv)return;const k=(c.company||"")+"|"+inv;(m[k]=m[k]||[]).push(c.id)});
+  const out={};Object.values(m).forEach(ids=>{if(ids.length>1)ids.forEach(id=>out[id]=ids.filter(x=>x!==id))});
+  return out;
+}
+function yearOf(c){return (c.claimDate||"").slice(0,4)}
+function monthOf(c){return Number((c.claimDate||"").slice(5,7))||0}
+function filtered(opts){
+  const f=S.filters;opts=opts||{};
+  return S.claims.filter(c=>{
+    const k=calc(c);
+    if(!opts.ignoreYear && f.year!=="all" && yearOf(c)!==f.year)return false;
+    if(!opts.ignoreMonth && f.month!=="all" && monthOf(c)!==Number(f.month))return false;
+    if(f.company!=="all" && c.company!==f.company)return false;
+    if(f.category!=="all" && c.category!==f.category)return false;
+    if(f.status!=="all"){
+      if(f.status==="Open"){if(!k.open)return false}
+      else if(f.status==="Overdue"){if(!k.overdue)return false}
+      else if(k.status!==f.status)return false;
+    }
+    return true;
+  });
+}
+function totals(list){
+  const t={count:list.length,claim:0,approved:0,rejected:0,received:0,unpaid:0,awaiting:0,outstanding:0,overdueN:0,overdueAmt:0,rejectedN:0};
+  list.forEach(c=>{const k=calc(c);t.claim+=k.claim;t.approved+=k.approved;t.rejected+=k.rejected;t.received+=k.received;t.unpaid+=k.unpaid;t.awaiting+=k.awaiting;t.outstanding+=k.outstanding;if(k.overdue){t.overdueN++;t.overdueAmt+=k.outstanding}if(k.status==="Rejected")t.rejectedN++});
+  return t;
+}
+function groupBy(list,keyFn,keys){
+  const g={};(keys||[]).forEach(k=>g[k]=[]);
+  list.forEach(c=>{const k=keyFn(c)||"(blank)";(g[k]=g[k]||[]).push(c)});
+  return g;
+}
+function filterLabel(){
+  const f=S.filters,p=[];
+  p.push(f.year==="all"?"All years":"Year "+f.year);
+  if(f.month!=="all")p.push(MONTHS[f.month-1]);
+  if(f.company!=="all")p.push(f.company);
+  if(f.category!=="all")p.push(f.category);
+  if(f.status!=="all")p.push(f.status);
+  return p.join(" · ");
+}
+
+/* ---------- filters UI ---------- */
+function opt(v,l,sel){return `<option value="${esc(v)}"${String(v)===String(sel)?" selected":""}>${esc(l)}</option>`}
+function renderFilters(){
+  const f=S.filters;
+  const years=new Set([String(new Date().getFullYear())]);S.claims.forEach(c=>{const y=yearOf(c);if(y)years.add(y)});
+  const ys=[...years].sort().reverse();
+  document.getElementById("fYear").innerHTML=opt("all","All",f.year)+ys.map(y=>opt(y,y,f.year)).join("");
+  document.getElementById("fMonth").innerHTML=opt("all","All months",f.month)+MONTHS.map((m,i)=>opt(i+1,m,f.month)).join("");
+  const comps=new Set(allNames(S.config.companies));S.claims.forEach(c=>c.company&&comps.add(c.company));
+  document.getElementById("fCompany").innerHTML=opt("all","All companies",f.company)+[...comps].map(x=>opt(x,x,f.company)).join("");
+  const cats=new Set(allNames(S.config.categories));S.claims.forEach(c=>c.category&&cats.add(c.category));
+  document.getElementById("fCategory").innerHTML=opt("all","All categories",f.category)+[...cats].map(x=>opt(x,x,f.category)).join("");
+  document.getElementById("fStatus").innerHTML=opt("all","All status",f.status)+opt("Open","Open (unsettled)",f.status)+opt("Overdue","Overdue",f.status)+STATUSES.map(s=>opt(s,STATUS_LABEL[s],f.status)).join("");
+  document.getElementById("filters").hidden=(S.view==="settings"||S.view==="receive");
+}
+["fYear","fMonth","fCompany","fCategory","fStatus"].forEach(id=>{
+  document.getElementById(id).addEventListener("change",e=>{const key={fYear:"year",fMonth:"month",fCompany:"company",fCategory:"category",fStatus:"status"}[id];S.filters[key]=e.target.value;S.bucket=null;render()});
+});
+
+/* ---------- helpers for UI ---------- */
+function pill(st){const cls=st.split(" ")[0];return `<span class="pill st-${cls}">${esc(STATUS_LABEL[st]||st)}</span>`}
+function panel(title,sub,body,act){return `<section class="panel"><div class="ph"><h2>${title}</h2>${sub?`<small>${sub}</small>`:""}${act?`<div class="act">${act}</div>`:""}</div>${body}</section>`}
+function sampleBanner(){
+  const n=S.claims.filter(c=>c.sample).length;if(!n)return "";
+  return `<div class="banner"><span><b>Ye ${n} sample claims hain</b> — sirf dikhane ke liye. Apne asli claims daalne se pehle inhe hata dein.</span>${S.canWrite?`<button class="btn" data-action="clearSamples">Sample data hatayein</button>`:""}</div>`;
+}
+function staleBanner(){
+  if(S.localOnly)return `<div class="banner"><span><b>Storage is view mein available nahi.</b> Yahan kiye gaye changes save nahi honge. Artifact ko claude.ai par sign-in karke kholein.</span></div>`;
+  if(S.stale)return `<div class="banner"><span><b>Saved data abhi tak nahi pohncha.</b> Connection check karein; data aate hi page update ho jayega.</span></div>`;
+  return "";
+}
+
+/* ---------- charts ---------- */
+function niceMax(v){if(v<=0)return 1;const p=Math.pow(10,Math.floor(Math.log10(v)));const m=v/p;return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p}
+function short(v){v=n(v);if(v>=1e7)return (v/1e7).toFixed(1).replace(/\.0$/,"")+"Cr";if(v>=1e5)return (v/1e5).toFixed(1).replace(/\.0$/,"")+"L";if(v>=1e3)return (v/1e3).toFixed(0)+"K";return String(Math.round(v))}
+function chartMonthly(list){
+  const m=Array.from({length:12},()=>({claim:0,recv:0}));
+  list.forEach(c=>{const i=monthOf(c)-1;if(i<0)return;const k=calc(c);m[i].claim+=k.claim;m[i].recv+=k.received});
+  const W=640,H=230,L=46,R=10,T=14,B=28,iw=W-L-R,ih=H-T-B,max=niceMax(Math.max(...m.map(x=>x.claim)));
+  let g="";for(let i=0;i<=4;i++){const y=T+ih-ih*i/4;g+=`<line class="c-grid" x1="${L}" x2="${W-R}" y1="${y}" y2="${y}"/><text class="c-axis" x="${L-6}" y="${y+4}" text-anchor="end">${short(max*i/4)}</text>`}
+  const bw=iw/12;
+  m.forEach((x,i)=>{const cx=L+bw*i;const h=ih*x.claim/max,h2=ih*x.recv/max;
+    g+=`<rect class="c-claim" x="${cx+bw*.14}" y="${T+ih-h}" width="${bw*.72}" height="${Math.max(h,0)}" rx="2"><title>${MONTHS[i]}: claim ${rs(x.claim)}</title></rect>`;
+    g+=`<rect class="c-recv" x="${cx+bw*.3}" y="${T+ih-h2}" width="${bw*.4}" height="${Math.max(h2,0)}" rx="2"><title>${MONTHS[i]}: received ${rs(x.recv)}</title></rect>`;
+    if(x.claim>0)g+=`<text class="c-val" x="${cx+bw/2}" y="${T+ih-h-4}" text-anchor="middle">${short(x.claim)}</text>`;
+    g+=`<text class="c-axis" x="${cx+bw/2}" y="${H-9}" text-anchor="middle">${MSHORT[i]}</text>`});
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly claims trend">${g}</svg>
+  <div class="legend"><span><i style="background:var(--blue);opacity:.4"></i>Claim amount</span><span><i style="background:var(--teal)"></i>Received</span></div>`;
+}
+function chartSplit(t){
+  const parts=[{k:"received",l:"Received",cls:"c-recv",c:"var(--teal)"},{k:"unpaid",l:"Approved but unpaid",cls:"c-unpaid",c:"var(--amber)"},{k:"awaiting",l:"Awaiting approval",cls:"c-await",c:"var(--orange)"},{k:"rejected",l:"Rejected",cls:"c-rej",c:"var(--red)"}];
+  const vals={received:Math.min(t.received,t.approved),unpaid:t.unpaid,awaiting:t.awaiting,rejected:t.rejected};
+  const tot=Math.max(t.claim,1);const W=640,H=64;let x=0,g="";
+  parts.forEach(p=>{const w=W*vals[p.k]/tot;if(w>0)g+=`<rect class="${p.cls}" x="${x}" y="8" width="${w}" height="34"><title>${p.l}: ${rs(vals[p.k])}</title></rect>`;x+=w});
+  if(t.claim===0)g=`<rect class="c-claim" x="0" y="8" width="${W}" height="34"/>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Approved vs pending split">${g}<text class="c-axis" x="0" y="60">0</text><text class="c-axis" x="${W}" y="60" text-anchor="end">${rs(t.claim)}</text></svg>
+  <div class="legend">${parts.map(p=>`<span><i style="background:${p.c}"></i>${p.l} <b class="num">${money(vals[p.k])}</b> (${pctS(vals[p.k],t.claim)})</span>`).join("")}</div>`;
+}
+function chartGauge(t){
+  const r=70,C=2*Math.PI*r,p=Math.min(pct(t.received,t.claim),100);
+  return `<svg class="chart" viewBox="0 0 200 180" style="max-width:240px;margin:0 auto" role="img" aria-label="Recovery rate">
+  <circle class="c-track" cx="100" cy="90" r="${r}"/>
+  <circle class="c-arc" cx="100" cy="90" r="${r}" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 100 90)"/>
+  <text class="c-big" x="100" y="96" text-anchor="middle">${p.toFixed(1)}%</text>
+  <text class="c-sub" x="100" y="116" text-anchor="middle">recovered</text></svg>
+  <p class="note" style="text-align:center;margin:4px 0 0"><b class="num">${rs(t.received)}</b> of <b class="num">${rs(t.claim)}</b></p>`;
+}
+function chartAging(list){
+  const bm=bucketMeta(),cnt=[0,0,0,0],amt=[0,0,0,0];
+  list.forEach(c=>{const k=calc(c);if(!k.open)return;const b=bucketOf(k.ageDays);cnt[b]++;amt[b]+=k.outstanding});
+  const W=320,H=190,L=10,T=20,B=34,ih=H-T-B,bw=(W-L*2)/4,max=niceMax(Math.max(...amt,1));let g="";
+  bm.forEach((b,i)=>{const h=ih*amt[i]/max,x=L+bw*i;
+    g+=`<rect class="${b.cls}" x="${x+bw*.15}" y="${T+ih-h}" width="${bw*.7}" height="${Math.max(h,1)}" rx="3"><title>${b.label}: ${cnt[i]} claims, ${rs(amt[i])}</title></rect>`;
+    g+=`<text class="c-val" x="${x+bw/2}" y="${T+ih-h-5}" text-anchor="middle">${short(amt[i])}</text>`;
+    g+=`<text class="c-axis" x="${x+bw/2}" y="${H-18}" text-anchor="middle">${b.label}</text><text class="c-axis" x="${x+bw/2}" y="${H-4}" text-anchor="middle">${cnt[i]} claims</text>`});
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Claim aging">${g}</svg>`;
+}
+
+/* ---------- views ---------- */
+function vDashboard(){
+  const list=filtered(),t=totals(list);
+  const f=S.filters;let yoy="";
+  if(f.year!=="all"){
+    const cy=f.year,ly=String(Number(f.year)-1);
+    const base=filtered({ignoreYear:true});
+    const a=totals(base.filter(c=>yearOf(c)===cy)),b=totals(base.filter(c=>yearOf(c)===ly));
+    const d=(x,y)=>{if(!y)return `<em>—</em>`;const p=(x-y)/y*100;return `<em class="${p>=0?"up":"down"}">${p>=0?"▲":"▼"} ${Math.abs(p).toFixed(0)}%</em>`};
+    yoy=`<div class="yoy"><div><small>Claims ${cy} vs ${ly}</small><b>${a.count}</b> / ${b.count}${d(a.count,b.count)}</div><div><small>Claim amount</small><b>${money(a.claim)}</b> / ${money(b.claim)}${d(a.claim,b.claim)}</div><div><small>Recovered</small><b>${money(a.received)}</b> / ${money(b.received)}${d(a.received,b.received)}</div></div>`;
+  }
+  const kpi=(cls,l,v,s)=>`<div class="kpi ${cls}"><span class="l">${l}</span><span class="v">${v}</span>${s?`<span class="s">${s}</span>`:""}</div>`;
+  const kp=`<div class="kpis">
+    ${kpi("k-blue","Total Claims",t.count,`${list.filter(c=>calc(c).open).length} open`)}
+    ${kpi("k-teal","Total Claim Amount",money(t.claim),"Company se requested")}
+    ${kpi("k-green","Total Approved",money(t.approved),pctS(t.approved,t.claim)+" of claim")}
+    ${kpi("k-orange","Total Pending",money(t.outstanding),"Abhi tak nahi mila")}
+    ${kpi("k-navy","Total Recovered",money(t.received),"Actual payment received")}
+    ${kpi("k-amber","Approved but Unpaid",money(t.unpaid),"Approve ho chuka, paisa baqi")}
+    ${kpi("k-slate","Awaiting Approval",money(t.awaiting),"Company decision baqi")}
+    ${kpi("k-red","Total Rejected",money(t.rejected),`${t.rejectedN} claims fully rejected`)}
+    ${kpi("k-purple","Overdue",t.overdueN+" claims",rs(t.overdueAmt))}
+    ${kpi("k-cyan","Recovery %",pctS(t.received,t.claim),"Received ÷ claim amount")}
+  </div>`;
+  const recon=panel("Company Recovery Calculator",filterLabel(),`<div class="pb recon"><div>
+    <table class="ledger"><tbody>
+      <tr><td class="op"></td><td>Total Claim Submitted</td><td>${rs(t.claim)}</td></tr>
+      <tr><td class="op">−</td><td>Rejected by company</td><td>${rs(t.rejected)}</td></tr>
+      <tr><td class="op">−</td><td>Approved by company</td><td>${rs(t.approved)}</td></tr>
+      <tr class="sum"><td class="op">=</td><td>Awaiting Approval</td><td>${rs(t.awaiting)}</td></tr>
+      <tr><td class="op"></td><td>Approved amount</td><td>${rs(t.approved)}</td></tr>
+      <tr><td class="op">−</td><td>Amount Received (net of reversals)</td><td>${rs(t.received)}</td></tr>
+      <tr class="sum"><td class="op">=</td><td>Approved but Unpaid</td><td>${rs(t.unpaid)}</td></tr>
+      <tr><td class="op"></td><td>Recovery Rate</td><td>${pctS(t.received,t.claim)}</td></tr>
+    </tbody></table></div><div>
+    ${chartSplit(t)}
+    <div class="formula">
+      <code>Awaiting = Claim − Approved − Rejected</code><br>
+      <code>Approved but Unpaid = Approved − Received</code> (har claim par alag, phir total)<br>
+      <code>Pending = Claim − Rejected − Received</code><br>
+      <code>Recovery % = Received ÷ Claim × 100</code><br>
+      Received = us claim ki saari recovery entries ka jor. Reversal ko minus amount se likhein.
+    </div></div></div>`);
+  const charts=`<div class="grid2">
+    ${panel("Monthly Claims Trend",f.year==="all"?"All years, month-wise":"Year "+f.year,`<div class="pb">${chartMonthly(filtered({ignoreMonth:true}))}</div>`)}
+    <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+      ${panel("Recovery Rate","",`<div class="pb">${chartGauge(t)}</div>`)}
+      ${panel("Claim Aging","Sirf open claims, pending amount",`<div class="pb">${chartAging(list)}</div>`)}
+    </div></div>`;
+  return sampleBanner()+staleBanner()+kp+(yoy?panel("Current Year vs Last Year","",`<div class="pb">${yoy}</div>`):"")+recon+charts+vAlerts(list)+vActions(list);
+}
+function vAlerts(list){
+  const bm=bucketMeta(),open=list.filter(c=>calc(c).open);
+  const by=[[],[],[],[]];open.forEach(c=>by[bucketOf(calc(c).ageDays)].push(c));
+  const rule=S.config.agingBase==="receivingDate"?"Receiving date (company ko claim mila)":"Claim date (submit hua)";
+  let rows="";
+  if(S.bucket!=null){
+    const arr=by[S.bucket].slice().sort((a,b)=>calc(b).ageDays-calc(a).ageDays);
+    rows=`<div class="tscroll" style="margin-top:12px">${regTable(arr,true)}</div>`;
+  }
+  return panel("Pending Claims Alert Center",`Aging rule: ${esc(rule)} se aaj tak, jab tak claim settle ya reject na ho`,`<div class="pb"><div class="buckets">${[3,2,1,0].map(i=>{const b=bm[i];const amt=by[i].reduce((s,c)=>s+calc(c).outstanding,0);
+    return `<button class="bucket" style="--c:${b.c}" data-action="bucket" data-b="${i}" aria-pressed="${S.bucket===i}"><span class="t">${b.tag} ${b.label} se pending</span><span class="n">${by[i].length}</span><span class="a">${rs(amt)}</span></button>`}).join("")}</div>${rows}</div>`);
+}
+function aItem(c,right,sub){const k=calc(c);return `<li data-action="edit" data-id="${esc(c.id)}"><span class="id">${esc(c.id)}</span><span class="mid">${esc(c.category||"-")} · ${esc(c.branch||"")}<small>${sub}</small></span><span class="amt">${right}</span></li>`}
+function aList(title,color,items,render){
+  return `<div class="alist" style="--c:${color}"><h3>${title}<span class="cnt">${items.length}</span></h3><ul>${items.length?items.slice(0,30).map(render).join(""):`<li class="empty-li">Koi claim nahi.</li>`}</ul></div>`;
+}
+function vActions(list){
+  const today=todayStr(),dm=dupMap(),T=[...S.config.thresholds].map(Number).sort((a,b)=>a-b);
+  const open=list.filter(c=>calc(c).open);
+  const critical=open.filter(c=>calc(c).ageDays>T[2]).sort((a,b)=>calc(b).outstanding-calc(a).outstanding);
+  const dueToday=open.filter(c=>c.nextFollowUp===today);
+  const missing=open.filter(c=>calc(c).missing.length);
+  const overdue=open.filter(c=>calc(c).overdue).sort((a,b)=>(a.nextFollowUp||"9").localeCompare(b.nextFollowUp||"9"));
+  const dups=list.filter(c=>dm[c.id]);
+  return panel("Action Center","Aaj kya karna hai",`<div class="pb actions">
+    ${aList("Critical pending","var(--red)",critical,c=>aItem(c,money(calc(c).outstanding),`${calc(c).ageDays} din se pending`))}
+    ${aList("Follow-ups due today","var(--blue)",dueToday,c=>aItem(c,money(calc(c).outstanding),`Last follow-up: ${fmtD(c.lastFollowUp)}`))}
+    ${aList("Overdue claims","var(--orange)",overdue,c=>aItem(c,money(calc(c).outstanding),c.nextFollowUp&&c.nextFollowUp<today?`Follow-up ${fmtD(c.nextFollowUp)} guzar gaya`:`Expected settlement ${fmtD(c.expectedSettlement)} guzar gayi`))}
+    ${aList("Missing documents","var(--amber)",missing,c=>aItem(c,"",`Missing: ${esc(calc(c).missing.join(", "))}`))}
+    ${aList("Duplicate claim suspects","var(--red)",dups,c=>aItem(c,"",`Invoice ${esc(c.invoiceNo)} — ${esc(dm[c.id].join(", "))} mein bhi`))}
+  </div>`);
+}
+function regTable(list,compact){
+  const dm=dupMap(),bm=bucketMeta();
+  const t=totals(list);
+  const rows=list.map(c=>{const k=calc(c);const age=k.open?`<span class="agedot" style="--c:${bm[bucketOf(k.ageDays)].c}"></span>${k.ageDays}d`:(k.settleDays!=null?`✓ ${k.settleDays}d`:"✓");
+    const flags=(dm[c.id]?`<span class="flag" title="Same invoice: ${esc(dm[c.id].join(", "))}">DUP</span>`:"")+(k.missing.length?`<span class="flag amber" title="Missing: ${esc(k.missing.join(", "))}">DOCS</span>`:"")+(k.overdue?`<span class="flag" style="background:var(--orange)">OVERDUE</span>`:"")+(c.sample?`<span class="flag" style="background:var(--muted)">SAMPLE</span>`:"");
+    return `<tr class="click" data-action="edit" data-id="${esc(c.id)}">
+      <td data-l="Claim ID" class="num"><b>${esc(c.id)}</b>${flags}</td>
+      <td data-l="Claim Date">${fmtD(c.claimDate)}</td>
+      ${compact?"":`<td data-l="Receiving Date">${fmtD(c.receivingDate)}</td>`}
+      <td data-l="Company">${esc(c.company||"-")}</td>
+      ${compact?"":`<td data-l="Branch">${esc(c.branch||"-")}</td>`}
+      <td data-l="Category">${esc(c.category||"-")}</td>
+      ${compact?"":`<td data-l="Invoice">${esc(c.invoiceNo||"-")}</td><td data-l="Product" class="wrapcell">${esc(c.product||"")}${c.description?`<br><span class="note">${esc(c.description)}</span>`:""}</td><td data-l="Claimant">${esc(c.claimant||"-")}</td>`}
+      <td data-l="Claim" class="r">${money(k.claim)}</td>
+      <td data-l="Approved" class="r">${dash(k.approved)}</td>
+      <td data-l="Received" class="r">${dash(k.received)}</td>
+      <td data-l="Pending" class="r"><b>${dash(k.outstanding)}</b></td>
+      <td data-l="Status">${pill(k.status)}</td>
+      <td data-l="Age">${age}</td>
+      ${compact?"":`<td data-l="Passing Date">${fmtD(c.approvalDate)}</td><td data-l="Last Follow-up">${fmtD(c.lastFollowUp)}</td><td data-l="Next Follow-up">${fmtD(c.nextFollowUp)}</td><td data-l="Documents">${(c.docs||[]).length}/${S.config.docTypes.length}${(c.files||[]).length?` · ${c.files.length} file`:""}</td><td data-l="Remarks" class="wrapcell full">${esc(c.remarks||"")}</td>`}
+    </tr>`}).join("");
+  const span=compact?3:8;
+  return `<table class="t reg"><thead><tr><th>Claim ID</th><th>Claim Date</th>${compact?"":"<th>Receiving Date</th>"}<th>Company</th>${compact?"":"<th>Branch</th>"}<th>Category</th>${compact?"":"<th>Invoice</th><th>Product / Description</th><th>Claimant</th>"}<th class="r">Claim</th><th class="r">Approved</th><th class="r">Received</th><th class="r">Pending</th><th>Status</th><th>Age</th>${compact?"":"<th>Passing Date</th><th>Last Follow-up</th><th>Next Follow-up</th><th>Docs</th><th>Remarks</th>"}</tr></thead>
+  <tbody>${rows||`<tr><td colspan="20" class="state">Is filter mein koi claim nahi.</td></tr>`}</tbody>
+  ${list.length?`<tfoot><tr><td>TOTAL (${list.length})</td><td colspan="${span}"></td><td class="r">${money(t.claim)}</td><td class="r">${dash(t.approved)}</td><td class="r">${dash(t.received)}</td><td class="r">${dash(t.outstanding)}</td><td colspan="${compact?2:7}"></td></tr></tfoot>`:""}</table>`;
+}
+function vRegister(){
+  let list=filtered();
+  const q=S.search.trim().toLowerCase();
+  if(q)list=list.filter(c=>[c.id,c.invoiceNo,c.product,c.description,c.company,c.branch,c.category,c.claimant,c.remarks].join(" ").toLowerCase().includes(q));
+  const sorters={date:(a,b)=>(b.claimDate||"").localeCompare(a.claimDate||"")||b.id.localeCompare(a.id),pending:(a,b)=>calc(b).outstanding-calc(a).outstanding,age:(a,b)=>(calc(b).ageDays??-1)-(calc(a).ageDays??-1),id:(a,b)=>a.id.localeCompare(b.id)};
+  list=list.slice().sort(sorters[S.regSort]||sorters.date);
+  const body=`<div class="toolbar"><div class="fld"><label for="regSearch">Search</label><input id="regSearch" type="search" placeholder="Claim ID, invoice, product, branch, remarks…" value="${esc(S.search)}"></div>
+    <div class="fld" style="flex:0 1 180px"><label for="regSort">Sort</label><select id="regSort">${opt("date","Newest claim date",S.regSort)}${opt("pending","Highest pending",S.regSort)}${opt("age","Oldest pending",S.regSort)}${opt("id","Claim ID",S.regSort)}</select></div></div>
+    <div class="tscroll">${regTable(list,false)}</div>`;
+  return sampleBanner()+staleBanner()+(S.claims.length?"":emptyState())+panel("Smart Claim Register",`${list.length} claims · ${filterLabel()}`,body,S.canWrite?`<button class="btn" data-action="new">+ Naya claim</button>`:"");
+}
+function emptyState(){return `<div class="panel"><div class="state"><h3>Abhi koi claim save nahi hai</h3><p>Upar "+ Naya Claim" dabayein. Har claim ko apne aap ID milegi, jaise FB-CL-2026-001.</p></div></div>`}
+function summaryRows(groups,order){
+  let ft={count:0,claim:0,approved:0,received:0,outstanding:0,rejected:0,unpaid:0};
+  const rows=order.map(key=>{const t=totals(groups[key]||[]);Object.keys(ft).forEach(k=>ft[k]+=t[k]);
+    return `<tr><td><b>${esc(key)}</b></td><td class="r">${t.count}</td><td class="r">${dash(t.claim)}</td><td class="r">${dash(t.approved)}</td><td class="r">${dash(t.received)}</td><td class="r">${dash(t.unpaid)}</td><td class="r">${dash(t.rejected)}</td><td class="r">${dash(t.outstanding)}</td><td class="r">${pctS(t.approved,t.claim)}</td><td class="r">${pctS(t.received,t.claim)}</td></tr>`}).join("");
+  return {rows,ft};
+}
+function summaryTable(first,groups,order,totalLabel){
+  const {rows,ft}=summaryRows(groups,order);
+  return `<div class="tscroll"><table class="t"><thead><tr><th>${first}</th><th class="r">Claims</th><th class="r">Claim Amount</th><th class="r">Approved</th><th class="r">Received</th><th class="r">Approved Unpaid</th><th class="r">Rejected</th><th class="r">Pending</th><th class="r">% Approved</th><th class="r">% Recovered</th></tr></thead><tbody>${rows}</tbody>
+  <tfoot><tr><td>${totalLabel}</td><td class="r">${ft.count}</td><td class="r">${money(ft.claim)}</td><td class="r">${dash(ft.approved)}</td><td class="r">${dash(ft.received)}</td><td class="r">${dash(ft.unpaid)}</td><td class="r">${dash(ft.rejected)}</td><td class="r">${money(ft.outstanding)}</td><td class="r">${pctS(ft.approved,ft.claim)}</td><td class="r">${pctS(ft.received,ft.claim)}</td></tr></tfoot></table></div>`;
+}
+function recoveryTx(list){
+  const tx=[];list.forEach(c=>(c.recoveries||[]).forEach((r,idx)=>tx.push({...r,idx,claimId:c.id,company:c.company,category:c.category})));
+  return tx.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+}
+function vReports(){return sampleBanner()+staleBanner()+reportsBody()}
+function reportsBody(){
+  const list=filtered(),listY=filtered({ignoreMonth:true});
+  const bm=groupBy(listY,c=>MONTHS[monthOf(c)-1],MONTHS);
+  const cats=[...new Set([...allNames(S.config.categories),...list.map(c=>c.category).filter(Boolean)])];
+  const bc=groupBy(list,c=>c.category,cats);
+  const comps=[...new Set([...allNames(S.config.companies),...list.map(c=>c.company).filter(Boolean)])];
+  const bco=groupBy(list,c=>c.company,comps);
+  const br=[...new Set(list.map(c=>c.branch||"(blank)"))];const bb=groupBy(list,c=>c.branch);
+  const st=groupBy(list,c=>calc(c).status,STATUSES);
+  const tx=recoveryTx(list);
+  const txRows=tx.map(r=>`<tr class="click" data-action="edit" data-id="${esc(r.claimId)}"><td>${fmtD(r.date)}</td><td class="num"><b>${esc(r.claimId)}</b></td><td>${esc(r.company||"-")}</td><td>${esc(r.category||"-")}</td><td>${esc(r.ref||"")}</td><td class="wrapcell">${esc(r.note||"")}</td><td class="r" style="color:${n(r.amount)<0?"var(--red)":"inherit"}">${money(r.amount)}${n(r.amount)<0?" (reversal)":""}</td></tr>`).join("");
+  const txTotal=tx.reduce((s,r)=>s+n(r.amount),0);
+  const statusRows=STATUSES.map(s=>{const t=totals(st[s]||[]);return `<tr><td>${pill(s)}</td><td class="r">${t.count}</td><td class="r">${dash(t.claim)}</td><td class="r">${dash(t.approved)}</td><td class="r">${dash(t.received)}</td><td class="r">${dash(t.outstanding)}</td><td class="r">${pctS(t.count,list.length)}</td></tr>`}).join("");
+  const T=totals(list);
+  return panel("Claim Status Breakdown",filterLabel(),`<div class="tscroll"><table class="t"><thead><tr><th>Status</th><th class="r">Claims</th><th class="r">Claim Amount</th><th class="r">Approved</th><th class="r">Received</th><th class="r">Pending</th><th class="r">% of Claims</th></tr></thead><tbody>${statusRows}</tbody><tfoot><tr><td>TOTAL</td><td class="r">${T.count}</td><td class="r">${money(T.claim)}</td><td class="r">${dash(T.approved)}</td><td class="r">${dash(T.received)}</td><td class="r">${money(T.outstanding)}</td><td class="r">100.0%</td></tr></tfoot></table></div>`)+
+  panel("Month-wise Report",`Claim date ke hisaab se · ${S.filters.year==="all"?"all years":S.filters.year}`,summaryTable("Month",bm,MONTHS,"YEAR TOTAL"))+
+  `<div class="grid2">${panel("Category-wise Report","",summaryTable("Category",bc,cats.filter(k=>(bc[k]||[]).length||active(S.config.categories).includes(k)),"TOTAL"))}
+  ${panel("Company-wise Report","",summaryTable("Company",bco,comps,"TOTAL"))}</div>`+
+  panel("Branch-wise Report","",summaryTable("Branch",bb,br,"TOTAL"))+
+  (()=>{const pl=paidList(list);const pt=pl.reduce((s,c)=>s+calc(c).received,0);
+    return panel("Paid / Received Claims Report",`${pl.length} claims poore receive ho chuke · ${filterLabel()}`,`<div class="tscroll"><table class="t"><thead><tr><th>Claim ID</th><th>Claim Date</th><th>Category</th><th>Product</th><th class="r">Claim</th><th class="r">Rejected</th><th class="r">Received</th><th>Receiving Date</th><th class="r">Days</th></tr></thead><tbody>
+    ${pl.map(c=>{const k=calc(c);return `<tr class="click" data-action="edit" data-id="${esc(c.id)}"><td class="num"><b>${esc(c.id)}</b></td><td>${fmtD(c.claimDate)}</td><td>${esc(c.category||"-")}</td><td class="wrapcell">${esc(c.product||c.description||"")}</td><td class="r">${money(k.claim)}</td><td class="r">${dash(k.rejected)}</td><td class="r"><b>${money(k.received)}</b></td><td>${fmtD(k.lastRec)}</td><td class="r">${k.settleDays??"-"}</td></tr>`}).join("")||`<tr><td colspan="9" class="state">Abhi koi claim poora receive nahi hua.</td></tr>`}</tbody>
+    ${pl.length?`<tfoot><tr><td colspan="6">TOTAL RECEIVED</td><td class="r">${money(pt)}</td><td colspan="2"></td></tr></tfoot>`:""}</table></div>`)})()+
+  panel("Recovery Transactions",`${tx.length} entries · partial payments aur reversals sab yahan`,`<div class="tscroll"><table class="t"><thead><tr><th>Date</th><th>Claim ID</th><th>Company</th><th>Category</th><th>Reference</th><th>Note</th><th class="r">Amount</th></tr></thead><tbody>${txRows||`<tr><td colspan="7" class="state">Abhi koi recovery entry nahi.</td></tr>`}</tbody>${tx.length?`<tfoot><tr><td colspan="6">NET RECEIVED</td><td class="r">${money(txTotal)}</td></tr></tfoot>`:""}</table></div>`);
+}
+function scoreData(list){
+  const names=[...new Set([...allNames(S.config.handlers),...list.map(c=>c.claimant).filter(Boolean)])];
+  const g=groupBy(list,c=>c.claimant||"(unassigned)");if(g["(unassigned)"])names.push("(unassigned)");
+  return names.filter(nm=>(g[nm]||[]).length).map(nm=>{const arr=g[nm];const t=totals(arr);
+    const sd=arr.map(c=>calc(c).settleDays).filter(x=>x!=null);
+    const withDecision=arr.filter(c=>calc(c).approved+calc(c).rejected>0).length;
+    return {name:nm,count:t.count,claim:t.claim,approved:t.approved,received:t.received,recovery:pct(t.received,t.claim),avgSettle:sd.length?sd.reduce((a,b)=>a+b,0)/sd.length:null,overdue:t.overdueN,rejRate:pct(t.rejected,t.claim),outstanding:t.outstanding,decided:withDecision}}).sort((a,b)=>b.recovery-a.recovery||b.claim-a.claim);
+}
+function vScorecard(){return sampleBanner()+staleBanner()+scoreBody()}
+function scoreBody(){
+  const rows=scoreData(filtered());
+  const body=rows.length?`<div class="tscroll"><table class="t"><thead><tr><th>#</th><th>Employee</th><th class="r">Claims Handled</th><th class="r">Claim Amount</th><th class="r">Approved</th><th class="r">Recovered</th><th class="r">Recovery %</th><th class="r">Avg Settlement Days</th><th class="r">Overdue</th><th class="r">Rejection Rate</th><th class="r">Still Pending</th></tr></thead><tbody>
+  ${rows.map((r,i)=>`<tr><td>${i===0?"🏆":i+1}</td><td><b>${esc(r.name)}</b></td><td class="r">${r.count}</td><td class="r">${money(r.claim)}</td><td class="r">${dash(r.approved)}</td><td class="r">${dash(r.received)}</td><td class="r"><b>${r.recovery.toFixed(1)}%</b></td><td class="r">${r.avgSettle==null?"-":r.avgSettle.toFixed(1)}</td><td class="r" style="color:${r.overdue?"var(--red)":"inherit"}">${r.overdue}</td><td class="r">${r.rejRate.toFixed(1)}%</td><td class="r">${money(r.outstanding)}</td></tr>`).join("")}</tbody></table></div>
+  <div class="formula" style="margin:12px">Ranking: Recovery % ke hisaab se. Avg settlement days = aging date se aakhri recovery tak (sirf settled claims). Rejection rate = rejected amount ÷ claim amount. Overdue = follow-up ya expected settlement date guzar gayi.</div>`
+  :`<div class="state"><h3>Koi data nahi</h3><p>Claim form mein "Claimant / Handled by" bharein to employee-wise score yahan aayega.</p></div>`;
+  return panel("Claim Performance Scorecard",filterLabel(),body);
+}
+function listEditor(key,label,hint,withHint){
+  const arr=S.config[key]||[];
+  return `<div class="panel"><div class="ph"><h2>${label}</h2><small>${hint}</small></div><div class="pb slist">
+  ${arr.map((x,i)=>`<div class="srow ${x.active===false?"off":""}"><input type="text" id="cfg-${key}-${i}" data-cfg="${key}" data-i="${i}" value="${esc(x.name)}" ${S.canWrite?"":"disabled"}>${withHint?`<input type="text" id="cfg-${key}-h-${i}" data-cfgh="${key}" data-i="${i}" value="${esc(x.hint||"")}" placeholder="Detail" ${S.canWrite?"":"disabled"}>`:""}<button class="btn ghost tog" data-action="toggleCfg" data-key="${key}" data-i="${i}" ${S.canWrite?"":"disabled"}>${x.active===false?"Activate":"Deactivate"}</button></div>`).join("")}
+  ${S.canWrite?`<div class="srow"><input type="text" id="cfg-new-${key}" placeholder="Naya naam likhein"><button class="btn" data-action="addCfg" data-key="${key}">+ Add</button></div>`:""}
+  </div></div>`;
+}
+function vSettings(){
+  const c=S.config,t=[...c.thresholds].map(Number).sort((a,b)=>a-b);
+  return staleBanner()+`<div class="grid2">${listEditor("categories","Claim Categories","Add, edit, deactivate — purane claims par asar nahi",true)}
+  <div style="display:flex;flex-direction:column;gap:18px">${listEditor("companies","Companies","")}${listEditor("branches","Branches","")}${listEditor("handlers","Employees (Claim handlers)","Scorecard inhi par banta hai")}</div></div>
+  <div class="grid2">
+  ${panel("Aging Rule & Alert Thresholds","",`<div class="pb fgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+    <div class="fld w4"><label for="cfgBase">Aging kis date se gine?</label><select id="cfgBase" ${S.canWrite?"":"disabled"}>${opt("claimDate","Claim Date (claim submit hone ki date)",c.agingBase)}${opt("receivingDate","Receiving Date (company ne claim receive kiya)",c.agingBase)}</select></div>
+    <div class="fld"><label for="cfgT0">🟢 Green tak (din)</label><input id="cfgT0" type="number" min="1" value="${t[0]}" ${S.canWrite?"":"disabled"}></div>
+    <div class="fld"><label for="cfgT1">🟡 Yellow tak (din)</label><input id="cfgT1" type="number" min="2" value="${t[1]}" ${S.canWrite?"":"disabled"}></div>
+    <div class="fld"><label for="cfgT2">🟠 Orange tak (din)</label><input id="cfgT2" type="number" min="3" value="${t[2]}" ${S.canWrite?"":"disabled"}></div>
+    <p class="note w4" style="margin:0">Rule: chuni hui date se aaj tak din gine jaate hain, jab tak claim Settled ya Rejected na ho jaye. ${t[2]} din se zyada = 🔴 critical.</p></div>`)}
+  ${panel("Documents","Required docs na hon to claim “Missing documents” mein aata hai",`<div class="pb">
+    <div class="docs">${c.docTypes.map(d=>`<label class="chk ${c.requiredDocs.includes(d)?"req":""}"><input type="checkbox" data-req="${esc(d)}" ${c.requiredDocs.includes(d)?"checked":""} ${S.canWrite?"":"disabled"}> ${esc(d)} required</label>`).join("")}</div>
+    ${S.canWrite?`<div class="srow" style="margin-top:10px"><input type="text" id="cfg-new-doc" placeholder="Naya document type"><button class="btn" data-action="addDoc">+ Add</button></div>`:""}</div>`)}
+  </div>
+  ${S.canWrite?`<div><button class="btn primary" data-action="saveCfg">Settings save karein</button></div>`:""}`;
+}
+
+/* ---------- receive payment ---------- */
+function rcvList(){
+  const q=(S.rcv.q||"").trim().toLowerCase();
+  return S.claims.filter(c=>calc(c).outstanding>0&&calc(c).status!=="Rejected")
+    .filter(c=>!q||[c.id,c.invoiceNo,c.product,c.description,c.category,c.branch,c.company].join(" ").toLowerCase().includes(q))
+    .sort((a,b)=>(a.claimDate||"").localeCompare(b.claimDate||"")||a.id.localeCompare(b.id));
+}
+function rcvAmt(c){const v=S.rcv.amt[c.id];return v===undefined||v===""?calc(c).outstanding:n(v)}
+function rcvSummary(){
+  const ids=Object.keys(S.rcv.sel).filter(id=>S.claims.some(c=>c.id===id));
+  const tot=ids.reduce((s,id)=>s+rcvAmt(S.claims.find(c=>c.id===id)),0);
+  const el=document.getElementById("rcvSum");if(el)el.innerHTML=`<b>${ids.length}</b> claim select · Receive: <b class="num">${rs(tot)}</b>`;
+  return {ids,tot};
+}
+function vReceive(){
+  if(!S.rcv.date)S.rcv.date=todayStr();
+  const list=rcvList(),ro=S.canWrite?"":"disabled";
+  const allSel=list.length&&list.every(c=>S.rcv.sel[c.id]);
+  const rows=list.map(c=>{const k=calc(c);const sel=!!S.rcv.sel[c.id];return `<tr${sel?' style="outline:2px solid var(--teal);outline-offset:-2px"':""}>
+    <td data-l="Select"><input type="checkbox" id="rs_${esc(c.id)}" data-rsel="${esc(c.id)}" ${sel?"checked":""} ${ro} aria-label="Select ${esc(c.id)}"></td>
+    <td data-l="Claim ID" class="num"><b>${esc(c.id)}</b></td><td data-l="Claim Date">${fmtD(c.claimDate)}</td>
+    <td data-l="Category">${esc(c.category||"-")}</td><td data-l="Product" class="wrapcell">${esc(c.product||c.description||"")}</td>
+    <td data-l="Claim" class="r">${money(k.claim)}</td><td data-l="Received" class="r">${dash(k.received)}</td><td data-l="Pending" class="r"><b>${money(k.outstanding)}</b></td>
+    <td data-l="Receive amount" class="full"><input type="number" inputmode="decimal" id="ra_${esc(c.id)}" data-ramt="${esc(c.id)}" value="${esc(S.rcv.amt[c.id]??k.outstanding)}" style="width:130px;border:1px solid var(--line);border-radius:var(--r);padding:6px 8px;background:var(--surface)" ${ro}></td></tr>`}).join("");
+  const sum=(()=>{const ids=Object.keys(S.rcv.sel).filter(id=>S.claims.some(c=>c.id===id));return {ids,tot:ids.reduce((s,id)=>s+rcvAmt(S.claims.find(c=>c.id===id)),0)}})();
+  const act=!S.canWrite?"":S.rcv.confirm?`<span class="confirm">${sum.ids.length} claims, ${rs(sum.tot)} — ${fmtD(S.rcv.date)} ko receive karein? <button class="btn primary" data-action="rcvYes">Haan, receive karein</button><button class="btn" data-action="rcvCancel">Nahi</button></span>`
+    :`<button class="btn primary" data-action="rcvGo" ${sum.ids.length?"":"disabled"}>✓ Selected claims receive karein</button>`;
+  // recent receipts
+  const tx=recoveryTx(S.claims).slice(0,25);
+  const txRows=tx.map(r=>`<tr><td>${fmtD(r.date)}</td><td class="num"><b>${esc(r.claimId)}</b></td><td>${esc(r.category||"-")}</td><td>${esc(r.ref||"")}</td><td class="r">${money(r.amount)}</td><td>${pill(calc(S.claims.find(c=>c.id===r.claimId)).status)}</td><td>${S.canWrite?`<button class="btn ghost" style="padding:3px 9px;font-size:12px" data-action="rcvUndo" data-id="${esc(r.claimId)}" data-i="${r.idx}">Undo</button>`:""}</td></tr>`).join("");
+  return sampleBanner()+staleBanner()+panel("Receive Payment","Claim select karein, receiving date daalein, aur receive karein — paid claim pending se nikal jayega",`
+    <div class="toolbar">
+      <div class="fld" style="flex:0 1 170px"><label for="rcvDate">Receiving Date</label><input id="rcvDate" type="date" value="${esc(S.rcv.date)}" ${ro}></div>
+      <div class="fld" style="flex:0 1 200px"><label for="rcvRef">Cheque / Credit note #</label><input id="rcvRef" type="text" value="${esc(S.rcv.ref)}" placeholder="Optional" ${ro}></div>
+      <div class="fld"><label for="rcvSearch">Search</label><input id="rcvSearch" type="search" value="${esc(S.rcv.q)}" placeholder="Claim ID, product, category…"></div>
+    </div>
+    <div class="tscroll"><table class="t reg"><thead><tr><th><input type="checkbox" id="rcvAll" ${allSel?"checked":""} ${ro} aria-label="Sab select"></th><th>Claim ID</th><th>Claim Date</th><th>Category</th><th>Product</th><th class="r">Claim</th><th class="r">Received</th><th class="r">Pending</th><th>Receive amount</th></tr></thead>
+    <tbody>${rows||`<tr><td colspan="9" class="state">Koi pending claim nahi. Sab receive ho chuke hain.</td></tr>`}</tbody></table></div>
+    <div class="foot"><span id="rcvSum"><b>${sum.ids.length}</b> claim select · Receive: <b class="num">${rs(sum.tot)}</b></span><span class="sp"></span>${act}</div>
+    <p class="note" style="margin:0;padding:0 14px 12px">Poora pending amount daalne par claim "Settled (Paid)" ho jata hai aur pending, aging aur alerts se nikal jata hai. Kam amount daalein to baqi pending rehta hai.</p>`)+
+  panel("Recently Received","Ghalti ho to Undo dabayein",`<div class="tscroll"><table class="t"><thead><tr><th>Receiving Date</th><th>Claim ID</th><th>Category</th><th>Reference</th><th class="r">Amount</th><th>Status</th><th></th></tr></thead><tbody>${txRows||`<tr><td colspan="7" class="state">Abhi koi payment receive nahi hui.</td></tr>`}</tbody></table></div>`);
+}
+async function writeClaim(c){const body=stripUndef({...c,updatedAt:new Date().toISOString()});delete body.id;
+  if(S.db)await S.db.collection("claims").doc(c.id).set(body);else{const i=S.claims.findIndex(x=>x.id===c.id);S.claims[i]={...body,id:c.id}}}
+async function doReceive(){
+  const date=S.rcv.date||todayStr(),ref=S.rcv.ref||"";
+  const ids=Object.keys(S.rcv.sel).filter(id=>S.claims.some(c=>c.id===id));
+  let ok=0,fail=0;
+  for(const id of ids){
+    const c=clone(S.claims.find(x=>x.id===id));const k=calc(c);const amt=Math.min(rcvAmt(c),k.outstanding);
+    if(!(amt>0))continue;
+    const prev=n(c.approvedAmount);
+    c.recoveries=(c.recoveries||[]);c.recoveries.push({date,amount:amt,ref,note:amt>=k.outstanding?"Paid (full)":"Partial receive",prevApproved:prev});
+    const newRecv=k.received+amt;if(newRecv>prev)c.approvedAmount=Math.min(newRecv,k.claim-k.rejected);
+    if(!c.approvalDate)c.approvalDate=date;
+    try{await writeClaim(c);ok++}catch(e){fail++}
+  }
+  S.rcv={sel:{},amt:{},date,ref:"",q:S.rcv.q,confirm:false};
+  toast(fail?`${ok} receive hue, ${fail} save nahi hue`:`${ok} claims receive ho gaye`);render();
+}
+async function undoReceive(id,i){
+  const c=clone(S.claims.find(x=>x.id===id));if(!c||!c.recoveries||!c.recoveries[i])return;
+  const r=c.recoveries.splice(i,1)[0];if(r.prevApproved!==undefined)c.approvedAmount=r.prevApproved;
+  try{await writeClaim(c);toast(id+" ki payment undo ho gayi");render()}catch(e){toast("Undo nahi hua")}
+}
+function paidList(list){return list.filter(c=>calc(c).status==="Settled").sort((a,b)=>(calc(b).lastRec||"").localeCompare(calc(a).lastRec||""))}
+
+/* ---------- render ---------- */
+function render(){
+  const v=S.view;
+  document.querySelectorAll("#tabs a").forEach(a=>a.setAttribute("aria-current",a.dataset.v===v?"page":"false"));
+  renderFilters();
+  document.getElementById("btnNew").hidden=!S.canWrite;
+  const el=document.getElementById("view");
+  if(!S.loaded&&!S.stale&&!S.localOnly){el.innerHTML=`<div class="state"><h3>Claims load ho rahe hain…</h3></div>`;return}
+  const html={dashboard:vDashboard,register:vRegister,receive:vReceive,reports:vReports,scorecard:vScorecard,settings:vSettings}[v]();
+  const focusId=document.activeElement&&document.activeElement.id;const selS=document.activeElement&&document.activeElement.selectionStart;
+  el.innerHTML=html;
+  if(focusId==="regSearch"||focusId==="rcvSearch"){const i=document.getElementById(focusId);if(i){i.focus();try{i.setSelectionRange(selS,selS)}catch(e){}}}
+}
+function route(){const h=(location.hash||"").slice(1);S.view=["dashboard","register","receive","reports","scorecard","settings"].includes(h)?h:"dashboard";render()}
+window.addEventListener("hashchange",route);
+
+document.getElementById("view").addEventListener("input",e=>{
+  if(e.target.id==="regSearch"){S.search=e.target.value;render()}
+  if(e.target.id==="rcvSearch"){S.rcv.q=e.target.value;render()}
+  if(e.target.dataset.ramt){S.rcv.amt[e.target.dataset.ramt]=e.target.value;rcvSummary()}
+  if(e.target.id==="rcvDate")S.rcv.date=e.target.value;
+  if(e.target.id==="rcvRef")S.rcv.ref=e.target.value;
+});
+document.getElementById("view").addEventListener("change",e=>{
+  if(e.target.id==="regSort"){S.regSort=e.target.value;render()}
+  if(e.target.dataset.rsel){const id=e.target.dataset.rsel;if(e.target.checked)S.rcv.sel[id]=true;else delete S.rcv.sel[id];S.rcv.confirm=false;render()}
+  if(e.target.id==="rcvAll"){rcvList().forEach(c=>{if(e.target.checked)S.rcv.sel[c.id]=true;else delete S.rcv.sel[c.id]});S.rcv.confirm=false;render()}
+  if(e.target.dataset.cfg){S.config[e.target.dataset.cfg][e.target.dataset.i].name=e.target.value}
+  if(e.target.dataset.cfgh){S.config[e.target.dataset.cfgh][e.target.dataset.i].hint=e.target.value}
+  if(e.target.dataset.req){const d=e.target.dataset.req;const r=new Set(S.config.requiredDocs);e.target.checked?r.add(d):r.delete(d);S.config.requiredDocs=[...r];render()}
+  if(e.target.id==="cfgBase"){S.config.agingBase=e.target.value}
+  if(["cfgT0","cfgT1","cfgT2"].includes(e.target.id)){S.config.thresholds=[n(document.getElementById("cfgT0").value),n(document.getElementById("cfgT1").value),n(document.getElementById("cfgT2").value)]}
+});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-action]");if(!b)return;
+  const a=b.dataset.action;
+  if(a==="new")openForm(null);
+  else if(a==="edit")openForm(S.claims.find(c=>c.id===b.dataset.id));
+  else if(a==="bucket"){const k=Number(b.dataset.b);S.bucket=S.bucket===k?null:k;render()}
+  else if(a==="pdf")openReport();
+  else if(a==="pdfdl")runPdf("report");
+  else if(a==="clearSamples")clearSamples(b);
+  else if(a==="toggleCfg"){const it=S.config[b.dataset.key][b.dataset.i];it.active=it.active===false;render()}
+  else if(a==="addCfg"){const i=document.getElementById("cfg-new-"+b.dataset.key);const v=i.value.trim();if(!v)return;S.config[b.dataset.key].push({name:v,active:true});render()}
+  else if(a==="addDoc"){const v=document.getElementById("cfg-new-doc").value.trim();if(!v||S.config.docTypes.includes(v))return;S.config.docTypes.push(v);render()}
+  else if(a==="saveCfg")saveConfig();
+  else if(a==="rcvGo"){S.rcv.confirm=true;render()}
+  else if(a==="rcvCancel"){S.rcv.confirm=false;render()}
+  else if(a==="rcvYes")doReceive();
+  else if(a==="rcvUndo")undoReceive(b.dataset.id,Number(b.dataset.i));
+});
+
+function toast(msg){const h=document.getElementById("toastHost");h.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`;clearTimeout(toast._t);toast._t=setTimeout(()=>h.innerHTML="",2800)}
+
+/* ---------- form ---------- */
+function nextId(dateStr){
+  const y=(dateStr||todayStr()).slice(0,4);const pre="FB-CL-"+y+"-";
+  let max=0;S.claims.forEach(c=>{if(c.id&&c.id.startsWith(pre)){const k=parseInt(c.id.slice(pre.length),10);if(k>max)max=k}});
+  return pre+String(max+1).padStart(3,"0");
+}
+function selectOpts(list,cur,blank){const names=active(list);if(cur&&!names.includes(cur))names.push(cur);return (blank?opt("","— chunein —",cur):"")+names.map(x=>opt(x,x,cur)).join("")}
+function openForm(c){
+  const isNew=!c;const d=c?clone(c):{claimDate:todayStr(),company:active(S.config.companies)[0]||"",branch:active(S.config.branches)[0]||"",claimant:active(S.config.handlers)[0]||"",category:"",recoveries:[],docs:[],files:[]};
+  S.editing={orig:c,data:d};
+  const ro=!S.canWrite?"disabled":"";
+  const m=document.getElementById("modal");
+  m.innerHTML=`<div class="overlay" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="fTitle">
+  <div class="ph"><h2 id="fTitle">${isNew?"Naya Claim":"Claim "+esc(c.id)}</h2><small>${isNew?"ID save par banegi: "+esc(nextId(d.claimDate)):(c.sample?"Sample claim":"")}</small><div class="act"><button class="btn" data-close="1" aria-label="Close">✕</button></div></div>
+  <form id="claimForm" class="pb fgrid" novalidate>
+    <div class="fsec">Claim details</div>
+    <div class="fld"><label for="f_claimDate">Claim Date *</label><input id="f_claimDate" type="date" value="${esc(d.claimDate||"")}" ${ro} required></div>
+    <div class="fld"><label for="f_receivingDate">Receiving Date</label><input id="f_receivingDate" type="date" value="${esc(d.receivingDate||"")}" ${ro}></div>
+    <div class="fld"><label for="f_company">Company</label><select id="f_company" ${ro}>${selectOpts(S.config.companies,d.company,true)}</select></div>
+    <div class="fld"><label for="f_branch">Branch</label><select id="f_branch" ${ro}>${selectOpts(S.config.branches,d.branch,true)}</select></div>
+    <div class="fld w2"><label for="f_category">Claim Category</label><select id="f_category" ${ro}>${selectOpts(S.config.categories,d.category,true)}</select></div>
+    <div class="fld"><label for="f_invoiceNo">Invoice Number</label><input id="f_invoiceNo" type="text" value="${esc(d.invoiceNo||"")}" ${ro}></div>
+    <div class="fld"><label for="f_claimant">Claimant / Handled by</label><select id="f_claimant" ${ro}>${selectOpts(S.config.handlers,d.claimant,true)}</select></div>
+    <div class="fld w2"><label for="f_product">Product</label><input id="f_product" type="text" value="${esc(d.product||"")}" placeholder="Biscuit product name" ${ro}></div>
+    <div class="fld w2"><label for="f_description">Description</label><input id="f_description" type="text" value="${esc(d.description||"")}" ${ro}></div>
+    <div id="dupWarn" class="warn" hidden></div>
+
+    <div class="fsec">Amounts</div>
+    <div class="fld"><label for="f_claimAmount">Claim Amount *</label><input id="f_claimAmount" type="number" inputmode="decimal" min="0" value="${esc(d.claimAmount??"")}" ${ro}></div>
+    <div class="fld"><label for="f_approvedAmount">Approved Amount</label><input id="f_approvedAmount" type="number" inputmode="decimal" min="0" value="${esc(d.approvedAmount??"")}" ${ro}></div>
+    <div class="fld"><label for="f_rejectedAmount">Rejected Amount</label><input id="f_rejectedAmount" type="number" inputmode="decimal" min="0" value="${esc(d.rejectedAmount??"")}" ${ro}></div>
+    <div class="fld"><label for="f_approvalDate">Passing / Approval Date</label><input id="f_approvalDate" type="date" value="${esc(d.approvalDate||"")}" ${ro}></div>
+    <div id="amtWarn" class="warn" hidden></div>
+
+    <div class="fsec">Recovery transactions (Received Amount)</div>
+    <div class="w4" id="recs"></div>
+    ${S.canWrite?`<div class="w4"><button type="button" class="btn primary" id="fullRec">✓ Poora pending receive (Paid)</button> <button type="button" class="btn" id="addRec">+ Partial payment entry</button> <span class="note">Reversal ho to minus amount likhein (jaise -5000).</span></div>`:""}
+    <div class="calcline" id="calcline"></div>
+
+    <div class="fsec">Follow-up</div>
+    <div class="fld"><label for="f_lastFollowUp">Last Follow-up</label><input id="f_lastFollowUp" type="date" value="${esc(d.lastFollowUp||"")}" ${ro}></div>
+    <div class="fld"><label for="f_nextFollowUp">Next Follow-up</label><input id="f_nextFollowUp" type="date" value="${esc(d.nextFollowUp||"")}" ${ro}></div>
+    <div class="fld"><label for="f_expectedSettlement">Expected Settlement</label><input id="f_expectedSettlement" type="date" value="${esc(d.expectedSettlement||"")}" ${ro}></div>
+    <div class="fld"><label>Status (auto)</label><div id="autoStatus" style="padding-top:6px"></div></div>
+
+    <div class="fsec">Supporting documents</div>
+    <div class="w4 docs">${S.config.docTypes.map((t,i)=>`<label class="chk ${S.config.requiredDocs.includes(t)?"req":""}"><input type="checkbox" id="f_doc_${i}" data-doc="${esc(t)}" ${(d.docs||[]).includes(t)?"checked":""} ${ro}> ${esc(t)}${S.config.requiredDocs.includes(t)?" *":""}</label>`).join("")}</div>
+    <div class="w4"><div class="files" id="fileList"></div>${S.assets&&S.canWrite?`<label class="btn" style="margin-top:8px;width:max-content">📎 File attach karein<input type="file" id="f_file" hidden multiple accept="image/*,application/pdf"></label> <span class="note">Invoice ki photo, claim proof (PDF/image)</span>`:""}</div>
+
+    <div class="fld w4"><label for="f_remarks">Remarks</label><textarea id="f_remarks" rows="2" ${ro}>${esc(d.remarks||"")}</textarea></div>
+  </form>
+  <div class="foot">
+    ${!isNew&&S.canWrite?`<span id="delZone"><button class="btn danger" type="button" id="delBtn">Delete</button></span>`:""}
+    ${!isNew?`<button class="btn" type="button" id="slipBtn">⤓ Claim slip PDF</button>`:""}
+    <span class="sp"></span>
+    <button class="btn" type="button" data-close="1">Band karein</button>
+    ${S.canWrite?`<button class="btn primary" type="button" id="saveBtn">Save claim</button>`:""}
+  </div></div></div>`;
+  renderRecs();renderFiles();updateCalc();
+  const form=document.getElementById("claimForm");
+  form.addEventListener("input",updateCalc);form.addEventListener("change",updateCalc);
+  const ar=document.getElementById("addRec");if(ar)ar.onclick=()=>{readRecs();S.editing.data.recoveries.push({date:todayStr(),amount:"",ref:"",note:""});renderRecs();updateCalc()};
+  const fr=document.getElementById("fullRec");if(fr)fr.onclick=()=>{const d=readForm();const k=calc(d);if(!(k.outstanding>0)){toast("Is claim mein kuch pending nahi");return}
+    S.editing.data.recoveries.push({date:todayStr(),amount:k.outstanding,ref:"",note:"Full receive"});renderRecs();updateCalc();toast("Payment entry lag gayi — date check karke Save dabayein")};
+  const sb=document.getElementById("saveBtn");if(sb)sb.onclick=saveClaim;
+  const sl=document.getElementById("slipBtn");if(sl)sl.onclick=()=>runPdf("slip",S.editing.orig);
+  const db=document.getElementById("delBtn");if(db)db.onclick=()=>{document.getElementById("delZone").innerHTML=`<span class="confirm">Pakka delete? Wapas nahi aayega. <button class="btn danger" type="button" id="delYes">Haan, delete</button><button class="btn" type="button" id="delNo">Nahi</button></span>`;
+    document.getElementById("delYes").onclick=deleteClaim;document.getElementById("delNo").onclick=()=>openForm(S.editing.orig)};
+  const fi=document.getElementById("f_file");if(fi)fi.onchange=uploadFiles;
+  m.querySelector(".overlay").addEventListener("click",ev=>{if(ev.target.classList.contains("overlay")||ev.target.closest("button[data-close]"))closeForm()});
+  document.getElementById("f_claimDate").focus();
+}
+function closeForm(){document.getElementById("modal").innerHTML="";S.editing=null}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(S.editing||S.report)){closeForm();S.report=false}});
+function renderRecs(){
+  const box=document.getElementById("recs");const ro=!S.canWrite?"disabled":"";
+  const r=S.editing.data.recoveries||[];
+  box.innerHTML=r.length?r.map((x,i)=>`<div class="rec-row"><input type="date" id="r_date_${i}" value="${esc(x.date||"")}" aria-label="Payment date" ${ro}><input type="number" id="r_amt_${i}" value="${esc(x.amount??"")}" placeholder="Amount" aria-label="Amount" ${ro}><input type="text" id="r_ref_${i}" value="${esc(x.ref||"")}" placeholder="Cheque / credit note #" aria-label="Reference" ${ro}><input type="text" id="r_note_${i}" value="${esc(x.note||"")}" placeholder="Note" aria-label="Note" ${ro}>${S.canWrite?`<button type="button" class="iconbtn x" data-rm="${i}" aria-label="Remove">✕</button>`:""}</div>`).join(""):`<p class="note" style="margin:0">Abhi koi payment receive nahi hui.</p>`;
+  box.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{readRecs();S.editing.data.recoveries.splice(Number(b.dataset.rm),1);renderRecs();updateCalc()});
+}
+function readRecs(){const r=S.editing.data.recoveries||[];r.forEach((x,i)=>{const g=id=>document.getElementById(id);if(!g("r_date_"+i))return;x.date=g("r_date_"+i).value;x.amount=g("r_amt_"+i).value===""?"":n(g("r_amt_"+i).value);x.ref=g("r_ref_"+i).value;x.note=g("r_note_"+i).value})}
+function renderFiles(){
+  const fl=document.getElementById("fileList");const f=S.editing.data.files||[];
+  fl.innerHTML=f.map((x,i)=>`<div><a href="${esc(x.url)}" target="_blank" rel="noopener">📄 ${esc(x.name)}</a>${S.canWrite?` <button type="button" class="btn ghost" style="padding:2px 8px" data-rmf="${i}">hatao</button>`:""}</div>`).join("");
+  fl.querySelectorAll("[data-rmf]").forEach(b=>b.onclick=()=>{S.editing.data.files.splice(Number(b.dataset.rmf),1);renderFiles()});
+}
+async function uploadFiles(e){
+  const files=[...e.target.files];if(!files.length)return;
+  for(const f of files){try{toast("Upload ho raha hai: "+f.name);const r=await S.assets.upload(f);(S.editing.data.files=S.editing.data.files||[]).push({id:r.id,url:r.url,name:f.name});renderFiles()}catch(err){toast("Upload nahi hua: "+(err&&err.message||"error"))}}
+  toast("File attach ho gayi — Save dabana na bhoolein");
+}
+function readForm(){
+  const g=id=>document.getElementById(id);const d=S.editing.data;
+  ["claimDate","receivingDate","company","branch","category","invoiceNo","claimant","product","description","approvalDate","lastFollowUp","nextFollowUp","expectedSettlement","remarks"].forEach(k=>d[k]=g("f_"+k).value.trim());
+  ["claimAmount","approvedAmount","rejectedAmount"].forEach(k=>d[k]=g("f_"+k).value===""?0:n(g("f_"+k).value));
+  d.docs=[...document.querySelectorAll("[data-doc]")].filter(x=>x.checked).map(x=>x.dataset.doc);
+  readRecs();return d;
+}
+function updateCalc(){
+  if(!S.editing)return;const d=readForm();const k=calc(d);
+  document.getElementById("calcline").innerHTML=`<div>Received<b>${money(k.received)}</b></div><div>Approved unpaid<b>${money(k.unpaid)}</b></div><div>Awaiting approval<b>${money(k.awaiting)}</b></div><div>Pending (total)<b>${money(k.outstanding)}</b></div>`;
+  document.getElementById("autoStatus").innerHTML=pill(k.status)+(k.open?` <span class="note">${k.ageDays} din</span>`:"");
+  const w=document.getElementById("amtWarn");const msgs=[];
+  if(n(d.approvedAmount)+n(d.rejectedAmount)>n(d.claimAmount)&&n(d.claimAmount)>0)msgs.push("Approved + Rejected, claim amount se zyada hai.");
+  if(k.received>n(d.claimAmount)-n(d.rejectedAmount)&&n(d.claimAmount)>0)msgs.push("Received amount, claim (minus rejected) se zyada hai — check karein.");
+  w.hidden=!msgs.length;w.textContent=msgs.join(" ");
+  const inv=(d.invoiceNo||"").trim().toUpperCase();const dw=document.getElementById("dupWarn");
+  const other=inv?S.claims.filter(c=>c.id!==(S.editing.orig&&S.editing.orig.id)&&c.company===d.company&&String(c.invoiceNo||"").trim().toUpperCase()===inv):[];
+  dw.hidden=!other.length;dw.textContent=other.length?`⚠ Duplicate? Isi company ka invoice ${d.invoiceNo} pehle se claim ${other.map(c=>c.id).join(", ")} mein hai.`:"";
+}
+function stripUndef(o){return JSON.parse(JSON.stringify(o))}
+async function saveClaim(){
+  const d=readForm();
+  if(!d.claimDate){toast("Claim date zaroori hai");return}
+  if(!(n(d.claimAmount)>0)){toast("Claim amount daalein");return}
+  d.recoveries=(d.recoveries||[]).filter(r=>r.amount!==""&&n(r.amount)!==0);
+  const orig=S.editing.orig;
+  const id=orig?orig.id:nextId(d.claimDate);
+  const body=stripUndef({...d,id:undefined,updatedAt:new Date().toISOString(),createdAt:(orig&&orig.createdAt)||new Date().toISOString()});
+  delete body.id;
+  const btn=document.getElementById("saveBtn");btn.disabled=true;btn.textContent="Save ho raha hai…";
+  try{
+    if(S.db){await S.db.collection("claims").doc(id).set(body)}
+    else{const i=S.claims.findIndex(c=>c.id===id);const rec={...body,id};if(i>=0)S.claims[i]=rec;else S.claims.push(rec)}
+    closeForm();toast(`${id} save ho gaya`);render();
+  }catch(err){btn.disabled=false;btn.textContent="Save claim";toast(err&&err.code==="quota_exceeded"?"Storage full hai — purane claims delete karein":"Save nahi hua: "+(err&&err.message||"dobara koshish karein"))}
+}
+async function deleteClaim(){
+  const id=S.editing.orig.id;
+  try{if(S.db)await S.db.collection("claims").doc(id).delete();else S.claims=S.claims.filter(c=>c.id!==id);closeForm();toast(id+" delete ho gaya");render()}
+  catch(err){toast("Delete nahi hua: "+(err&&err.message||""))}
+}
+async function clearSamples(btn){
+  if(btn.dataset.sure!=="1"){btn.dataset.sure="1";btn.textContent="Pakka? Dobara dabayein";return}
+  btn.disabled=true;const ids=S.claims.filter(c=>c.sample).map(c=>c.id);
+  try{for(const id of ids){if(S.db)await S.db.collection("claims").doc(id).delete()}if(!S.db)S.claims=S.claims.filter(c=>!c.sample);toast("Sample data hata diya");render()}catch(e){toast("Kuch sample delete nahi hue");render()}
+}
+async function saveConfig(){
+  const t=S.config.thresholds.map(Number).sort((a,b)=>a-b);
+  if(t.some(x=>!(x>0))||new Set(t).size<3){toast("Thresholds alag alag positive numbers hon (jaise 7, 14, 30)");return}
+  S.config.thresholds=t;
+  try{if(S.db)await S.db.doc("config/main").set(stripUndef(S.config));toast("Settings save ho gayi");render()}catch(e){toast("Settings save nahi huin: "+(e&&e.message||""))}
+}
+
+/* ---------- report view ---------- */
+function openReport(){
+  const list=filtered(),t=totals(list);
+  const kpi=(cls,l,v)=>`<div class="kpi ${cls}"><span class="l">${l}</span><span class="v">${v}</span></div>`;
+  const reg=list.slice().sort((a,b)=>(a.claimDate||"").localeCompare(b.claimDate||"")||a.id.localeCompare(b.id));
+  document.getElementById("modal").innerHTML=`<div class="overlay"><div class="sheet" style="max-width:1100px" role="dialog" aria-modal="true" aria-labelledby="repTitle">
+  <div class="ph"><h2 id="repTitle">Report Card</h2><small>${esc(filterLabel())}</small><div class="act"><button class="btn" data-action="pdfdl" style="background:#fff;color:#1f3864;border-color:#fff">⤓ PDF download</button><button class="btn" data-close="1" aria-label="Close">✕</button></div></div>
+  <div class="pb" style="display:flex;flex-direction:column;gap:16px">
+    <div id="repMsg" class="banner" hidden></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:end;border-bottom:3px solid var(--blue);padding-bottom:10px">
+      <div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.02em">FAIZAN &amp; BROTHERS</div><div class="note">Claim Management Report Card · EBM / Peak Freans</div></div>
+      <div class="note" style="text-align:right">${esc(filterLabel())}<br>Generated: ${fmtD(todayStr())}</div></div>
+    <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+      ${kpi("k-blue","Total Claims",t.count)}${kpi("k-teal","Claim Amount",money(t.claim))}${kpi("k-green","Approved",money(t.approved))}${kpi("k-orange","Pending",money(t.outstanding))}
+      ${kpi("k-navy","Recovered",money(t.received))}${kpi("k-amber","Approved Unpaid",money(t.unpaid))}${kpi("k-red","Rejected",money(t.rejected))}${kpi("k-cyan","Recovery %",pctS(t.received,t.claim))}</div>
+    ${panel("Recovery Reconciliation","",`<div class="pb"><table class="ledger"><tbody>
+      <tr><td class="op"></td><td>Total Claim Submitted</td><td>${rs(t.claim)}</td></tr><tr><td class="op">−</td><td>Rejected</td><td>${rs(t.rejected)}</td></tr><tr><td class="op">−</td><td>Approved</td><td>${rs(t.approved)}</td></tr><tr class="sum"><td class="op">=</td><td>Awaiting Approval</td><td>${rs(t.awaiting)}</td></tr>
+      <tr><td class="op"></td><td>Approved</td><td>${rs(t.approved)}</td></tr><tr><td class="op">−</td><td>Received (net)</td><td>${rs(t.received)}</td></tr><tr class="sum"><td class="op">=</td><td>Approved but Unpaid</td><td>${rs(t.unpaid)}</td></tr>
+      <tr><td class="op"></td><td>Overdue claims</td><td>${t.overdueN} / ${rs(t.overdueAmt)}</td></tr></tbody></table></div>`)}
+    ${reportsBody()}
+    ${scoreBody()}
+    ${panel("Claim Register",list.length+" claims",`<div class="tscroll">${regTable(reg,false)}</div>`)}
+  </div></div></div>`;
+  S.editing=null;S.report=true;
+  document.querySelector("#modal .overlay").addEventListener("click",ev=>{if(ev.target.classList.contains("overlay")||ev.target.closest("button[data-close]")){document.getElementById("modal").innerHTML="";S.report=false}});
+}
+
+/* ---------- PDF ---------- */
+const NAVY=[31,56,100],BLUE=[46,117,182];
+function pdfLib(){return (window.jspdf&&window.jspdf.jsPDF)||null}
+function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=src;sc.onload=res;sc.onerror=()=>rej(new Error("load failed"));document.head.appendChild(sc)})}
+function pdfReady(){return !!(window.jspdf&&window.jspdf.jsPDF&&window.jspdf.jsPDF.API&&window.jspdf.jsPDF.API.autoTable)}
+async function ensurePdf(){
+  if(pdfReady())return true;
+  try{
+    if(!(window.jspdf&&window.jspdf.jsPDF))await loadScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
+    if(!pdfReady())await loadScript("https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js");
+  }catch(e){}
+  return pdfReady();
+}
+function reportMsg(html){const el=document.getElementById("repMsg");if(el){el.innerHTML=html;el.hidden=!html}}
+async function runPdf(kind,arg){
+  reportMsg("");toast("PDF ban rahi hai…");
+  if(!(await ensurePdf())){toast("PDF library load nahi hui");reportMsg("<b>PDF library load nahi hui.</b> Internet check karke dobara try karein. Tab tak ye report isi screen par dekh sakte hain.");return}
+  try{if(kind==="slip")await slipPdf(arg);else await exportPdf()}
+  catch(e){console.error(e);toast("PDF mein error: "+(e&&e.message||e));reportMsg("<b>PDF banate waqt error aaya:</b> "+esc(e&&e.message||e))}
+}
+async function deliver(doc,filename){
+  const blob=doc.output("blob");
+  const noDl="<b>Is app/view mein download ki ijazat nahi mili.</b> Report isi screen par khuli hai. PDF file ke liye ye page computer ya phone ke browser mein <b>claude.ai</b> par khol kar \"PDF download\" dabayein.";
+  if(!S.downloads){toast("Download yahan available nahi");reportMsg(noDl);return}
+  try{const r=await S.downloads.save({filename,data:blob});toast(r&&r.status==="delivered"?"PDF bhej di gayi":"PDF save ho gayi: "+filename)}
+  catch(e){const c=e&&e.code;if(c==="declined"){toast("Download cancel kiya");return}
+    if(c==="rate_limited"){toast("Thora ruk kar dobara dabayein");return}
+    toast("PDF save nahi hui");reportMsg(c==="unavailable"||c==="not_granted"||c==="capability_disabled"?noDl:"<b>PDF save nahi hui:</b> "+esc((e&&e.message)||c||"unknown"))}
+}
+function pdfHeader(doc,title,sub){
+  const W=doc.internal.pageSize.getWidth();
+  doc.setFillColor(...NAVY);doc.rect(0,0,W,62,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(19);doc.text("FAIZAN & BROTHERS",30,30);
+  doc.setFontSize(10.5);doc.setFont("helvetica","normal");doc.text(title,30,47);
+  doc.setFontSize(9);doc.text(sub,W-30,28,{align:"right"});doc.text("Generated: "+fmtD(todayStr()),W-30,44,{align:"right"});
+  doc.setFillColor(...BLUE);doc.rect(0,62,W,4,"F");
+}
+function pdfFooter(doc){
+  const pages=doc.getNumberOfPages(),W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+  for(let i=1;i<=pages;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(120,130,150);doc.text("Faizan & Brothers - Claim Management System",30,H-16);doc.text("Page "+i+" of "+pages,W-30,H-16,{align:"right"})}
+}
+function secTitle(doc,y,txt){
+  const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+  if(y>H-110){doc.addPage();y=40}
+  doc.setFillColor(...NAVY);doc.rect(30,y,W-60,20,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(10.5);doc.text(txt.toUpperCase(),38,y+14);
+  return y+20;
+}
+function tbl(doc,y,head,body,foot,opts){
+  doc.autoTable(Object.assign({startY:y,head:[head],body,foot:foot?[foot]:undefined,margin:{left:30,right:30},theme:"grid",
+    styles:{fontSize:8.2,cellPadding:4,lineColor:[214,220,232],lineWidth:.5,textColor:[22,34,58]},
+    headStyles:{fillColor:BLUE,textColor:255,fontStyle:"bold"},footStyles:{fillColor:NAVY,textColor:255,fontStyle:"bold"},
+    alternateRowStyles:{fillColor:[245,247,251]},showFoot:"lastPage"},opts||{}));
+  return doc.lastAutoTable.finalY+16;
+}
+function rAlign(n0){const o={};for(let i=n0;i<20;i++)o[i]={halign:"right"};return o}
+function sumBody(groups,order){
+  let ft={count:0,claim:0,approved:0,received:0,unpaid:0,rejected:0,outstanding:0};
+  const body=order.map(k=>{const t=totals(groups[k]||[]);Object.keys(ft).forEach(x=>ft[x]+=t[x]);return [k,t.count,dash(t.claim),dash(t.approved),dash(t.received),dash(t.unpaid),dash(t.rejected),dash(t.outstanding),pctS(t.approved,t.claim),pctS(t.received,t.claim)]});
+  const foot=["TOTAL",ft.count,money(ft.claim),money(ft.approved),money(ft.received),money(ft.unpaid),money(ft.rejected),money(ft.outstanding),pctS(ft.approved,ft.claim),pctS(ft.received,ft.claim)];
+  return {body,foot};
+}
+function exportPdf(){
+  const J=pdfLib();if(!J)return;
+  const doc=new J({orientation:"landscape",unit:"pt",format:"a4"});
+  const W=doc.internal.pageSize.getWidth();
+  const list=filtered(),t=totals(list);
+  pdfHeader(doc,"Claim Management Report Card - EBM / Peak Freans",filterLabel());
+  // KPI tiles
+  const tiles=[["TOTAL CLAIMS",String(t.count),[46,117,182]],["CLAIM AMOUNT",money(t.claim),[0,137,123]],["APPROVED",money(t.approved),[46,125,50]],["PENDING",money(t.outstanding),[230,81,0]],["RECOVERED",money(t.received),[31,56,100]],["APPROVED UNPAID",money(t.unpaid),[168,107,0]],["REJECTED",money(t.rejected),[183,28,28]],["RECOVERY %",pctS(t.received,t.claim),[0,111,138]]];
+  const gap=8,tw=(W-60-gap*3)/4,th=46;
+  tiles.forEach((x,i)=>{const col=i%4,row=Math.floor(i/4);const tx=30+col*(tw+gap),ty=80+row*(th+gap);doc.setFillColor(...x[2]);doc.rect(tx,ty,tw,th,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(8);doc.text(x[0],tx+tw/2,ty+15,{align:"center"});doc.setFontSize(16);doc.text(x[1],tx+tw/2,ty+36,{align:"center"})});
+  let y=80+2*(th+gap)+8;
+  // recon + status side by side
+  y=secTitle(doc,y,"Company Recovery Reconciliation");
+  const yStart=y;
+  doc.autoTable({startY:y,margin:{left:30,right:W/2+5},theme:"grid",styles:{fontSize:9,cellPadding:4},columnStyles:{1:{halign:"right",fontStyle:"bold"}},
+    body:[["Total Claim Submitted",rs(t.claim)],["(-) Rejected",rs(t.rejected)],["(-) Approved",rs(t.approved)],["(=) Awaiting Approval",rs(t.awaiting)],["Approved Amount",rs(t.approved)],["(-) Received (net)",rs(t.received)],["(=) Approved but Unpaid",rs(t.unpaid)],["Recovery Rate",pctS(t.received,t.claim)],["Overdue Claims",t.overdueN+" / "+rs(t.overdueAmt)]],
+    didParseCell:d=>{if([3,6].includes(d.row.index)){d.cell.styles.fillColor=[231,240,250];d.cell.styles.fontStyle="bold"}}});
+  const yL=doc.lastAutoTable.finalY;
+  const st=groupBy(list,c=>calc(c).status,STATUSES);
+  doc.autoTable({startY:yStart,margin:{left:W/2+5,right:30},theme:"grid",styles:{fontSize:8.5,cellPadding:4},headStyles:{fillColor:BLUE},footStyles:{fillColor:NAVY},columnStyles:rAlign(1),
+    head:[["Status","Claims","Claim Amt","Approved","Pending","%"]],
+    body:STATUSES.map(s=>{const x=totals(st[s]||[]);return [STATUS_LABEL[s],x.count,dash(x.claim),dash(x.approved),dash(x.outstanding),pctS(x.count,list.length)]}),
+    foot:[["TOTAL",t.count,money(t.claim),money(t.approved),money(t.outstanding),"100.0%"]]});
+  y=Math.max(yL,doc.lastAutoTable.finalY)+16;
+  // aging
+  y=secTitle(doc,y,"Claim Aging (open claims)");
+  const bm=bucketMeta(),ag=[[],[],[],[]];list.forEach(c=>{const k=calc(c);if(k.open)ag[bucketOf(k.ageDays)].push(c)});
+  const agColors=[[46,125,50],[184,160,0],[230,81,0],[198,40,40]];
+  y=tbl(doc,y,["Bucket","Claims","Pending Amount","% of Pending"],[3,2,1,0].map(i=>[bm[i].label.replace("–","-")+" se pending",ag[i].length,money(ag[i].reduce((s,c)=>s+calc(c).outstanding,0)),pctS(ag[i].reduce((s,c)=>s+calc(c).outstanding,0),t.outstanding)]),null,
+    {columnStyles:rAlign(1),didParseCell:d=>{if(d.section==="body"&&d.column.index===0){d.cell.styles.textColor=agColors[[3,2,1,0][d.row.index]];d.cell.styles.fontStyle="bold"}}});
+  // month-wise
+  const listY=filtered({ignoreMonth:true});
+  let s=sumBody(groupBy(listY,c=>MONTHS[monthOf(c)-1],MONTHS),MONTHS);
+  y=secTitle(doc,y,"Month-wise Report (claim date)");
+  const H=["","Claims","Claim Amount","Approved","Received","Appr. Unpaid","Rejected","Pending","% Appr.","% Recov."];
+  y=tbl(doc,y,["Month",...H.slice(1)],s.body,s.foot,{columnStyles:rAlign(1)});
+  const cats=[...new Set([...allNames(S.config.categories),...list.map(c=>c.category).filter(Boolean)])];
+  const bc=groupBy(list,c=>c.category,cats);
+  s=sumBody(bc,cats.filter(k=>(bc[k]||[]).length));
+  y=secTitle(doc,y,"Category-wise Report");y=tbl(doc,y,["Category",...H.slice(1)],s.body,s.foot,{columnStyles:rAlign(1)});
+  const comps=[...new Set(list.map(c=>c.company||"(blank)"))];
+  s=sumBody(groupBy(list,c=>c.company),comps);
+  y=secTitle(doc,y,"Company-wise Report");y=tbl(doc,y,["Company",...H.slice(1)],s.body,s.foot,{columnStyles:rAlign(1)});
+  const br=[...new Set(list.map(c=>c.branch||"(blank)"))];
+  s=sumBody(groupBy(list,c=>c.branch),br);
+  y=secTitle(doc,y,"Branch-wise Report");y=tbl(doc,y,["Branch",...H.slice(1)],s.body,s.foot,{columnStyles:rAlign(1)});
+  // scorecard
+  const sc=scoreData(list);
+  if(sc.length){y=secTitle(doc,y,"Claim Performance Scorecard");y=tbl(doc,y,["#","Employee","Claims","Claim Amt","Approved","Recovered","Recovery %","Avg Settle Days","Overdue","Rejection %","Pending"],sc.map((r,i)=>[i+1,r.name,r.count,money(r.claim),dash(r.approved),dash(r.received),r.recovery.toFixed(1)+"%",r.avgSettle==null?"-":r.avgSettle.toFixed(1),r.overdue,r.rejRate.toFixed(1)+"%",money(r.outstanding)]),null,{columnStyles:Object.assign(rAlign(2),{1:{halign:"left"}})})}
+  // action items
+  const today=todayStr();const T=[...S.config.thresholds].map(Number).sort((a,b)=>a-b);
+  const act=list.filter(c=>{const k=calc(c);return k.open&&(k.overdue||k.ageDays>T[2]||k.missing.length||c.nextFollowUp===today)}).sort((a,b)=>calc(b).outstanding-calc(a).outstanding);
+  if(act.length){y=secTitle(doc,y,"Action Items - critical, overdue, follow-ups, missing docs");
+    y=tbl(doc,y,["Claim ID","Category","Branch","Pending","Age","Next Follow-up","Issue"],act.map(c=>{const k=calc(c);const iss=[];if(k.ageDays>T[2])iss.push(k.ageDays+" din se pending");if(k.overdue)iss.push("Overdue");if(c.nextFollowUp===today)iss.push("Follow-up aaj");if(k.missing.length)iss.push("Missing: "+k.missing.join(", "));return [c.id,c.category||"-",c.branch||"-",money(k.outstanding),k.ageDays+"d",fmtD(c.nextFollowUp),iss.join(" | ")]}),null,{columnStyles:{3:{halign:"right"},4:{halign:"right"}}})}
+  // paid claims
+  const pl=paidList(list);
+  y=secTitle(doc,y,"Paid / Received Claims ("+pl.length+")");
+  y=tbl(doc,y,["Claim ID","Claim Date","Category","Product","Claim","Rejected","Received","Receiving Date","Days"],pl.length?pl.map(c=>{const k=calc(c);return [c.id,fmtD(c.claimDate),c.category||"-",c.product||c.description||"",money(k.claim),dash(k.rejected),money(k.received),fmtD(k.lastRec),k.settleDays??"-"]}):[["Abhi koi claim poora receive nahi hua","","","","","","","",""]],
+    pl.length?["TOTAL","","","",money(pl.reduce((s,c)=>s+calc(c).claim,0)),"",money(pl.reduce((s,c)=>s+calc(c).received,0)),"",""]:null,{columnStyles:{4:{halign:"right"},5:{halign:"right"},6:{halign:"right"},8:{halign:"right"}}});
+  // register
+  doc.addPage();y=40;
+  y=secTitle(doc,y,"Claim Register ("+list.length+" claims)");
+  const reg=list.slice().sort((a,b)=>(a.claimDate||"").localeCompare(b.claimDate||"")||a.id.localeCompare(b.id));
+  const dm=dupMap();
+  y=tbl(doc,y,["Claim ID","Claim Date","Recv. Date","Passing Date","Branch","Category","Invoice","Product","Claim","Approved","Received","Pending","Status","Next F/U"],
+    reg.map(c=>{const k=calc(c);return [c.id+(dm[c.id]?" (DUP)":""),fmtD(c.claimDate),fmtD(c.receivingDate),fmtD(c.approvalDate),c.branch||"-",c.category||"-",c.invoiceNo||"-",c.product||"",money(k.claim),dash(k.approved),dash(k.received),dash(k.outstanding),STATUS_LABEL[k.status],fmtD(c.nextFollowUp)]}),
+    ["TOTAL","","","","","","","",money(t.claim),money(t.approved),money(t.received),money(t.outstanding),"",""],
+    {styles:{fontSize:7.2,cellPadding:3,lineColor:[214,220,232],lineWidth:.5,textColor:[22,34,58]},columnStyles:{8:{halign:"right"},9:{halign:"right"},10:{halign:"right"},11:{halign:"right",fontStyle:"bold"},7:{cellWidth:90}}});
+  // recovery tx
+  const tx=recoveryTx(list);
+  if(tx.length){y=secTitle(doc,y,"Recovery Transactions");y=tbl(doc,y,["Date","Claim ID","Category","Reference","Note","Amount"],tx.map(r=>[fmtD(r.date),r.claimId,r.category||"-",r.ref||"",r.note||"",money(r.amount)]),["NET RECEIVED","","","","",money(tx.reduce((s,r)=>s+n(r.amount),0))],{columnStyles:{5:{halign:"right"}}})}
+  // signature
+  const PH=doc.internal.pageSize.getHeight();if(y>PH-80){doc.addPage();y=60}
+  doc.setDrawColor(150);doc.setTextColor(90,100,120);doc.setFontSize(9);doc.setFont("helvetica","normal");
+  doc.line(30,y+40,210,y+40);doc.text("Prepared by",30,y+52);doc.line(W-210,y+40,W-30,y+40);doc.text("Approved by (Faizan & Brothers)",W-210,y+52);
+  pdfFooter(doc);
+  const tag=S.filters.year==="all"?"All":S.filters.year+(S.filters.month!=="all"?"-"+MSHORT[S.filters.month-1]:"");
+  deliver(doc,`Faizan-Brothers-Claim-Report-${tag}.pdf`);
+}
+function slipPdf(c){
+  const J=pdfLib();if(!J||!c)return;const k=calc(c);
+  const doc=new J({unit:"pt",format:"a4"});const W=doc.internal.pageSize.getWidth();
+  pdfHeader(doc,"Claim Slip - "+c.id,STATUS_LABEL[k.status]);
+  let y=84;
+  y=secTitle(doc,y,"Claim Details");
+  y=tbl(doc,y,["Field","Detail","Field","Detail"],[
+    ["Claim ID",c.id,"Company",c.company||"-"],["Claim Date",fmtD(c.claimDate),"Branch",c.branch||"-"],["Receiving Date",fmtD(c.receivingDate),"Category",c.category||"-"],
+    ["Passing / Approval Date",fmtD(c.approvalDate),"Invoice No.",c.invoiceNo||"-"],["Claimant",c.claimant||"-","Product",c.product||"-"],
+    ["Last Follow-up",fmtD(c.lastFollowUp),"Next Follow-up",fmtD(c.nextFollowUp)],["Expected Settlement",fmtD(c.expectedSettlement),"Age",k.open?k.ageDays+" din (open)":(k.settleDays!=null?"Settled in "+k.settleDays+" din":"Closed")],
+    ["Description",{content:c.description||"-",colSpan:3}]],null,{showHead:false,columnStyles:{0:{fontStyle:"bold",fillColor:[231,240,250],cellWidth:110},2:{fontStyle:"bold",fillColor:[231,240,250],cellWidth:100}}});
+  y=secTitle(doc,y,"Recovery Calculator");
+  y=tbl(doc,y,["Financial Detail","Amount"],[["Total Claim Submitted",rs(k.claim)],["Approved by company",rs(k.approved)],["Rejected",rs(k.rejected)],["Amount Received (net)",rs(k.received)],["Approved but Unpaid",rs(k.unpaid)],["Awaiting Approval",rs(k.awaiting)],["Total Pending",rs(k.outstanding)],["Recovery %",pctS(k.received,k.claim)]],null,{columnStyles:{1:{halign:"right",fontStyle:"bold"}}});
+  const recs=c.recoveries||[];
+  y=secTitle(doc,y,"Payments Received");
+  y=tbl(doc,y,["Date","Reference","Note","Amount"],recs.length?recs.map(r=>[fmtD(r.date),r.ref||"",r.note||"",money(r.amount)]):[["-","Abhi koi payment nahi","","-"]],recs.length?["TOTAL","","",money(k.received)]:null,{columnStyles:{3:{halign:"right"}}});
+  y=secTitle(doc,y,"Documents & Remarks");
+  y=tbl(doc,y,["Item","Detail"],[["Documents attached",(c.docs||[]).join(", ")||"-"],["Missing (required)",k.missing.join(", ")||"Koi nahi"],["Files",(c.files||[]).map(f=>f.name).join(", ")||"-"],["Remarks",c.remarks||"-"]],null,{columnStyles:{0:{fontStyle:"bold",cellWidth:130}}});
+  doc.setDrawColor(150);doc.setTextColor(90,100,120);doc.setFontSize(9);doc.line(40,y+40,220,y+40);doc.text("Prepared by",40,y+52);doc.line(W-220,y+40,W-40,y+40);doc.text("Company representative",W-220,y+52);
+  pdfFooter(doc);deliver(doc,`${c.id}-claim-slip.pdf`);
+}
+
+/* ---------- boot ---------- */
+route();
+(async function boot(){
+  if(!window.claude||!window.claude.use){S.localOnly=true;render();return}
+  const [db,user,assets,downloads]=await Promise.all(["db","user","assets","downloads"].map(x=>window.claude.use(x).catch(()=>null)));
+  S.db=db;S.user=user;S.assets=assets;S.downloads=downloads;
+  if(user){try{const w=await user.can("data.write");if(w===false)S.canWrite=false}catch(e){}}
+  if(!db){S.localOnly=true;render();return}
+  const timer=setTimeout(()=>{if(!S.loaded){S.stale=true;render()}},10000);
+  db.doc("config/main").onSnapshot(s=>{if(s.exists){const d=s.data();S.config=Object.assign(clone(DEFAULT_CONFIG),clone(d))}if(S.view!=="settings"||!document.activeElement||!document.activeElement.closest("#view"))render()},()=>{});
+  db.collection("claims").onSnapshot(snap=>{
+    S.claims=snap.docs.map(d=>Object.assign(clone(d.data()),{id:d.id}));
+    if(!snap.metadata.fromCache){S.loaded=true;S.stale=false;clearTimeout(timer)}else if(snap.docs.length)S.loaded=true;
+    if(S.editing)return; render();
+  },err=>{clearTimeout(timer);S.stale=true;S.loaded=true;render()});
+})();
+})();
+</script>

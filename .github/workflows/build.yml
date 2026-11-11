@@ -27,6 +27,14 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      - name: Put the claims page and PDF libraries inside the app
+        run: |
+          A=ClaimsApp/app/src/main/assets
+          curl -fsSL https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js -o $A/jspdf.umd.min.js
+          curl -fsSL https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js -o $A/jspdf.plugin.autotable.min.js
+          python3 web/make_app.py $A
+          ls -la $A
+
       - name: Build
         working-directory: ClaimsApp
         run: gradle assembleRelease --no-daemon -PvCode=${{ github.run_number }}

@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Every GitHub build passes its run number, so each new APK has a higher
+// version and the app can tell that an update is available.
+def vCode = project.hasProperty('vCode') ? project.property('vCode').toString().toInteger() : 1
+
+android {
+    namespace 'com.faizanbrothers.claims'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.faizanbrothers.claims'
+        minSdk 21          // Android 5.0 and above
+        targetSdk 34
+        versionCode vCode
+        versionName "1." + vCode
+    }
+
+    // Fixed signing key: every future update installs over the old app.
+    // Never delete or replace keystore/fb-claims.jks.
+    signingConfigs {
+        release {
+            storeFile file('../keystore/fb-claims.jks')
+            storePassword 'FBClaims2026'
+            keyAlias 'fbclaims'
+            keyPassword 'FBClaims2026'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
+
+dependencies {
+    implementation 'androidx.browser:browser:1.8.0'
+}

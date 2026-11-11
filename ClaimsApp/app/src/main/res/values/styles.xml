@@ -1,0 +1,12 @@
+<resources>
+    <color name="navy">#1F3864</color>
+    <color name="page">#EEF1F6</color>
+    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/page</item>
+        <item name="android:statusBarColor">@color/navy</item>
+        <item name="android:navigationBarColor">@color/navy</item>
+        <item name="android:colorAccent">#2E75B6</item>
+        <item name="android:colorPrimary">@color/navy</item>
+        <item name="android:colorPrimaryDark">@color/navy</item>
+    </style>
+</resources>

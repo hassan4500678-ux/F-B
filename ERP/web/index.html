@@ -191,8 +191,8 @@ body.open #drawer{transform:none}
 .mbox .grab{width:36px;height:4px;border-radius:2px;background:var(--line);margin:-10px auto 16px}
 .mbox h2{font-size:17px;font-weight:600;margin:12px 0 4px}
 .mbox p{font-size:13.5px;color:var(--muted)}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,140%);background:#0F172A;color:#fff;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:500;z-index:70;transition:transform .3s;max-width:90%;display:flex;gap:8px;align-items:center;box-shadow:var(--sh2)}
-#toast.show{transform:translate(-50%,0)}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,140%);background:#0F172A;color:#fff;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:500;z-index:70;transition:transform .3s,opacity .3s,visibility .3s;max-width:90%;display:flex;gap:8px;align-items:center;box-shadow:var(--sh2)}
+#toast{opacity:0;visibility:hidden}#toast.show{transform:translate(-50%,0);opacity:1;visibility:visible}
 
 /* Login */
 .login{min-height:100vh;display:flex;flex-direction:column}
@@ -357,6 +357,7 @@ function updBanner(){
 function updBox(){
   if(!NATIVE)return `<div class="card-h"><div><h3>Android app</h3><p>Install FB ERP on your phone</p></div></div><div class="card-b"><a class="btn" href="${APK_URL}" target="_blank" rel="noopener">${I('dl',18,'#fff',2)}Download APK</a></div>`;
   const u=upd,cur=esc(appInfo?appInfo.versionName:'');
+  if(appInfo&&appInfo.play)return `<div class="card-h"><div><h3>App update</h3><p>Installed version ${cur}</p></div></div><div class="card-b"><p class="muted" style="font-size:13px;margin-bottom:12px">This app updates automatically from Google Play.</p><button class="btn out" onclick="installUpdate()">${I('dl',18)}Open in Play Store</button></div>`;
   let line='',btn=`<button class="btn out" onclick="checkUpdate()">${I('refresh',18)}Check for updates</button>`;
   if(u.status==='checking'){line='Checking for updates…';btn=`<button class="btn out" disabled>${I('refresh',18)}Checking…</button>`}
   else if(u.status==='none')line='You are on the latest version.';
@@ -1344,7 +1345,7 @@ function after(){
 setInterval(()=>{const c=$('#clock');if(c){const t=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}).split(' ');c.innerHTML=t[0]+'<small>'+(t[1]||'')+'</small>'}const h=$('#hrs');if(h&&session&&!isAdmin()){h.textContent=dur((db.att[session.id]||{})[today()])}},1000);
 try{db=migrate(db)}catch(e){logErr('migrate: '+e.message)}
 render();
-if(NATIVE)setTimeout(checkUpdate,1200);
+if(NATIVE&&!(appInfo&&appInfo.play))setTimeout(checkUpdate,1200);
 </script>
 </body>
 </html>

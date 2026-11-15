@@ -19,7 +19,11 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
 import android.widget.Toast;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
+import android.widget.FrameLayout;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -68,7 +72,25 @@ public class MainActivity extends Activity {
         super.onCreate(state);
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#F4F6FA"));
-        setContentView(web);
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.parseColor("#0B1F3A"));
+        root.addView(web, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(root);
+        // Android 15+ draws apps edge to edge: keep content clear of the status bar, navigation bar and keyboard.
+        if (Build.VERSION.SDK_INT >= 30) {
+            root.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                    android.graphics.Insets b = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.ime() | WindowInsets.Type.displayCutout());
+                    v.setPadding(b.left, b.top, b.right, b.bottom);
+                    return WindowInsets.CONSUMED;
+                }
+            });
+            try {
+                WindowInsetsController c = getWindow().getInsetsController();
+                if (c != null) c.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+            } catch (Exception ignored) { }
+        }
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -123,6 +145,7 @@ public class MainActivity extends Activity {
                 JSONObject o = new JSONObject();
                 o.put("versionName", versionName());
                 o.put("versionCode", versionCode());
+                o.put("play", isPlay());
                 return o.toString();
             } catch (Exception e) {
                 return "{}";
@@ -227,6 +250,8 @@ public class MainActivity extends Activity {
 
     // ---------------------------------------------------------------- Update
 
+    static boolean isPlay() { return "play".equals(BuildConfig.FLAVOR); }
+
     int versionCode() {
         try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode; } catch (Exception e) { return 0; }
     }
@@ -267,6 +292,7 @@ public class MainActivity extends Activity {
     }
 
     void checkForUpdate() {
+        if (isPlay()) { push("none", 0); return; }
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -291,6 +317,12 @@ public class MainActivity extends Activity {
     }
 
     void startUpdate() {
+        if (isPlay()) {
+            // Play build: updates come from Google Play only.
+            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()))); }
+            catch (Exception e) { try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()))); } catch (Exception ignored) { } }
+            return;
+        }
         if (downloading) return;
         if (Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
             waitingForPermission = true;

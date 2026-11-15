@@ -262,6 +262,34 @@ a.btn{text-decoration:none}
 .tbl.tight td,.tbl.tight th{padding:10px 7px}.ro{background:var(--surface2);color:var(--muted);font-weight:600}
 .sumrow td{font-weight:700;background:var(--surface2)}
 #drawer{overflow-y:auto!important}.dlive{flex:none!important;overflow:visible!important}.nav.out{margin-top:auto}
+.navg{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);padding:12px 12px 6px;font-weight:600}
+.nav{padding:10px 12px}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;height:34px;padding:0 12px;border-radius:7px;border:none;background:none;font-weight:600;font-size:12.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--sh1),0 0 0 1px var(--line)}
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:8px;padding:18px 12px 0}
+.pod{text-align:center}.pod .av{margin:0 auto 8px}
+.pod b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pod small{font-size:12px;color:var(--muted)}
+.pod .st{margin-top:8px;border-radius:10px 10px 0 0;display:grid;place-items:center;color:#fff;font-weight:700;font-size:20px}
+.rk{width:26px;text-align:center;font-weight:700;color:var(--faint);font-size:13px;flex:none}
+.grade{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:16px;color:#fff;flex:none}
+.map{position:relative;height:320px;overflow:hidden;border-radius:0 0 var(--r) var(--r);background:#E8EDF3}
+body.dark .map{background:#16233A}
+.map img.tile{position:absolute;width:256px;height:256px;user-select:none;pointer-events:none}
+.map .pt{position:absolute;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700}
+.map .lbl{position:absolute;transform:translate(-50%,0);background:rgba(15,23,42,.82);color:#fff;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:5px;white-space:nowrap;pointer-events:none}
+.map .attr{position:absolute;right:4px;bottom:3px;font-size:9.5px;color:#334155;background:rgba(255,255,255,.75);padding:1px 4px;border-radius:3px}
+.hgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.ht{border-radius:10px;padding:12px;color:#fff;min-height:84px;display:flex;flex-direction:column;justify-content:space-between}
+.ht b{font-size:13.5px;font-weight:600}.ht span{font-size:11.5px;opacity:.9}.ht .pc{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.rc-img{width:100%;border-radius:12px;display:block;box-shadow:var(--sh2)}
+.pred{display:flex;align-items:center;gap:14px}
+.pred .ring{flex:none}
+.rpt{font-size:13px}
+.rpt h4{font-size:13.5px;font-weight:600;margin-bottom:4px}
+.rpt .blk{padding:12px 16px;border-bottom:1px solid var(--line2)}.rpt .blk:last-child{border-bottom:none}
+.rpt .kv{display:flex;justify-content:space-between;gap:10px;color:var(--muted);padding:2px 0}.rpt .kv b{color:var(--text);font-weight:600;text-align:right}
 .foot-note{text-align:center;font-size:11.5px;color:var(--faint);margin-top:6px}
 </style>
 </head>
@@ -287,7 +315,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}cat
 let session=null;
 try{session=JSON.parse(localStorage.getItem(KEY+'_s'))}catch(e){}
 function setSession(s){session=s;try{s?localStorage.setItem(KEY+'_s',JSON.stringify(s)):localStorage.removeItem(KEY+'_s')}catch(e){}}
-let view='dash',newCat='Core',histFilter='all',pendingPhoto=null,editId=null,busy=false,tYm=null,tEmp='all',ntEmp='',ntYm=null,aYm=null,aEmp='all';
+let view='dash',newCat='Core',histFilter='all',pendingPhoto=null,editId=null,busy=false,tYm=null,tEmp='all',ntEmp='',ntYm=null,aYm=null,aEmp='all',rcYm=null,rcEmp='',lbYm=null,lbBy='ach',hmYm=null,hmEmp='all',cmpMode='month',cmpA=null,cmpB=null,cmpEmp='all',cmpE1='',cmpE2='',rpType='daily',rpDate=null,rpYm=null,rpEmp='all',hmZ=0;
 
 /* ============ App update (Android) ============ */
 const APK_URL='https://github.com/hassan4500678-ux/F-B/releases/download/erp-latest/FB-ERP.apk';
@@ -384,6 +412,11 @@ const P={
  box:'<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/>',
  lockc:'<rect x="4.5" y="10.5" width="15" height="10.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
  up:'<path d="M12 19V5M5 12l7-7 7 7"/>',down:'<path d="M12 5v14M5 12l7 7 7-7"/>',
+ card:'<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 15l2.5-3 2 2 3.5-4.5L17 12"/><path d="M3 8.5h18"/>',
+ map:'<path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
+ crystal:'<circle cx="12" cy="10" r="6.5"/><path d="M7 20h10M8.5 16.5l-1 3.5M15.5 16.5l1 3.5M9.5 8a3 3 0 0 1 3-2"/>',
+ share:'<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>',
  dl:'<path d="M12 3v12M7 10l5 5 5-5M5 20h14"/>',
  refresh:'<path d="M20 11a8 8 0 0 0-14.9-3.5M4 4v4h4M4 13a8 8 0 0 0 14.9 3.5M20 20v-4h-4"/>',
  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
@@ -399,7 +432,7 @@ const P={
  id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.5 1.8-2.3 3.2-2.3s2.6.8 3.2 2.3M14.5 10h4M14.5 13.5h3"/>'
 };
 function I(n,s,c,w){return `<svg width="${s||20}" height="${s||20}" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="${w||1.8}" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`}
-const MODULES=[['report','Reports','#475569'],['trophy','Leaderboard','#B45309'],['wallet','Salary','#047857'],['gift','Incentives','#BE123C'],['compare','Comparison','#0369A1'],['box','PCS','#9333EA']];
+const MODULES=[['wallet','Salary','#047857'],['gift','Incentives','#BE123C']];
 
 const BADGES=[['star','star','Star Performer','#B45309'],['seller','trophy','Top Seller','#2563EB'],['ontime','clock','Always On Time','#047857'],['target','target','Target Achiever','#7C3AED'],['team','users','Team Player','#0D9488'],['rising','trend','Rising Star','#DB2777'],['hero','heart','Customer Hero','#BE123C'],['reliable','shield','Most Reliable','#1E3A8A']];
 const badgeOf=id=>BADGES.find(b=>b[0]===id);
@@ -414,8 +447,8 @@ function liveCard(){
 /* GPS */
 let locCb=null;
 window.erpLocation=function(r){const cb=locCb;locCb=null;if(cb)cb(r||{ok:false})};
-function getLocation(){return new Promise(res=>{
-  if(NATIVE&&NATIVE.requestLocation){locCb=res;setTimeout(()=>{if(locCb===res){locCb=null;res({ok:false,error:'Could not get your location in time. Move near a window or outside and try again.'})}},35000);try{NATIVE.requestLocation()}catch(e){locCb=null;res({ok:false,error:'Location is not available.'})}return}
+function getLocation(quick){return new Promise(res=>{
+  if(NATIVE&&NATIVE.requestLocation){locCb=res;setTimeout(()=>{if(locCb===res){locCb=null;res({ok:false,error:'Could not get your location in time. Move near a window or outside and try again.'})}},quick?15000:35000);try{if(quick&&NATIVE.requestLocationQuick)NATIVE.requestLocationQuick();else NATIVE.requestLocation()}catch(e){locCb=null;res({ok:false,error:'Location is not available.'})}return}
   if(!navigator.geolocation)return res({ok:false,error:'Location is not available on this device. Please use the FB ERP Android app.'});
   navigator.geolocation.getCurrentPosition(p=>res({ok:true,lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy}),()=>res({ok:false,error:'Location permission was denied. Please use the FB ERP Android app and allow location.'}),{enableHighAccuracy:true,timeout:25000,maximumAge:0});
 })}
@@ -494,14 +527,17 @@ function openDrawer(){renderDrawer();document.body.classList.add('open')}
 function closeDrawer(){document.body.classList.remove('open')}
 function renderDrawer(){
   const u=me();if(!u)return;
-  const items=[['dash','Dashboard','grid'],['targets','Targets','target'],['profile','Profile','user'],['settings','Settings','gear'],['history','Attendance History','cal']];
-  if(isAdmin())items.splice(2,0,['newtarget','New Targets','tplus'],['analytics','Analytics','trend'],['add','Add Employee','uadd'],['badges','Badges','medal']);
-  else items.splice(2,0,['dform','Daily Form','form']);
+  const A=isAdmin();
+  const groups=[['',[['dash','Dashboard','grid']]],
+   ['Sales',A?[['targets','Targets','target'],['newtarget','New Targets','tplus'],['analytics','Analytics','trend'],['predict','Target Predictor','crystal'],['heatmap','Area Heatmap','map']]:[['targets','Targets','target'],['dform','Daily Form','form'],['predict','Target Predictor','crystal'],['heatmap','Area Heatmap','map']]],
+   ['Performance',[['leaderboard','Leaderboard','trophy'],['compare','Comparison','compare'],['reports','Reports','report'],['reportcard','Report Card','card']]],
+   ['People',A?[['add','Add Employee','uadd'],['badges','Badges','medal'],['history','Attendance History','cal']]:[['history','Attendance History','cal']]],
+   ['Account',[['profile','Profile','user'],['settings','Settings','gear']]]];
+  const navBtn=i=>`<button class="nav ${view===i[0]||(view==='edit'&&i[0]==='add')?'on':''}" onclick="${i[0]==='add'?'openAdd()':i[0]==='newtarget'?'openNewTarget()':`go('${i[0]}')`}">${I(i[2],19)}${i[1]}</button>`;
   const list=liveOrder(),n=list.filter(isLive).length;
   $('#drawer').innerHTML=`<div class="brand"><div class="mark">FB</div><div><b>FB ERP</b><span>Workforce Management</span></div></div>
   <div class="dprof">${avatar(u,42,{seal:true})}<div style="min-width:0"><b>${esc(u.name)}</b><span>${isAdmin()?'Administrator':esc(u.category)+' · '+esc(u.branch)}</span></div></div>
-  <div class="navl">Menu</div>
-  ${items.map(i=>`<button class="nav ${view===i[0]||(view==='edit'&&i[0]==='add')?'on':''}" onclick="${i[0]==='add'?'openAdd()':i[0]==='newtarget'?'openNewTarget()':`go('${i[0]}')`}">${I(i[2],19)}${i[1]}</button>`).join('')}
+  ${groups.map(g=>(g[0]?`<div class="navg">${g[0]}</div>`:'')+g[1].map(navBtn).join('')).join('')}
   <div class="dlive"><div class="navl" style="display:flex;justify-content:space-between"><span>Office status</span><span style="color:#6EE7B7;text-transform:none;letter-spacing:0">${n} active</span></div>
   ${list.length?list.map(e=>{const a=isLive(e);return `<div class="dli">${avatar(e,32,{dot:a?'on':'off'})}<div style="min-width:0"><b>${esc(e.name)}</b><span class="${a?'a':''}">${liveSub(e)}</span></div></div>`}).join(''):'<div class="dli"><span>No employees yet</span></div>'}</div>
   <button class="nav out" onclick="logout()">${I('logout',19)}Sign out</button>`;
@@ -518,7 +554,7 @@ function login(){
   if(e){setSession({role:'emp',id:e.id});view='dash';return render()}
   $('#code').value='';toast('Invalid login code','bad');
 }
-function logout(){closeDrawer();setSession(null);tYm=null;tEmp='all';aYm=null;aEmp='all';ntEmp='';ntYm=null;histFilter='all';render()}
+function logout(){closeDrawer();setSession(null);tYm=null;tEmp='all';aYm=null;aEmp='all';rcYm=null;rcEmp='';lbYm=null;hmYm=null;hmEmp='all';cmpA=null;cmpB=null;cmpEmp='all';rpDate=null;rpYm=null;rpEmp='all';ntEmp='';ntYm=null;histFilter='all';render()}
 
 /* ============ Shell ============ */
 function bar(title,sub,back){
@@ -542,7 +578,7 @@ function render(){
   document.body.classList.toggle('dark',db.theme==='dark');
   const app=$('#app');
   if(!session||!me()){if(session)setSession(null);app.innerHTML=loginView();return}
-  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash,edit:isAdmin()?addView:empDash,badges:isAdmin()?badgesView:empDash,targets:targetsView,newtarget:isAdmin()?newTargetView:targetsView,dform:isAdmin()?adminDash:dformView,analytics:isAdmin()?analyticsView:empDash}[view]||(isAdmin()?adminDash:empDash);
+  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash,edit:isAdmin()?addView:empDash,badges:isAdmin()?badgesView:empDash,targets:targetsView,newtarget:isAdmin()?newTargetView:targetsView,dform:isAdmin()?adminDash:dformView,analytics:isAdmin()?analyticsView:empDash,predict:predictView,heatmap:heatmapView,leaderboard:leaderView,compare:compareView,reports:reportsView,reportcard:reportCardView}[view]||(isAdmin()?adminDash:empDash);
   app.innerHTML=fn();after();
 }
 function loginView(){
@@ -639,7 +675,7 @@ function tcalc(id,ym){
   let req=null,remDays=0,todayAch=0;
   if(ym===cy){const before=days.filter(d=>dkey(d)<tk).reduce((a,d)=>a+dayCtn(id,dkey(d)),0);todayAch=dayCtn(id,tk);remDays=wd.filter(d=>dkey(d)>=tk).length;req=remDays?Math.max(0,(T-before)/remDays):0}
   const avg=goneWD?ach/goneWD:0;
-  return{T,ach,rem:Math.max(0,T-ach),achPct,timeGone,base,req,remDays,todayAch,daily,days,wd,totalWD,goneWD,avg,has:T>0};
+  return{id,T,ach,rem:Math.max(0,T-ach),achPct,timeGone,base,req,remDays,todayAch,daily,days,wd,totalWD,goneWD,avg,has:T>0};
 }
 function monthOptions(sel){const cy=curYm(),set=new Set();for(let k=-11;k<=2;k++)set.add(ymShift(cy,k));
   Object.values(db.targets).forEach(t=>Object.keys(t).forEach(k=>set.add(k)));
@@ -653,12 +689,12 @@ function dashTargetCard(){
     return `<div class="card"><div class="card-h"><div><h3>Team target · ${ymLabel(ym,true)}</h3><p>${n} of ${db.employees.length} employees have targets</p></div><button class="btn out sm" onclick="tEmp='all';tYm=null;go('targets')">Open</button></div><div class="card-b">
      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px"><span class="big num">${fmtN(A)}</span><span class="muted">/ ${fmtN(T)} CTN</span></div>
      <div class="req" style="margin-bottom:14px"><div><span>Total per day</span><b class="num">${ctn(Math.ceil(tt.B))}</b></div><div><span>Live daily total</span><b class="num">${ctn(Math.ceil(tt.R))}</b></div><div><span>Today</span><b class="num">${ctn(tt.TD)}</b></div></div>
-     ${pbars(p,tg)}</div></div>`}
+     ${pbars(p,tg)}${predLineTeam(ym)}</div></div>`}
   const e=me(),c=tcalc(e.id,ym);
   if(!c.has)return `<div class="card"><div class="card-h"><div><h3>My target · ${ymLabel(ym,true)}</h3><p>No target assigned yet</p></div>${I('target',20,'var(--faint)')}</div></div>`;
   return `<div class="card"><div class="card-h"><div><h3>My target · ${ymLabel(ym,true)}</h3><p>${fmtN(c.ach)} of ${fmtN(c.T)} CTN achieved</p></div><button class="btn out sm" onclick="go('targets')">Open</button></div><div class="card-b">
    <div class="req" style="margin-bottom:14px"><div><span>Today’s target</span><b class="num">${ctn(Math.ceil(c.req))}</b></div><div><span>Achieved today</span><b class="num" style="color:${c.todayAch>=Math.ceil(c.req)&&c.req>0?'var(--ok)':'var(--text)'}">${ctn(c.todayAch)}</b></div></div>
-   ${pbars(c.achPct,c.timeGone)}</div></div>`;
+   ${pbars(c.achPct,c.timeGone)}${predLine(c)}</div></div>`;
 }
 function pbars(ach,tg){const col=ach>=tg?C.ok:C.bad;
   return `<div class="prow"><div class="pl"><span class="muted">Achievement</span><b class="num" style="color:${col}">${fmtN(ach)}%</b></div><div class="pbar"><i style="width:${Math.min(100,ach)}%;background:${col}"></i><span class="mk" style="left:calc(${Math.min(100,tg)}% - 1px)" title="Time gone"></span></div></div>
@@ -717,7 +753,7 @@ function empTargets(e,ym){
   const tvsa=barChart(['Time gone','Achievement'],[{name:'%',color:C.pri,colors:['#94A3B8',c.achPct>=c.timeGone?C.ok:C.bad],data:[Math.round(c.timeGone),Math.round(c.achPct)]}],{min:100,legend:[{name:'Time gone',color:'#94A3B8'},{name:c.achPct>=c.timeGone?'Achievement (ahead)':'Achievement (behind)',color:c.achPct>=c.timeGone?C.ok:C.bad}]});
   const log=c.days.map((d,i)=>({d,v:c.daily[i]})).filter(x=>x.v>0).reverse();
   const logHtml=log.length?`<table class="tbl"><thead><tr><th>Date</th><th style="text-align:right">CTN</th><th style="text-align:right">vs base</th></tr></thead><tbody>${log.map(x=>`<tr><td class="num">${fmtD(dkey(x.d))}<small>${fmtW(dkey(x.d))}</small></td><td class="num" style="text-align:right;font-weight:600">${fmtN(x.v)}</td><td style="text-align:right"><span class="delta ${x.v>=c.base?'up':'down'}">${x.v>=c.base?'+':'−'}${fmtN(Math.abs(x.v-c.base))}</span></td></tr>`).join('')}</tbody></table>`:`<div class="empty" style="padding:18px">No achievement recorded yet.</div>`;
-  return head+hero+live+entry+
+  return head+hero+live+(ym===curYm()?predCard(c):'')+entry+
    `<div class="card"><div class="card-h"><div><h3>Time gone vs achievement</h3><p>${paceTag(c)||''}</p></div></div><div class="card-b">${pbars(c.achPct,c.timeGone)}<div style="height:14px"></div>${tvsa}</div></div>
    <div class="card"><div class="card-h"><div><h3>Progress vs target pace</h3><p>Cumulative CTN this month</p></div></div><div class="card-b">${line}</div></div>
    <div class="card"><div class="card-h"><div><h3>Daily achievement</h3><p>CTN per day</p></div></div><div class="card-b">${bars}</div></div>
@@ -774,12 +810,14 @@ function delTarget(id,ym){if(isLocked(ym))return toast('This month is locked','b
 /* ============ Daily Form ============ */
 function areasCard(u){const n=AREA_N[u.category]||3,a=u.areas||[];
   return `<div class="card"><div class="card-h"><div><h3>My areas</h3><p>${esc(u.category)} · ${n} areas for your Daily Form</p></div>${I('pin',20,'var(--pri)')}</div><div class="card-b">
-  ${Array.from({length:n},(_,i)=>`<div class="fld"><label for="ar${i}">Area ${i+1}</label><input id="ar${i}" class="inp areaIn" value="${esc(a[i]||'')}" placeholder="Area name" autocomplete="off"></div>`).join('')}
+  ${Array.from({length:n},(_,i)=>{const L=(u.areaLoc||{})[a[i]];return `<div class="fld"><label for="ar${i}">Area ${i+1}${L?' <span style="color:var(--ok);font-weight:500">· location set</span>':''}</label><div style="display:flex;gap:8px"><input id="ar${i}" class="inp areaIn" value="${esc(a[i]||'')}" placeholder="Area name" autocomplete="off">${a[i]?`<button class="xb" style="width:44px;height:44px;flex:none;color:${L?'var(--ok)':'var(--faint)'}" title="Set map location" onclick="pinArea(${i})">${I('pin',18)}</button>`:''}</div></div>`}).join('')}
+  <p class="muted" style="font-size:11.5px;margin:-4px 0 14px">Tap the pin while standing in an area to place it on the Area Heatmap. Daily Form saves also update it.</p>
   <button class="btn" onclick="saveAreas()">${I('check',18,'#fff',2.4)}Save areas</button></div></div>`}
 function saveAreas(){const e=me(),v=[...document.querySelectorAll('.areaIn')].map(x=>x.value.trim());
   if(v.some(x=>!x))return toast('Please fill all '+v.length+' area names','bad');
   if(new Set(v.map(x=>x.toLowerCase())).size!==v.length)return toast('Area names must be different','bad');
   e.areas=v;save();toast('Areas saved');render()}
+async function pinArea(i){const e=me(),a=(e.areas||[])[i];if(!a)return;toast('Getting location…');const r=await getLocation();if(!r.ok)return gpsError('Location needed',esc(r.error||'Turn on GPS and try again.'));if(r.mock)return gpsError('Fake GPS detected','Turn off mock-location apps.');e.areaLoc=e.areaLoc||{};e.areaLoc[a]={lat:+r.lat.toFixed(6),lng:+r.lng.toFixed(6)};save();toast(a+' placed on the map');render()}
 function myAreas(e){return(e.areas||[]).slice(0,AREA_N[e.category]||3).filter(Boolean)}
 function dashFormCard(){const e=me(),t=today(),f=formsOn(e.id,t);
   const pr=f.reduce((a,x)=>a+x.prod,0),c=f.reduce((a,x)=>a+x.ctn,0);
@@ -791,7 +829,7 @@ function dformView(){
    <div class="fld"><label for="fA">Area</label><select id="fA" class="inp" onchange="fillForm()">${areas.map(a=>`<option>${esc(a)}</option>`).join('')}</select></div>
    <div class="filters"><div class="fld"><label>Total shops</label><input class="inp num ro" value="${SHOPS}" readonly></div><div class="fld"><label for="fP">Productive shops</label><input id="fP" type="number" min="0" max="${SHOPS}" inputmode="numeric" class="inp num" placeholder="0" oninput="fNP()"></div></div>
    <div class="filters"><div class="fld"><label>Non-productive</label><input id="fN" class="inp num ro" value="${SHOPS}" readonly></div><div class="fld"><label for="fC">CTNs</label><input id="fC" type="number" min="0" step="1" inputmode="numeric" class="inp num" placeholder="0"></div></div>
-   <button class="btn" onclick="saveForm()">${I('check',18,'#fff',2.4)}Save</button><p class="muted" id="fHint" style="font-size:11.5px;margin-top:8px">CTNs are added to your target achievement automatically.</p></div></div>`;
+   <button class="btn" data-fsave onclick="saveForm()">${I('check',18,'#fff',2.4)}Save</button><p class="muted" id="fHint" style="font-size:11.5px;margin-top:8px">CTNs are added to your target achievement automatically.</p></div></div>`;
   const tot=f.reduce((a,x)=>({s:a.s+x.total,p:a.p+x.prod,c:a.c+x.ctn}),{s:0,p:0,c:0});
   const sum=f.length?`<div style="overflow-x:auto"><table class="tbl tight"><thead><tr><th>Area</th><th style="text-align:right">Shops</th><th style="text-align:right">Prod.</th><th style="text-align:right">Non</th><th style="text-align:right">CTN</th>${locked?'':'<th></th>'}</tr></thead><tbody>
    ${f.map((x,i)=>`<tr><td>${esc(x.area)}<small>${fmtT(x.ts)}</small></td><td class="num" style="text-align:right">${x.total}</td><td class="num" style="text-align:right;color:var(--ok);font-weight:600">${x.prod}</td><td class="num" style="text-align:right;color:var(--bad)">${x.total-x.prod}</td><td class="num" style="text-align:right;font-weight:600">${fmtN(x.ctn)}</td>${locked?'':`<td style="width:36px"><button class="xb" onclick="delForm(${i})">${I('trash',14)}</button></td>`}</tr>`).join('')}
@@ -805,13 +843,14 @@ function dformView(){
 }
 function fNP(){const p=+$('#fP').value||0;$('#fN').value=Math.max(0,SHOPS-p)}
 function fillForm(){const e=me(),a=$('#fA').value,x=formsOn(e.id,today()).find(z=>z.area===a);$('#fP').value=x?x.prod:'';$('#fC').value=x?x.ctn:'';fNP();$('#fHint').textContent=x?'This area is already saved today — saving will update it.':'CTNs are added to your target achievement automatically.'}
-function saveForm(){
-  const e=me(),t=today();if(isLocked(t.slice(0,7)))return toast('This month is locked','bad');
+async function saveForm(){
+  const e=me(),t=today();if(isLocked(t.slice(0,7)))return toast('This month is locked','bad');if(busy)return;
   const area=$('#fA').value,pv=$('#fP').value.trim(),cv=$('#fC').value.trim(),p=Number(pv),c=Number(cv);
   if(pv===''||!Number.isInteger(p)||p<0||p>SHOPS)return toast(`Productive shops must be 0–${SHOPS}`,'bad');
   if(cv===''||!isFinite(c)||c<0)return toast('Enter CTNs (0 if none)','bad');
   db.forms[e.id]=db.forms[e.id]||{};const list=db.forms[e.id][t]=db.forms[e.id][t]||[];
-  const rec={area,total:SHOPS,prod:p,ctn:Math.round(c*10)/10,ts:Date.now()},i=list.findIndex(x=>x.area===area);
+  let loc=null;if(NATIVE&&NATIVE.requestLocationQuick){busy=true;const b=document.querySelector('[data-fsave]');if(b){b.disabled=true;b.innerHTML=I('pin',18,'#fff',2)+'Saving…'}const r=await getLocation(true);busy=false;if(r.ok&&!r.mock)loc={lat:+r.lat.toFixed(6),lng:+r.lng.toFixed(6)}}
+  const rec={area,total:SHOPS,prod:p,ctn:Math.round(c*10)/10,ts:Date.now(),loc},i=list.findIndex(x=>x.area===area);
   if(i>-1)list[i]=rec;else list.push(rec);
   if(save()){toast(`${area} saved · ${fmtN(rec.ctn)} CTN added`);render()}
 }
@@ -868,6 +907,252 @@ function analyticsView(){
    <div class="card"><div class="card-h"><div><h3>All bookers detail</h3><p>Targets, live daily and shop productivity</p></div></div>${bTbl}</div>
    ${areas.length?`<div class="card"><div class="card-h"><div><h3>Area detail</h3><p>${areas.length} areas</p></div></div>${areaTbl}</div>`:''}</div>`;
 }
+
+/* ============ Shared metrics ============ */
+function attMonth(e,ym){const a=db.att[e.id]||{},t=today();let p=0,h=0,ab=0,wd=0;monthDates(ym).forEach(d=>{const k=dkey(d);if(k<e.joined||k>t||d.getDay()===0)return;const s=statusOf(a[k]);if(k===t&&s==='absent')return;wd++;if(s==='present')p++;else if(s==='half')h++;else ab++});return{p,h,ab,wd,pct:wd?(p+h*.5)*100/wd:0}}
+function formStats(e,ym,day){let v=0,s=0,p=0,c=0;const areas=new Set();(day?[new Date(day+'T00:00:00')]:monthDates(ym)).forEach(d=>formsOn(e.id,dkey(d)).forEach(x=>{v++;s+=x.total;p+=x.prod;c+=x.ctn;areas.add(x.area)}));return{v,s,p,c,pct:s?p*100/s:0,areas:[...areas]}}
+function predict(c){
+  const cy=curYm(),tk=today(),ym=dkey(c.days[0]).slice(0,7);
+  if(!c.has)return null;
+  if(ym<cy)return{final:true,proj:c.ach,projPct:c.achPct,recent:c.ach,recentPct:c.achPct,left:0,need:0};
+  if(ym>cy)return null;
+  const done=c.wd.filter(d=>dkey(d)<=tk),left=c.wd.filter(d=>dkey(d)>tk).length;
+  const avg=done.length?c.ach/done.length:0;
+  const last=done.slice(-7),la=last.length?last.reduce((a,d)=>a+dayCtn(c.id,dkey(d)),0)/last.length:0;
+  const proj=c.ach+avg*left,recent=c.ach+la*left;
+  return{final:false,proj,projPct:proj*100/c.T,recent,recentPct:recent*100/c.T,left,need:left?Math.max(0,(c.T-c.ach)/left):0,avg,la};
+}
+const pcol=p=>p>=100?C.ok:p>=85?C.warn:C.bad;
+function ringSvg(pct,col,size,label){const r=size/2-7,cc=2*Math.PI*r,v=Math.max(0,Math.min(100,pct));return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--line2)" stroke-width="9"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${cc*v/100} ${cc}" transform="rotate(-90 ${size/2} ${size/2})"/><text x="50%" y="${size/2+2}" text-anchor="middle" font-size="${size*.2}" font-weight="700" fill="var(--text)">${Math.round(pct)}%</text><text x="50%" y="${size/2+size*.17}" text-anchor="middle" font-size="${size*.09}" fill="var(--muted)">${label||''}</text></svg>`}
+function predLine(c){const p=predict(c);if(!p||p.final)return'';return `<div class="note" style="color:${pcol(p.recentPct)};font-weight:600">${I('crystal',14)}Predicted finish: ${Math.round(p.recentPct)}% (${fmtN(Math.round(p.recent))} CTN)</div>`}
+function teamPred(ym){let T=0,P=0,A=0;db.employees.forEach(e=>{const c=tcalc(e.id,ym);c.id=e.id;const p=predict(c);if(c.has&&p){T+=c.T;P+=p.recent;A+=c.ach}});return{T,P,A,pct:T?P*100/T:0}}
+function predLineTeam(ym){const t=teamPred(ym);if(!t.T)return'';return `<div class="note" style="color:${pcol(t.pct)};font-weight:600">${I('crystal',14)}Team predicted finish: ${Math.round(t.pct)}% (${fmtN(Math.round(t.P))} CTN)</div>`}
+function predCard(c){const p=predict(c);if(!p)return'';
+  const gap=c.T-p.recent;
+  return `<div class="card"><div class="card-h"><div><h3>Target predictor</h3><p>Based on your last 7 working days</p></div>${I('crystal',20,'var(--pri)')}</div><div class="card-b"><div class="pred">${ringSvg(p.recentPct,pcol(p.recentPct),112,'predicted')}<div style="flex:1;font-size:13px">
+   <div class="rpt"><div class="kv">Predicted finish<b>${fmtN(Math.round(p.recent))} CTN</b></div><div class="kv">At month average<b>${Math.round(p.projPct)}%</b></div><div class="kv">Recent pace<b>${fmtN(p.la)}/day</b></div><div class="kv">Needed for 100%<b>${Math.ceil(p.need)}/day</b></div></div></div></div>
+   <div class="note" style="margin-top:12px">${I('info',14)}${gap>0?`At this pace you will be short by about ${fmtN(Math.round(gap))} CTN. Sell ${Math.ceil(p.need)} CTN per day for the remaining ${p.left} days to reach 100%.`:`Great pace — you are on track to finish above target.`}</div></div></div>`}
+function predictView(){
+  const ym=curYm(),admin=isAdmin();
+  const rows=(admin?db.employees:[me()]).map(e=>{const c=tcalc(e.id,ym);c.id=e.id;return{e,c,p:predict(c)}}).filter(r=>r.c.has&&r.p).sort((a,b)=>a.p.recentPct-b.p.recentPct);
+  const t=teamPred(ym);
+  const hero=`<div class="idc"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="hello">${admin?'Team':'My'} forecast · ${ymLabel(ym)}</div><div class="big num" style="margin-top:4px">${Math.round(admin?t.pct:(rows[0]?rows[0].p.recentPct:0))}% <span style="font-size:15px;font-weight:500;opacity:.7">predicted</span></div></div>${lockChip(ym)}</div>
+   <div class="tgrid"><div><span>Target</span><b class="num">${fmtN(admin?t.T:(rows[0]?rows[0].c.T:0))}</b></div><div><span>Achieved</span><b class="num">${fmtN(admin?t.A:(rows[0]?rows[0].c.ach:0))}</b></div><div><span>Predicted</span><b class="num">${fmtN(Math.round(admin?t.P:(rows[0]?rows[0].p.recent:0)))}</b></div></div></div>`;
+  if(!rows.length)return bar('Target Predictor',ymLabel(ym),true)+`<div class="wrap">${hero}<div class="card"><div class="empty">${I('crystal',32)}No targets for this month yet.</div></div></div>`;
+  if(!admin)return bar('Target Predictor',ymLabel(ym),true)+`<div class="wrap">${hero}${predCard(rows[0].c)}${rows[0].c.has?`<div class="card"><div class="card-h"><div><h3>Path to target</h3><p>Achieved, recent pace and target</p></div></div><div class="card-b">${predChart(rows[0].c)}</div></div>`:''}</div>`;
+  const risk=rows.filter(r=>r.p.recentPct<100);
+  const list=rows.map(r=>`<div class="tli" onclick="tEmp='${r.e.id}';tYm=null;go('targets')">${avatar(r.e,40,{})}<div class="info"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(r.e.name)}</b><b class="num" style="color:${pcol(r.p.recentPct)}">${Math.round(r.p.recentPct)}%</b></div>
+   <div class="muted num" style="font-size:12px;margin:3px 0 7px">Now ${fmtN(r.c.achPct)}% · needs ${Math.ceil(r.p.need)}/day · pace ${fmtN(r.p.la)}/day</div><div class="pbar"><i style="width:${Math.min(100,r.c.achPct)}%;background:${C.pri}"></i><span class="mk" style="left:calc(${Math.min(100,r.p.recentPct)}% - 1px);background:${pcol(r.p.recentPct)};opacity:1"></span></div></div></div>`).join('');
+  return bar('Target Predictor',ymLabel(ym)+' · forecast',true)+`<div class="wrap">${hero}
+   <div class="card"><div class="card-h"><div><h3>Predicted finish by booker</h3><p>Coloured marker = predicted end of month</p></div></div><div class="card-b">${barChart(rows.map(r=>esc(r.e.name.split(' ')[0]).slice(0,8)),[{name:'%',color:C.pri,colors:rows.map(r=>pcol(r.p.recentPct)),data:rows.map(r=>Math.round(r.p.recentPct))}],{min:100,refLine:{v:100,color:'#64748B'},legend:[{name:'On track (100%+)',color:C.ok},{name:'At risk',color:C.warn},{name:'Off track',color:C.bad}]})}</div></div>
+   ${risk.length?`<div class="upd" style="background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 25%,transparent)"><span class="ui" style="background:var(--bad)">${I('alert',19,'#fff',2)}</span><div class="ut"><b>${risk.length} booker${risk.length>1?'s':''} may miss target</b><span>${risk.map(r=>esc(r.e.name.split(' ')[0])).join(', ')}</span></div></div>`:''}
+   <div class="card"><div class="card-h"><div><h3>Bookers</h3><p>Lowest forecast first · tap for details</p></div></div>${list}</div></div>`;
+}
+function predChart(c){const p=predict(c),cy=curYm(),tk=today();let cum=0;const A=[],F=[],labels=c.days.map(d=>d.getDate());let lastCum=0;
+  c.days.forEach((d,i)=>{const k=dkey(d);if(k<=tk){cum+=c.daily[i];A.push(cum);lastCum=cum;F.push(k===tk?cum:null)}else{A.push(null);lastCum+=d.getDay()!==TOFF?p.la:0;F.push(+lastCum.toFixed(1))}});
+  return lineChart(labels,[{name:'Achieved',color:C.pri,data:A,fill:true},{name:'Forecast',color:pcol(p.recentPct),data:F,dash:true},{name:'Target',color:'#94A3B8',data:c.days.map(()=>c.T),dash:true}],{every:5})}
+
+/* ============ Heatmap ============ */
+function areaAgg(emps,ym){const m={};emps.forEach(e=>{monthDates(ym).forEach(d=>formsOn(e.id,dkey(d)).forEach(x=>{const k=e.id+'|'+x.area;const o=m[k]=m[k]||{e,area:x.area,s:0,p:0,c:0,v:0,lat:0,lng:0,n:0};o.s+=x.total;o.p+=x.prod;o.c+=x.ctn;o.v++;if(x.loc){o.lat+=x.loc.lat;o.lng+=x.loc.lng;o.n++}}));
+  myAreas(e).forEach(a=>{const k=e.id+'|'+a;if(!m[k])m[k]={e,area:a,s:0,p:0,c:0,v:0,lat:0,lng:0,n:0}})});
+  return Object.values(m).map(o=>{const pin=(o.e.areaLoc||{})[o.area];const loc=pin||(o.n?{lat:o.lat/o.n,lng:o.lng/o.n}:null);return{...o,loc,pct:o.s?o.p*100/o.s:null}})}
+const hcol=p=>p==null?'#94A3B8':p>=70?'#10B981':p>=50?'#F59E0B':'#EF4444';
+function heatmapView(){hmZ=view==='heatmap'?hmZ:0;
+  const admin=isAdmin(),ym=hmYm||curYm(),emps=admin?(hmEmp==='all'?db.employees:db.employees.filter(e=>e.id===hmEmp)):[me()];
+  const ar=areaAgg(emps,ym).sort((a,b)=>(a.pct??-1)-(b.pct??-1));
+  const filters=`<div class="card"><div class="card-b" style="padding:12px"><div class="${admin?'filters':''}"><select class="inp" onchange="hmYm=this.value;render()">${monthOptions(ym)}</select>${admin?`<select class="inp" onchange="hmEmp=this.value;render()"><option value="all">All bookers</option>${db.employees.map(e=>`<option value="${e.id}" ${hmEmp===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}</select>`:''}</div></div></div>`;
+  const leg=`<div class="legend" style="margin-top:0"><span><i style="background:#10B981"></i>70%+ productive</span><span><i style="background:#F59E0B"></i>50–69%</span><span><i style="background:#EF4444"></i>Below 50%</span><span><i style="background:#94A3B8"></i>No data</span></div>`;
+  const located=ar.filter(a=>a.loc);
+  const map=`<div class="card"><div class="card-h"><div><h3>Area map</h3><p>${located.length} of ${ar.length} areas placed</p></div>${I('map',20,'var(--pri)')}</div>${located.length?`<div class="map" id="hmap"></div><p class="muted" style="font-size:11.5px;padding:8px 16px 12px">Tap a circle for details · circle size = shops visited</p>`:`<div class="empty">${I('pin',30)}No area locations yet.<br>Bookers place areas from Profile → My areas (pin button), or by saving Daily Forms in the app.</div>`}</div>`;
+  const tiles=ar.length?`<div class="hgrid">${ar.map(a=>`<div class="ht" style="background:${hcol(a.pct)}"><div><b>${esc(a.area)}</b><br><span>${esc(a.e.name.split(' ')[0])}</span></div><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:6px"><span class="pc num">${a.pct==null?'—':Math.round(a.pct)+'%'}</span><span class="num" style="text-align:right;line-height:1.35">${a.p}/${a.s} shops<br>${fmtN(a.c)} CTN</span></div></div>`).join('')}</div>`:`<p class="muted" style="font-size:13px">No areas yet. Bookers set areas in Profile.</p>`;
+  const worst=ar.filter(a=>a.pct!=null&&a.pct<50);
+  return bar('Area Heatmap',ymLabel(ym)+' · productivity',true)+`<div class="wrap">${filters}${map}
+   <div class="card"><div class="card-b" style="padding:12px 16px">${leg}</div></div>
+   ${worst.length?`<div class="upd" style="background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 25%,transparent)"><span class="ui" style="background:var(--bad)">${I('alert',19,'#fff',2)}</span><div class="ut"><b>Needs attention</b><span>${worst.map(a=>esc(a.area)+' ('+Math.round(a.pct)+'%)').join(', ')}</span></div></div>`:''}
+   <div class="card"><div class="card-h"><div><h3>All areas</h3><p>Weakest first</p></div></div><div class="card-b">${tiles}</div></div></div>`;
+}
+function drawMap(){
+  const el=$('#hmap');if(!el)return;
+  const admin=isAdmin(),ym=hmYm||curYm(),emps=admin?(hmEmp==='all'?db.employees:db.employees.filter(e=>e.id===hmEmp)):[me()];
+  const pts=areaAgg(emps,ym).filter(a=>a.loc);if(!pts.length)return;
+  const W=el.clientWidth,H=el.clientHeight;
+  const X=(lng,z)=>(lng+180)/360*256*2**z,Y=(lat,z)=>{const r=lat*Math.PI/180;return(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*256*2**z};
+  let z=16;for(;z>3;z--){const xs=pts.map(p=>X(p.loc.lng,z)),ys=pts.map(p=>Y(p.loc.lat,z));if(Math.max(...xs)-Math.min(...xs)<W-60&&Math.max(...ys)-Math.min(...ys)<H-70)break}
+  z=Math.max(3,Math.min(18,z+hmZ));
+  const xs=pts.map(p=>X(p.loc.lng,z)),ys=pts.map(p=>Y(p.loc.lat,z)),cx=(Math.max(...xs)+Math.min(...xs))/2,cy=(Math.max(...ys)+Math.min(...ys))/2,ox=cx-W/2,oy=cy-H/2;
+  let h='';const n=2**z;
+  for(let tx=Math.floor(ox/256);tx<=Math.floor((ox+W)/256);tx++)for(let ty=Math.floor(oy/256);ty<=Math.floor((oy+H)/256);ty++){if(ty<0||ty>=n)continue;const wx=((tx%n)+n)%n;h+=`<img class="tile" alt="" src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png" style="left:${tx*256-ox}px;top:${ty*256-oy}px" onerror="this.remove()">`}
+  const maxS=Math.max(45,...pts.map(p=>p.s));
+  const boxes=[],lbls=[];
+  pts.slice().sort((a,b)=>b.s-a.s).forEach(p=>{const x=X(p.loc.lng,z)-ox,y=Y(p.loc.lat,z)-oy,sz=Math.round(20+16*Math.sqrt(p.s/maxS));boxes.push([x-sz/2,y-sz/2,x+sz/2,y+sz/2]);
+    h+=`<div class="pt" style="left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${hcol(p.pct)};cursor:pointer" onclick="toast('${esc(p.area).replace(/'/g,'')} · ${esc(p.e.name.split(' ')[0])} · ${p.pct==null?'no data':Math.round(p.pct)+'% productive'} · ${fmtN(p.c)} CTN')">${p.pct==null?'':Math.round(p.pct)}</div>`;
+    const lw=p.area.length*6.3+14,ly=y+sz/2+3,bx=[x-lw/2,ly,x+lw/2,ly+18];lbls.push({bx,x,ly,t:p.area})});
+  const placed=[],hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
+  lbls.forEach(l=>{if(placed.some(b=>hit(b,l.bx))||boxes.some(b=>hit(b,l.bx)))return;placed.push(l.bx);h+=`<div class="lbl" style="left:${l.x}px;top:${l.ly}px">${esc(l.t)}</div>`});
+  h+=`<div style="position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:6px"><button class="xb" style="background:var(--surface)" onclick="hmZ++;drawMap()">${I('plus',16)}</button><button class="xb" style="background:var(--surface)" onclick="hmZ--;drawMap()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button></div>`;
+  h+=`<div class="attr">© OpenStreetMap contributors</div>`;el.innerHTML=h;
+}
+
+/* ============ Grade & leaderboard ============ */
+function scoreOf(e,ym){const c=tcalc(e.id,ym),a=attMonth(e,ym),f=formStats(e,ym);
+  const parts=[];if(c.has)parts.push([Math.min(c.achPct,100),.5]);if(a.wd)parts.push([a.pct,.25]);if(f.s)parts.push([f.pct,.25]);
+  const w=parts.reduce((x,p)=>x+p[1],0),sc=w?parts.reduce((x,p)=>x+p[0]*p[1],0)/w:null;
+  return{c,a,f,score:sc,grade:sc==null?'—':sc>=90?'A+':sc>=80?'A':sc>=70?'B':sc>=60?'C':'D'}}
+const gcol=g=>({'A+':'#047857','A':'#10B981','B':'#2563EB','C':'#D97706','D':'#DC2626'}[g]||'#94A3B8');
+const LB=[['ach','Achievement %'],['ctn','CTN'],['prod','Productivity'],['att','Attendance'],['score','Overall']];
+function lbVal(r,by){return by==='ach'?(r.c.has?r.c.achPct:-1):by==='ctn'?r.c.ach:by==='prod'?(r.f.s?r.f.pct:-1):by==='att'?(r.a.wd?r.a.pct:-1):(r.score??-1)}
+function lbFmt(r,by){const v=lbVal(r,by);if(v<0)return'—';return by==='ctn'?fmtN(v)+' CTN':Math.round(v)+'%'}
+function leaderView(){
+  const ym=lbYm||curYm(),rows=db.employees.map(e=>({e,...scoreOf(e,ym)})).sort((a,b)=>lbVal(b,lbBy)-lbVal(a,lbBy));
+  const tabs=`<div class="tabs">${LB.map(t=>`<button class="${lbBy===t[0]?'on':''}" onclick="lbBy='${t[0]}';render()">${t[1]}</button>`).join('')}</div>`;
+  const filt=`<div class="card"><div class="card-b" style="padding:12px;display:flex;flex-direction:column;gap:10px"><select class="inp" onchange="lbYm=this.value;render()">${monthOptions(ym)}</select>${tabs}</div></div>`;
+  if(!rows.length)return bar('Leaderboard',ymLabel(ym),true)+`<div class="wrap">${filt}<div class="card"><div class="empty">${I('trophy',32)}No bookers yet.</div></div></div>`;
+  const top=[rows[1],rows[0],rows[2]],hs=[78,104,62],cols=['#94A3B8','#D4A017','#B87333'],ranks=[2,1,3];
+  const pod=`<div class="card" style="overflow:hidden"><div class="card-h"><div><h3>Top performers</h3><p>${LB.find(t=>t[0]===lbBy)[1]} · ${ymLabel(ym)}</p></div>${I('trophy',20,'#D4A017')}</div><div class="podium">${top.map((r,i)=>r?`<div class="pod">${avatar(r.e,i===1?64:52,{seal:i===1})}<b>${esc(r.e.name.split(' ')[0])}</b><small class="num">${lbFmt(r,lbBy)}</small><div class="st" style="height:${hs[i]}px;background:${cols[i]}">${ranks[i]}</div></div>`:'<div></div>').join('')}</div></div>`;
+  const meId=isAdmin()?null:session.id;
+  const list=rows.map((r,i)=>`<div class="li" style="${r.e.id===meId?'background:var(--pri-soft)':''}"><span class="rk">${i+1}</span>${avatar(r.e,38,{})}<div class="info"><b>${esc(r.e.name)}${r.e.id===meId?' (you)':''}</b><span>${esc(r.e.category)} · grade ${r.grade}</span>${miniBadges(r.e)}</div><b class="num" style="font-size:15px">${lbFmt(r,lbBy)}</b></div>`).join('');
+  return bar('Leaderboard',ymLabel(ym),true)+`<div class="wrap">${filt}${pod}<div class="card"><div class="card-h"><div><h3>Full ranking</h3><p>${rows.length} bookers</p></div></div>${list}</div></div>`;
+}
+
+/* ============ Comparison ============ */
+function aggOf(emps,ym){let T=0,A=0,s=0,p=0,v=0,ap=0,an=0;emps.forEach(e=>{const c=tcalc(e.id,ym),f=formStats(e,ym),a=attMonth(e,ym);T+=c.T;A+=c.ach;s+=f.s;p+=f.p;v+=f.v;if(a.wd){ap+=a.pct;an++}});
+  const g=emps.length===1?scoreOf(emps[0],ym):null;return{T,A,ach:T?A*100/T:0,s,p,prod:s?p*100/s:0,v,att:an?ap/an:0,grade:g?g.grade:null}}
+function compareView(){
+  const admin=isAdmin(),cy=curYm();cmpA=cmpA||cy;cmpB=cmpB||ymShift(cy,-1);
+  const mode=admin?cmpMode:'month';
+  let L,R,ln,rn,ttl;
+  if(mode==='month'){const em=admin?(cmpEmp==='all'?db.employees:db.employees.filter(e=>e.id===cmpEmp)):[me()];L=aggOf(em,cmpA);R=aggOf(em,cmpB);ln=ymLabel(cmpA,true);rn=ymLabel(cmpB,true);ttl=admin&&cmpEmp==='all'?'Team':esc((em[0]||{}).name||'')}
+  else{const e1=db.employees.find(e=>e.id===cmpE1)||db.employees[0],e2=db.employees.find(e=>e.id===cmpE2)||db.employees[1]||db.employees[0];cmpE1=e1?e1.id:'';cmpE2=e2?e2.id:'';L=e1?aggOf([e1],cmpA):null;R=e2?aggOf([e2],cmpA):null;ln=e1?esc(e1.name.split(' ')[0]):'—';rn=e2?esc(e2.name.split(' ')[0]):'—';ttl=ymLabel(cmpA)}
+  const tabs=admin?`<div class="tabs" style="margin-bottom:10px"><button class="${mode==='month'?'on':''}" onclick="cmpMode='month';render()">Month vs month</button><button class="${mode==='booker'?'on':''}" onclick="cmpMode='booker';render()">Booker vs booker</button></div>`:'';
+  const opt=(sel,f)=>`<select class="inp" onchange="${f}=this.value;render()">${monthOptions(sel)}</select>`;
+  const empOpt=(sel,f,all)=>`<select class="inp" onchange="${f}=this.value;render()">${all?'<option value="all">All bookers (team)</option>':''}${db.employees.map(e=>`<option value="${e.id}" ${sel===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}</select>`;
+  const filt=`<div class="card"><div class="card-b" style="padding:12px">${tabs}${mode==='month'?`${admin?`<div style="margin-bottom:8px">${empOpt(cmpEmp,'cmpEmp',true)}</div>`:''}<div class="filters">${opt(cmpA,'cmpA')}${opt(cmpB,'cmpB')}</div>`:`<div style="margin-bottom:8px">${opt(cmpA,'cmpA')}</div><div class="filters">${empOpt(cmpE1,'cmpE1')}${empOpt(cmpE2,'cmpE2')}</div>`}</div></div>`;
+  if(!L||!R||!db.employees.length)return bar('Comparison','Compare performance',true)+`<div class="wrap">${filt}<div class="card"><div class="empty">${I('compare',32)}Add bookers to compare.</div></div></div>`;
+  const metrics=[['Target (CTN)','T',''],['Achieved (CTN)','A',''],['Achievement','ach','%'],['Shops visited','s',''],['Productive shops','p',''],['Productivity','prod','%'],['Form entries','v',''],['Attendance','att','%']];
+  const row=m=>{const a=L[m[1]],b=R[m[1]],d=a-b,cls=Math.abs(d)<0.05?'flat':d>0?'up':'down';return `<tr><td>${m[0]}</td><td class="num" style="font-weight:600">${fmtN(a)}${m[2]}</td><td class="num">${fmtN(b)}${m[2]}</td><td><span class="delta ${cls}">${Math.abs(d)<0.05?'—':(d>0?'+':'−')+fmtN(Math.abs(d))+m[2]}</span></td></tr>`};
+  const head=`<div class="card"><div class="card-b" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;text-align:center">
+   <div><div class="muted" style="font-size:12px">${ln}</div><div class="big num" style="color:${C.pri}">${Math.round(L.ach)}%</div><div class="muted" style="font-size:11.5px">${fmtN(L.A)} CTN${L.grade?` · ${L.grade}`:''}</div></div>
+   <div style="width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--muted)">VS</div>
+   <div><div class="muted" style="font-size:12px">${rn}</div><div class="big num" style="color:#94A3B8">${Math.round(R.ach)}%</div><div class="muted" style="font-size:11.5px">${fmtN(R.A)} CTN${R.grade?` · ${R.grade}`:''}</div></div></div></div>`;
+  const ch=groupBar(['Achievement','Productivity','Attendance'],[{name:ln,color:C.pri,data:[Math.round(L.ach),Math.round(L.prod),Math.round(L.att)]},{name:rn,color:'#94A3B8',data:[Math.round(R.ach),Math.round(R.prod),Math.round(R.att)]}]);
+  const ch2=groupBar(['Target','Achieved'],[{name:ln,color:C.pri,data:[L.T,L.A]},{name:rn,color:'#94A3B8',data:[R.T,R.A]}]);
+  return bar('Comparison',ttl,true)+`<div class="wrap">${filt}${head}
+   <div class="card"><div class="card-h"><div><h3>Key percentages</h3><p>${ln} vs ${rn}</p></div></div><div class="card-b">${ch}</div></div>
+   <div class="card"><div class="card-h"><div><h3>Target vs achieved</h3><p>CTN</p></div></div><div class="card-b">${ch2}</div></div>
+   <div class="card"><div class="card-h"><div><h3>All metrics</h3><p>Change = ${ln} minus ${rn}</p></div></div><div style="overflow-x:auto"><table class="tbl cmp"><thead><tr><th>Metric</th><th>${ln}</th><th>${rn}</th><th>Change</th></tr></thead><tbody>${metrics.map(row).join('')}</tbody></table></div></div></div>`;
+}
+
+/* ============ Reports ============ */
+function shareText(t){if(NATIVE&&NATIVE.shareText){try{NATIVE.shareText(t);return}catch(e){}}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Report copied — paste it in WhatsApp'),()=>toast('Could not copy','bad'))}else toast('Sharing is not available here','bad')}
+function reportData(){
+  const admin=isAdmin(),emps=admin?(rpEmp==='all'?db.employees:db.employees.filter(e=>e.id===rpEmp)):[me()];
+  if(rpType==='daily'){const d=rpDate||today(),ym=d.slice(0,7);
+    const rows=emps.map(e=>{const r=(db.att[e.id]||{})[d],f=formStats(e,ym,d),c=tcalc(e.id,ym);let req=null;if(c.has){const dd=new Date(d+'T00:00:00');const left=c.wd.filter(x=>dkey(x)>=d).length;const before=c.days.filter(x=>dkey(x)<d).reduce((a,x)=>a+dayCtn(e.id,dkey(x)),0);req=left?Math.max(0,(c.T-before)/left):0}
+      return{e,r,st:r&&r.in?statusOf(r):(new Date(d+'T00:00:00').getDay()===0?'off':'absent'),f,ctn:dayCtn(e.id,d),req}});
+    return{type:'daily',label:new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}),rows}}
+  const ym=rpYm||curYm();
+  const rows=emps.map(e=>{const g=scoreOf(e,ym);g.c.id=e.id;return{e,...g,p:predict(g.c)}});
+  return{type:'monthly',label:ymLabel(ym),ym,rows};
+}
+function reportText(R){
+  const L=['*FB ERP — '+(R.type==='daily'?'Daily':'Monthly')+' Report*',R.label,''];
+  if(R.type==='daily'){let tc=0,ts=0,tp=0,pr=0;R.rows.forEach(x=>{tc+=x.ctn;ts+=x.f.s;tp+=x.f.p;if(x.r&&x.r.in)pr++;
+      L.push('*'+x.e.name+'* ('+x.e.category+')');
+      L.push('Attendance: '+(x.r&&x.r.in?LBL[x.st]+' · '+fmtT(x.r.in)+(x.r.out?' – '+fmtT(x.r.out):''):x.st==='off'?'Day off':'Absent'));
+      if(x.f.v)L.push('Areas: '+x.f.areas.join(', '));
+      L.push('Shops: '+x.f.s+' · Productive: '+x.f.p+(x.f.s?' ('+Math.round(x.f.pct)+'%)':''));
+      L.push('CTN: '+fmtN(x.ctn)+(x.req!=null?' / target '+Math.ceil(x.req):''));L.push('')});
+    if(R.rows.length>1){L.push('*TEAM TOTAL*');L.push('Present: '+pr+'/'+R.rows.length);L.push('Shops: '+ts+' · Productive: '+tp+(ts?' ('+Math.round(tp*100/ts)+'%)':''));L.push('CTN: '+fmtN(tc))}}
+  else{let T=0,A=0;R.rows.forEach(x=>{T+=x.c.T;A+=x.c.ach;
+      L.push('*'+x.e.name+'* ('+x.e.category+') — Grade '+x.grade);
+      L.push('Target: '+fmtN(x.c.T)+' · Achieved: '+fmtN(x.c.ach)+(x.c.has?' ('+fmtN(x.c.achPct)+'%)':''));
+      if(x.p&&!x.p.final)L.push('Predicted finish: '+Math.round(x.p.recentPct)+'%');
+      L.push('Attendance: P '+x.a.p+' · H '+x.a.h+' · A '+x.a.ab+(x.a.wd?' ('+Math.round(x.a.pct)+'%)':''));
+      L.push('Shops: '+x.f.s+' · Productive: '+x.f.p+(x.f.s?' ('+Math.round(x.f.pct)+'%)':''));L.push('')});
+    if(R.rows.length>1){L.push('*TEAM TOTAL*');L.push('Target: '+fmtN(T)+' · Achieved: '+fmtN(A)+(T?' ('+fmtN(A*100/T)+'%)':''))}}
+  L.push('','_Generated by FB ERP_');return L.join('\n');
+}
+function reportsView(){
+  const admin=isAdmin(),R=reportData();
+  const tabs=`<div class="tabs" style="margin-bottom:10px"><button class="${rpType==='daily'?'on':''}" onclick="rpType='daily';render()">Daily report</button><button class="${rpType==='monthly'?'on':''}" onclick="rpType='monthly';render()">Monthly report</button></div>`;
+  const pick=rpType==='daily'?`<input type="date" class="inp num" value="${rpDate||today()}" max="${today()}" onchange="rpDate=this.value;render()">`:`<select class="inp" onchange="rpYm=this.value;render()">${monthOptions(rpYm||curYm())}</select>`;
+  const filt=`<div class="card"><div class="card-b" style="padding:12px">${tabs}<div class="${admin?'filters':''}">${pick}${admin?`<select class="inp" onchange="rpEmp=this.value;render()"><option value="all">All bookers</option>${db.employees.map(e=>`<option value="${e.id}" ${rpEmp===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}</select>`:''}</div></div></div>`;
+  let body;
+  if(!R.rows.length)body=`<div class="card"><div class="empty">${I('report',32)}No bookers to report.</div></div>`;
+  else if(R.type==='daily'){let tc=0,ts=0,tp=0,pr=0;R.rows.forEach(x=>{tc+=x.ctn;ts+=x.f.s;tp+=x.f.p;if(x.r&&x.r.in)pr++});
+    body=(R.rows.length>1?`<div class="kpis">${kpi(pr+'/'+R.rows.length,'Present','','present',C.ok,'#10B98117')}${kpi(fmtN(tc),'CTN','','box',C.pri,'#2563EB14')}${kpi(tp+'/'+ts,'Productive shops',ts?Math.round(tp*100/ts)+'% productive':'','check',C.ok,'#10B98117')}${kpi(R.rows.filter(x=>x.f.v).length,'Forms submitted','of '+R.rows.length+' bookers','form',C.navy,'#1E3A8A14')}</div>`:'')+
+    `<div class="card rpt">${R.rows.map(x=>`<div class="blk"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">${avatar(x.e,34,{})}<div style="flex:1;min-width:0"><h4>${esc(x.e.name)}</h4><span class="muted" style="font-size:12px">${esc(x.e.category)}</span></div><span class="tag ${x.st==='off'?'live':x.st}">${x.st==='off'?'Day off':LBL[x.st]}</span></div>
+     <div class="kv">Check in / out<b class="num">${fmtT(x.r&&x.r.in)} – ${fmtT(x.r&&x.r.out)}</b></div><div class="kv">Areas<b>${x.f.areas.length?esc(x.f.areas.join(', ')):'—'}</b></div><div class="kv">Shops · productive<b class="num">${x.f.s} · ${x.f.p}${x.f.s?` (${Math.round(x.f.pct)}%)`:''}</b></div><div class="kv">CTN vs day target<b class="num">${fmtN(x.ctn)}${x.req!=null?' / '+Math.ceil(x.req):''}</b></div></div>`).join('')}</div>`}
+  else{body=`<div class="card rpt">${R.rows.map(x=>`<div class="blk"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">${avatar(x.e,34,{})}<div style="flex:1;min-width:0"><h4>${esc(x.e.name)}</h4><span class="muted" style="font-size:12px">${esc(x.e.category)}</span></div><span class="grade" style="background:${gcol(x.grade)};width:36px;height:36px;font-size:14px">${x.grade}</span></div>
+     <div class="kv">Target · achieved<b class="num">${fmtN(x.c.T)} · ${fmtN(x.c.ach)}${x.c.has?` (${fmtN(x.c.achPct)}%)`:''}</b></div>${x.p&&!x.p.final?`<div class="kv">Predicted finish<b class="num" style="color:${pcol(x.p.recentPct)}">${Math.round(x.p.recentPct)}%</b></div>`:''}<div class="kv">Attendance (P/H/A)<b class="num">${x.a.p} / ${x.a.h} / ${x.a.ab}${x.a.wd?` · ${Math.round(x.a.pct)}%`:''}</b></div><div class="kv">Shops · productive<b class="num">${x.f.s} · ${x.f.p}${x.f.s?` (${Math.round(x.f.pct)}%)`:''}</b></div></div>`).join('')}</div>`}
+  return bar('Reports',R.label,true)+`<div class="wrap">${filt}
+   <div class="g2"><button class="btn ok" onclick="shareText(reportText(reportData()))">${I('share',18,'#fff',2)}Share on WhatsApp</button><button class="btn out" onclick="copyReport()">${I('copy',18)}Copy text</button></div>${body}</div>`;
+}
+function copyReport(){const t=reportText(reportData());if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast('Report copied'),()=>shareText(t));else shareText(t)}
+
+/* ============ Report card ============ */
+function reportCardView(){
+  const admin=isAdmin(),ym=rcYm||curYm();
+  if(admin&&!db.employees.find(e=>e.id===rcEmp))rcEmp=(db.employees[0]||{}).id||'';
+  const e=admin?db.employees.find(x=>x.id===rcEmp):me();
+  const filt=`<div class="card"><div class="card-b" style="padding:12px"><div class="${admin?'filters':''}"><select class="inp" onchange="rcYm=this.value;render()">${monthOptions(ym)}</select>${admin?`<select class="inp" onchange="rcEmp=this.value;render()">${db.employees.map(x=>`<option value="${x.id}" ${rcEmp===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select>`:''}</div></div></div>`;
+  if(!e)return bar('Report Card',ymLabel(ym),true)+`<div class="wrap">${filt}<div class="card"><div class="empty">${I('card',32)}No bookers yet.</div></div></div>`;
+  const g=scoreOf(e,ym),fin=ym<curYm();
+  return bar('Report Card',ymLabel(ym)+(fin?'':' · month to date'),true)+`<div class="wrap">${filt}
+   <div id="rcBox"><div class="card"><div class="empty">Preparing report card…</div></div></div>
+   <div class="g2"><button class="btn ok" onclick="shareCard()">${I('share',18,'#fff',2)}Share</button><button class="btn out" onclick="saveCardHint()">${I('dl',18)}Save image</button></div>
+   <div class="card"><div class="card-h"><div><h3>How the grade works</h3><p>Score ${g.score==null?'—':Math.round(g.score)+' / 100'}</p></div><span class="grade" style="background:${gcol(g.grade)}">${g.grade}</span></div><div class="card-b rpt" style="padding-top:10px">
+    <div class="kv">Target achievement (50%)<b class="num">${g.c.has?Math.round(Math.min(100,g.c.achPct))+'%':'—'}</b></div><div class="kv">Attendance (25%)<b class="num">${g.a.wd?Math.round(g.a.pct)+'%':'—'}</b></div><div class="kv">Shop productivity (25%)<b class="num">${g.f.s?Math.round(g.f.pct)+'%':'—'}</b></div>
+    <p class="muted" style="font-size:11.5px;margin-top:8px">A+ 90+ · A 80+ · B 70+ · C 60+ · D below 60. Parts without data are left out.</p></div></div></div>`;
+}
+let rcData=null;
+async function buildCard(){
+  const box=$('#rcBox');if(!box)return;
+  const admin=isAdmin(),ym=rcYm||curYm(),e=admin?db.employees.find(x=>x.id===rcEmp):me();if(!e)return;
+  try{await Promise.all(['400','600','700'].map(w=>document.fonts.load(w+' 40px Inter')))}catch(err){}
+  const g=scoreOf(e,ym),W=1080,H=1500,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
+  const F=(w,s)=>`${w} ${s}px Inter, "Segoe UI", Roboto, sans-serif`;
+  const rr=(X,Y,w,h,r,fill)=>{x.beginPath();x.roundRect?x.roundRect(X,Y,w,h,r):x.rect(X,Y,w,h);x.fillStyle=fill;x.fill()};
+  // background
+  x.fillStyle='#F4F6FA';x.fillRect(0,0,W,H);
+  const gr=x.createLinearGradient(0,0,W,560);gr.addColorStop(0,'#0B1F3A');gr.addColorStop(.6,'#132B4F');gr.addColorStop(1,'#1C3A66');x.fillStyle=gr;x.fillRect(0,0,W,560);
+  x.strokeStyle='rgba(255,255,255,.07)';x.lineWidth=2;[220,300,380].forEach(r=>{x.beginPath();x.arc(W-60,40,r,0,7);x.stroke()});
+  rr(70,64,64,64,16,'#2563EB');x.fillStyle='#fff';x.font=F(700,24);x.textAlign='center';x.textBaseline='middle';x.fillText('FB',102,97);
+  x.textAlign='left';x.font=F(600,28);x.fillText('FB ERP',152,86);x.font=F(400,22);x.fillStyle='rgba(255,255,255,.6)';x.fillText('Monthly Report Card',152,116);
+  x.textAlign='right';x.font=F(600,26);x.fillStyle='#fff';x.fillText(ymLabel(ym),W-70,86);x.font=F(400,20);x.fillStyle='rgba(255,255,255,.6)';x.fillText(ym<curYm()?'Final':'Month to date',W-70,116);
+  // avatar
+  const ax=170,ay=330,ar=96;x.save();x.beginPath();x.arc(ax,ay,ar+8,0,7);x.fillStyle='rgba(255,255,255,.9)';x.fill();x.beginPath();x.arc(ax,ay,ar,0,7);x.clip();
+  if(e.photo){await new Promise(res=>{const im=new Image();im.onload=()=>{x.drawImage(im,ax-ar,ay-ar,ar*2,ar*2);res()};im.onerror=res;im.src=e.photo})}else{x.fillStyle='#DCE6F7';x.fillRect(ax-ar,ay-ar,ar*2,ar*2);x.fillStyle='#0B1F3A';x.font=F(700,64);x.textAlign='center';x.fillText(e.name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(),ax,ay+4)}
+  x.restore();x.beginPath();x.arc(ax+ar*.72,ay+ar*.72,22,0,7);x.fillStyle='#2563EB';x.fill();x.strokeStyle='#fff';x.lineWidth=5;x.stroke();
+  x.strokeStyle='#fff';x.lineWidth=5;x.lineCap='round';x.beginPath();x.moveTo(ax+ar*.72-9,ay+ar*.72);x.lineTo(ax+ar*.72-2,ay+ar*.72+7);x.lineTo(ax+ar*.72+10,ay+ar*.72-7);x.stroke();
+  x.textAlign='left';x.fillStyle='#fff';let nm=e.name;x.font=F(700,46);while(x.measureText(nm).width>500&&nm.length>4)nm=nm.slice(0,-2);if(nm!==e.name)nm+='…';x.fillText(nm,310,300);
+  x.font=F(400,24);x.fillStyle='rgba(255,255,255,.7)';x.fillText(e.category+'  ·  '+e.branch+'  ·  '+empNo(e),310,345);
+  rr(310,380,250,44,10,'rgba(255,255,255,.12)');x.fillStyle='#fff';x.font=F(600,20);x.fillText('✓  Licensed Employee',328,403);
+  // grade
+  const gx=W-170,gy=330;x.beginPath();x.arc(gx,gy,92,0,7);x.fillStyle=gcol(g.grade);x.fill();x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=8;x.stroke();
+  x.fillStyle='#fff';x.textAlign='center';x.font=F(700,g.grade.length>1?72:84);x.fillText(g.grade,gx,gy-2);x.font=F(600,20);x.fillText('GRADE',gx,gy+52);
+  x.font=F(400,20);x.fillStyle='rgba(255,255,255,.65)';x.fillText(g.score==null?'Score —':'Score '+Math.round(g.score)+'/100',gx,gy+130);
+  // tiles
+  const tiles=[['Target achievement',g.c.has?fmtN(g.c.achPct)+'%':'—',g.c.has?fmtN(g.c.ach)+' of '+fmtN(g.c.T)+' CTN':'No target',g.c.has?Math.min(100,g.c.achPct):0,'#2563EB'],
+    ['Attendance',g.a.wd?Math.round(g.a.pct)+'%':'—',`P ${g.a.p} · H ${g.a.h} · A ${g.a.ab}`,g.a.pct,'#10B981'],
+    ['Shop productivity',g.f.s?Math.round(g.f.pct)+'%':'—',`${g.f.p} of ${g.f.s} shops`,g.f.pct,'#F59E0B'],
+    ['CTN sold',fmtN(g.c.ach),g.f.v+' area visits',g.c.has?Math.min(100,g.c.achPct):0,'#7C3AED']];
+  tiles.forEach((t,i)=>{const X=70+(i%2)*480,Y=600+Math.floor(i/2)*250;rr(X,Y,460,226,24,'#FFFFFF');x.strokeStyle='#E4E8EF';x.lineWidth=2;x.stroke();
+    x.textAlign='left';x.fillStyle='#64748B';x.font=F(500,24);x.fillText(t[0],X+32,Y+50);x.fillStyle='#0F172A';x.font=F(700,64);x.fillText(t[1],X+32,Y+118);
+    x.fillStyle='#94A3B8';x.font=F(400,21);x.fillText(t[2],X+32,Y+160);rr(X+32,Y+184,396,12,6,'#EEF1F5');if(t[3]>0)rr(X+32,Y+184,Math.max(12,396*Math.min(100,t[3])/100),12,6,t[4])});
+  // badges
+  x.textAlign='left';x.fillStyle='#0F172A';x.font=F(600,28);x.fillText('Badges',70,1150);
+  const bs=(e.badges||[]).map(badgeOf).filter(Boolean);let bx=70,by=1180;
+  if(!bs.length){x.fillStyle='#94A3B8';x.font=F(400,22);x.fillText('No badges this month',70,1200)}
+  bs.forEach(b=>{x.font=F(600,21);const w=x.measureText(b[2]).width+70;if(bx+w>W-70){bx=70;by+=66}rr(bx,by,w,52,26,b[3]);x.beginPath();x.arc(bx+26,by+26,13,0,7);x.fillStyle='rgba(255,255,255,.3)';x.fill();x.fillStyle='#fff';x.fillText(b[2],bx+50,by+27);bx+=w+12});
+  // footer
+  x.fillStyle='#0B1F3A';x.fillRect(0,H-110,W,110);x.fillStyle='rgba(255,255,255,.7)';x.font=F(400,20);x.textAlign='left';x.fillText('Generated '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),70,H-55);
+  x.textAlign='right';x.fillStyle='#fff';x.font=F(600,20);x.fillText('FB ERP · Workforce Management',W-70,H-55);
+  const url=cv.toDataURL('image/png');rcData={url,name:'ReportCard-'+e.name.replace(/\W+/g,'-')+'-'+ym+'.png'};
+  if($('#rcBox'))$('#rcBox').innerHTML=`<img class="rc-img" src="${url}" alt="Report card">`;
+}
+function shareCard(){if(!rcData)return toast('Report card is still loading','bad');if(NATIVE&&NATIVE.shareImage){try{NATIVE.shareImage(rcData.url.split(',')[1],rcData.name);return}catch(e){}}saveCardHint()}
+function saveCardHint(){if(!rcData)return;if(NATIVE&&NATIVE.saveImage){try{NATIVE.saveImage(rcData.url.split(',')[1],rcData.name);return}catch(e){}}openModal(`<h2 style="margin-top:0">Save report card</h2><p style="margin-bottom:14px">Long-press the image and choose “Save image”.</p><img src="${rcData.url}" style="width:100%;border-radius:10px"><button class="btn" style="margin-top:14px" onclick="closeModal()">Done</button>`)}
 
 /* ============ Employee ============ */
 function empDash(){
@@ -978,6 +1263,8 @@ function historyView(){
 /* ============ After render ============ */
 function after(){
   paintUpdate();
+  if(view==='heatmap')requestAnimationFrame(drawMap);
+  if(view==='reportcard'){rcData=null;buildCard()}
   const b=$('#bar');if(b){const f=()=>b.classList.toggle('scrolled',window.scrollY>4);window.onscroll=f;f()}
   const car=$('#car');
   if(car){const dots=[...document.querySelectorAll('#dots i')];

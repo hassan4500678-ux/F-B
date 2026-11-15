@@ -56,6 +56,16 @@ Settings > App update se khud bhi check kar sakte hain. Pehli dafa phone "Allow 
 Month aur booker filter. Targets vs achievement, target split, productive vs non-productive, area-wise shops,
 booker-wise productivity, daily trend, saare bookers ki detail table aur area detail table.
 
+## Performance modules
+
+- **Target Predictor**: pichle 7 working days ki raftaar se mahine ke aakhir ka andaza, 100% ke liye rozana kitna chahiye, at-risk bookers.
+- **Area Heatmap**: map par areas hare/peele/laal (productivity). Area ki jagah Profile > My areas ke pin se ya Daily Form save karte waqt GPS se.
+- **Leaderboard**: Achievement %, CTN, Productivity, Attendance, Overall — podium aur poori ranking.
+- **Comparison**: mahina vs mahina (team ya booker), booker vs booker.
+- **Reports**: daily / monthly report, WhatsApp par share ya copy.
+- **Report Card**: mahine ka card (attendance, target %, productivity, badges, grade A+ se D) — image share/save.
+  Grade = 50% target + 25% attendance + 25% productivity. A+ 90+, A 80+, B 70+, C 60+, D neeche.
+
 ## Files
 
 - `web/index.html` — poori app (fonts andar hain, internet ke baghair chalti hai).

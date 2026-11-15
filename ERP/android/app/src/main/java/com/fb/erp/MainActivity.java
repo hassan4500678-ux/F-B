@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,7 +15,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Base64;
+import android.widget.Toast;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -30,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -56,6 +61,7 @@ public class MainActivity extends Activity {
     private LocationListener locationListener;
     private Location bestFix;
     private boolean locating = false;
+    private boolean quickFix = false;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -122,7 +128,66 @@ public class MainActivity extends Activity {
         public void checkUpdate() { checkForUpdate(); }
 
         @JavascriptInterface
-        public void requestLocation() { runOnUiThread(new Runnable() { public void run() { startLocation(); } }); }
+        public void requestLocation() { runOnUiThread(new Runnable() { public void run() { quickFix = false; startLocation(); } }); }
+
+        /** Faster, less precise fix used by the Daily Form for the area map. */
+        @JavascriptInterface
+        public void requestLocationQuick() { runOnUiThread(new Runnable() { public void run() { quickFix = true; startLocation(); } }); }
+
+        @JavascriptInterface
+        public void shareText(final String text) {
+            runOnUiThread(new Runnable() { public void run() {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_TEXT, text);
+                try { startActivity(Intent.createChooser(i, "Share report")); } catch (Exception ignored) { }
+            } });
+        }
+
+        @JavascriptInterface
+        public void shareImage(final String base64, final String name) {
+            new Thread(new Runnable() { public void run() {
+                try {
+                    File dir = new File(getCacheDir(), "share");
+                    dir.mkdirs();
+                    File f = new File(dir, safeName(name));
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(Base64.decode(base64, Base64.DEFAULT));
+                    fo.close();
+                    final Uri uri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", f);
+                    runOnUiThread(new Runnable() { public void run() {
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("image/png");
+                        i.putExtra(Intent.EXTRA_STREAM, uri);
+                        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        try { startActivity(Intent.createChooser(i, "Share report card")); } catch (Exception ignored) { }
+                    } });
+                } catch (Exception e) {
+                    toast("Could not share the image");
+                }
+            } }).start();
+        }
+
+        /** Saves to Pictures/FB ERP (Android 10+); older phones get the share sheet. */
+        @JavascriptInterface
+        public void saveImage(final String base64, final String name) {
+            if (Build.VERSION.SDK_INT < 29) { shareImage(base64, name); return; }
+            new Thread(new Runnable() { public void run() {
+                try {
+                    ContentValues v = new ContentValues();
+                    v.put(MediaStore.Images.Media.DISPLAY_NAME, safeName(name));
+                    v.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                    v.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/FB ERP");
+                    Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
+                    OutputStream os = getContentResolver().openOutputStream(uri);
+                    os.write(Base64.decode(base64, Base64.DEFAULT));
+                    os.close();
+                    toast("Saved to Pictures / FB ERP");
+                } catch (Exception e) {
+                    toast("Could not save the image");
+                }
+            } }).start();
+        }
 
         @JavascriptInterface
         public void installUpdate() { runOnUiThread(new Runnable() { public void run() { startUpdate(); } }); }
@@ -263,6 +328,15 @@ public class MainActivity extends Activity {
         }
     }
 
+    static String safeName(String n) {
+        String s = (n == null ? "image.png" : n).replaceAll("[^A-Za-z0-9._-]", "_");
+        return s.endsWith(".png") ? s : s + ".png";
+    }
+
+    void toast(final String msg) {
+        runOnUiThread(new Runnable() { public void run() { Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show(); } });
+    }
+
     // ---------------------------------------------------------------- GPS
 
     boolean hasLocationPermission() {
@@ -296,7 +370,7 @@ public class MainActivity extends Activity {
         try { net = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER); } catch (Exception ignored) { }
         if (!gps && !net) {
             sendLocationError("Location (GPS) is turned off. Please turn it on and try again.");
-            try { startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)); } catch (Exception ignored) { }
+            if (!quickFix) try { startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)); } catch (Exception ignored) { }
             return;
         }
         locating = true;
@@ -305,7 +379,7 @@ public class MainActivity extends Activity {
             @Override public void onLocationChanged(Location loc) {
                 if (loc == null) return;
                 if (bestFix == null || loc.getAccuracy() < bestFix.getAccuracy()) bestFix = loc;
-                if (loc.getAccuracy() <= 25) finishLocation();
+                if (loc.getAccuracy() <= (quickFix ? 60 : 25)) finishLocation();
             }
             @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
             @Override public void onProviderEnabled(String provider) { }
@@ -319,8 +393,8 @@ public class MainActivity extends Activity {
             sendLocationError("Location permission is required for check in.");
             return;
         }
-        // Use the best fix found within 20 seconds.
-        handler.postDelayed(new Runnable() { public void run() { finishLocation(); } }, 20000);
+        // Use the best fix found in time (8 s quick, 20 s normal).
+        handler.postDelayed(new Runnable() { public void run() { finishLocation(); } }, quickFix ? 8000 : 20000);
     }
 
     void finishLocation() {

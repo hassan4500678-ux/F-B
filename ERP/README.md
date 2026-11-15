@@ -34,6 +34,15 @@ Settings > App update se khud bhi check kar sakte hain. Pehli dafa phone "Allow 
 - Admin dashboard par employee par tap karke edit ya delete karein.
 - Dashboard aur sidebar mein Live office status: kaun Active (check in) hai aur kaun Offline.
 
+## Targets (CTN)
+
+- **New Targets** (admin): employee, mahina aur saal chun kar CTN target assign karein. Foran employee ke Targets mein dikhta hai.
+- **Targets**: monthly target, achieved, remaining, live daily target (zyada bechne par agle din ka target kam, kam bechne par zyada),
+  time gone vs achievement, graphs (bars, line, pie), daily log aur pichle mahine se comparison.
+- Achievement "Record achievement" se din ke CTN daal kar save hoti hai (employee ya admin).
+- Har mahine ki aakhri tareekh raat **9 baje** woh mahina lock ho jata hai — target aur achievement mein koi change nahi.
+- Month filter se purane mahine dekhein; admin "All employees" ya aik aik employee dekh sakta hai.
+
 ## Files
 
 - `web/index.html` — poori app (fonts andar hain, internet ke baghair chalti hai).

@@ -258,6 +258,14 @@ a.btn{text-decoration:none}
 .tli{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line2);cursor:pointer}.tli:last-child{border-bottom:none}
 .tli .info{flex:1;min-width:0}.tli .info b{font-size:14px;font-weight:600}
 .unit{font-size:12px;font-weight:600;color:var(--muted);margin-left:3px}
+.tgrid.six{grid-template-columns:repeat(3,1fr)}
+.ab{margin-bottom:14px}.ab:last-child{margin-bottom:0}
+.ab .h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px;margin-bottom:6px}
+.ab .h b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ab .h span{color:var(--muted);white-space:nowrap}
+.sbar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line2)}.sbar i{display:block;height:100%}
+.tbl.tight td,.tbl.tight th{padding:10px 7px}.ro{background:var(--surface2);color:var(--muted);font-weight:600}
+.sumrow td{font-weight:700;background:var(--surface2)}
+#drawer{overflow-y:auto!important}.dlive{flex:none!important;overflow:visible!important}.nav.out{margin-top:auto}
 .foot-note{text-align:center;font-size:11.5px;color:var(--faint);margin-top:6px}
 </style>
 </head>
@@ -271,19 +279,19 @@ a.btn{text-decoration:none}
 <script>
 /* ============ Data ============ */
 const KEY='fb_erp_v1';
-const fresh=()=>({targets:{},sales:{},adminCode:'4321',admin:{name:'Administrator',photo:null},employees:[],att:{},theme:'light',seq:0,settings:{halfAfter:'09:15',office:null,radius:100}});
+const fresh=()=>({targets:{},sales:{},forms:{},adminCode:'4321',admin:{name:'Administrator',photo:null},employees:[],att:{},theme:'light',seq:0,settings:{halfAfter:'09:15',office:null,radius:100}});
 let db=null;
 try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!db||!Array.isArray(db.employees))db=fresh();
 if(db.seq==null)db.seq=db.employees.length;
 if(!db.settings)db.settings={halfAfter:'09:15',office:null,radius:100};
-if(!db.targets)db.targets={};if(!db.sales)db.sales={};
+if(!db.targets)db.targets={};if(!db.sales)db.sales={};if(!db.forms)db.forms={};
 db.employees.forEach(e=>{if(!Array.isArray(e.badges))e.badges=[]});
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){toast('Could not save — storage is full','bad');return false}}
 let session=null;
 try{session=JSON.parse(localStorage.getItem(KEY+'_s'))}catch(e){}
 function setSession(s){session=s;try{s?localStorage.setItem(KEY+'_s',JSON.stringify(s)):localStorage.removeItem(KEY+'_s')}catch(e){}}
-let view='dash',newCat='Core',histFilter='all',pendingPhoto=null,editId=null,busy=false,tYm=null,tEmp='all',ntEmp='',ntYm=null;
+let view='dash',newCat='Core',histFilter='all',pendingPhoto=null,editId=null,busy=false,tYm=null,tEmp='all',ntEmp='',ntYm=null,aYm=null,aEmp='all';
 
 /* ============ App update (Android) ============ */
 const APK_URL='https://github.com/hassan4500678-ux/F-B/releases/download/erp-latest/FB-ERP.apk';
@@ -395,7 +403,7 @@ const P={
  id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.5 1.8-2.3 3.2-2.3s2.6.8 3.2 2.3M14.5 10h4M14.5 13.5h3"/>'
 };
 function I(n,s,c,w){return `<svg width="${s||20}" height="${s||20}" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="${w||1.8}" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`}
-const MODULES=[['target','Targets','#2563EB','targets'],['tplus','New Targets','#4F46E5','newtarget'],['form','Daily Forms','#0D9488'],['report','Reports','#475569'],['trophy','Leaderboard','#B45309'],['trend','Analytics','#7C3AED'],['wallet','Salary','#047857'],['gift','Incentives','#BE123C'],['compare','Comparison','#0369A1'],['box','PCS','#9333EA']];
+const MODULES=[['report','Reports','#475569'],['trophy','Leaderboard','#B45309'],['wallet','Salary','#047857'],['gift','Incentives','#BE123C'],['compare','Comparison','#0369A1'],['box','PCS','#9333EA']];
 
 const BADGES=[['star','star','Star Performer','#B45309'],['seller','trophy','Top Seller','#2563EB'],['ontime','clock','Always On Time','#047857'],['target','target','Target Achiever','#7C3AED'],['team','users','Team Player','#0D9488'],['rising','trend','Rising Star','#DB2777'],['hero','heart','Customer Hero','#BE123C'],['reliable','shield','Most Reliable','#1E3A8A']];
 const badgeOf=id=>BADGES.find(b=>b[0]===id);
@@ -491,7 +499,8 @@ function closeDrawer(){document.body.classList.remove('open')}
 function renderDrawer(){
   const u=me();if(!u)return;
   const items=[['dash','Dashboard','grid'],['targets','Targets','target'],['profile','Profile','user'],['settings','Settings','gear'],['history','Attendance History','cal']];
-  if(isAdmin())items.splice(2,0,['newtarget','New Targets','tplus'],['add','Add Employee','uadd'],['badges','Badges','medal']);
+  if(isAdmin())items.splice(2,0,['newtarget','New Targets','tplus'],['analytics','Analytics','trend'],['add','Add Employee','uadd'],['badges','Badges','medal']);
+  else items.splice(2,0,['dform','Daily Form','form']);
   const list=liveOrder(),n=list.filter(isLive).length;
   $('#drawer').innerHTML=`<div class="brand"><div class="mark">FB</div><div><b>FB ERP</b><span>Workforce Management</span></div></div>
   <div class="dprof">${avatar(u,42,{seal:true})}<div style="min-width:0"><b>${esc(u.name)}</b><span>${isAdmin()?'Administrator':esc(u.category)+' · '+esc(u.branch)}</span></div></div>
@@ -513,7 +522,7 @@ function login(){
   if(e){setSession({role:'emp',id:e.id});view='dash';return render()}
   $('#code').value='';toast('Invalid login code','bad');
 }
-function logout(){closeDrawer();setSession(null);tYm=null;tEmp='all';ntEmp='';ntYm=null;histFilter='all';render()}
+function logout(){closeDrawer();setSession(null);tYm=null;tEmp='all';aYm=null;aEmp='all';ntEmp='';ntYm=null;histFilter='all';render()}
 
 /* ============ Shell ============ */
 function bar(title,sub,back){
@@ -537,7 +546,7 @@ function render(){
   document.body.classList.toggle('dark',db.theme==='dark');
   const app=$('#app');
   if(!session||!me()){if(session)setSession(null);app.innerHTML=loginView();return}
-  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash,edit:isAdmin()?addView:empDash,badges:isAdmin()?badgesView:empDash,targets:targetsView,newtarget:isAdmin()?newTargetView:targetsView}[view]||(isAdmin()?adminDash:empDash);
+  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash,edit:isAdmin()?addView:empDash,badges:isAdmin()?badgesView:empDash,targets:targetsView,newtarget:isAdmin()?newTargetView:targetsView,dform:isAdmin()?adminDash:dformView,analytics:isAdmin()?analyticsView:empDash}[view]||(isAdmin()?adminDash:empDash);
   app.innerHTML=fn();after();
 }
 function loginView(){
@@ -565,7 +574,7 @@ function adminDash(){
   <div class="card"><div class="card-h"><div><h3>Today’s distribution</h3><p>${c.total} employees</p></div></div><div class="card-b" id="ch2"></div></div>
   <div class="card"><div class="card-h"><div><h3>Employees</h3><p>Tap an employee to edit</p></div><button class="btn blue sm" onclick="openAdd()">${I('plus',15,'#fff',2.4)}Add</button></div>${rows}</div></div>`;
 }
-function delEmp(id){const e=db.employees.find(x=>x.id===id);if(!e)return;confirmBox('Delete employee?',`${esc(e.name)} and all of their attendance records will be permanently deleted.`,()=>{db.employees=db.employees.filter(x=>x.id!==id);delete db.att[id];delete db.targets[id];delete db.sales[id];save();toast('Employee deleted');editId=null;go('dash')})}
+function delEmp(id){const e=db.employees.find(x=>x.id===id);if(!e)return;confirmBox('Delete employee?',`${esc(e.name)} and all of their attendance records will be permanently deleted.`,()=>{db.employees=db.employees.filter(x=>x.id!==id);delete db.att[id];delete db.targets[id];delete db.sales[id];delete db.forms[id];save();toast('Employee deleted');editId=null;go('dash')})}
 function openAdd(){editId=null;newCat='Core';go('add')}
 function editEmp(id){const e=db.employees.find(x=>x.id===id);if(!e)return;editId=id;newCat=e.category;go('edit')}
 function addView(){
@@ -578,7 +587,8 @@ function addView(){
   <div class="fld"><label for="nBranch">Branch</label><select id="nBranch" class="inp"><option>Latifabad</option></select></div>
   <div class="fld"><label for="nCode">Login code</label><input id="nCode" class="inp num" inputmode="numeric" placeholder="e.g. 1122" autocomplete="off" value="${v('code')}"><span class="hint">The employee uses this code to sign in. It must be unique.</span></div>
   <button class="btn" onclick="addEmp()">${I('check',18,'#fff',2.4)}${e?'Save changes':'Save employee'}</button></div></div>
-  ${e?`<div class="card"><div class="card-h"><div><h3>Badges</h3><p>${(e.badges||[]).length} assigned</p></div><button class="btn out sm" onclick="manageBadges('${e.id}')">${I('medal',15)}Manage</button></div><div class="card-b">${badgeGrid(e)}</div></div>
+  ${e?`<div class="card"><div class="card-h"><div><h3>Areas</h3><p>${(e.areas||[]).filter(Boolean).length} of ${AREA_N[e.category]||3} set by employee</p></div></div><div class="card-b">${(e.areas||[]).filter(Boolean).length?`<div class="chips">${e.areas.filter(Boolean).map(a=>`<span class="tag live">${esc(a)}</span>`).join('')}</div>`:'<p class="muted" style="font-size:13px">Not set yet. The employee sets areas in Profile.</p>'}</div></div>
+  <div class="card"><div class="card-h"><div><h3>Badges</h3><p>${(e.badges||[]).length} assigned</p></div><button class="btn out sm" onclick="manageBadges('${e.id}')">${I('medal',15)}Manage</button></div><div class="card-b">${badgeGrid(e)}</div></div>
   <div class="card"><div class="card-b"><button class="btn danger" onclick="delEmp('${e.id}')">${I('trash',17)}Delete employee</button></div></div>`:''}</div>`;
 }
 function pickCat(b,c){newCat=c;document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b))}
@@ -609,6 +619,9 @@ function manageBadges(id){const e=db.employees.find(x=>x.id===id);if(!e)return;p
 function toggleB(b,id){const i=pickB.indexOf(id);if(i>-1)pickB.splice(i,1);else pickB.push(id);b.classList.toggle('on',i<0)}
 function saveBadges(id){const e=db.employees.find(x=>x.id===id);if(!e)return;e.badges=BADGES.map(b=>b[0]).filter(k=>pickB.includes(k));save();closeModal();toast('Badges updated for '+e.name);render()}
 /* ============ Targets ============ */
+const TOFF=5; /* Friday off for targets */
+const SHOPS=45;
+const AREA_N={'Core':3,'Vab':6,'Ws Core':3};
 const ymOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1);
 const curYm=()=>today().slice(0,7);
 function ymShift(ym,k){const[y,m]=ym.split('-').map(Number);return ymOf(new Date(y,m-1+k,1))}
@@ -619,14 +632,16 @@ const isLocked=ym=>Date.now()>=lockAt(ym).getTime();
 const lockLbl=ym=>lockAt(ym).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+', 9 PM';
 const fmtN=n=>{n=+n||0;return Math.abs(n%1)>0.001?n.toFixed(1):String(Math.round(n))};
 const ctn=n=>`${fmtN(n)}<span class="unit">CTN</span>`;
+function formsOn(id,k){return((db.forms[id]||{})[k])||[]}
+function dayCtn(id,k){return +((db.sales[id]||{})[k]||0)+formsOn(id,k).reduce((a,x)=>a+(+x.ctn||0),0)}
 function tcalc(id,ym){
-  const T=+(((db.targets[id]||{})[ym]||{}).ctn||0),sales=db.sales[id]||{},tk=today(),cy=curYm();
-  const days=monthDates(ym),wd=days.filter(d=>d.getDay()!==0),daily=days.map(d=>+(sales[dkey(d)]||0));
+  const T=+(((db.targets[id]||{})[ym]||{}).ctn||0),tk=today(),cy=curYm();
+  const days=monthDates(ym),wd=days.filter(d=>d.getDay()!==TOFF),daily=days.map(d=>dayCtn(id,dkey(d)));
   const ach=daily.reduce((a,b)=>a+b,0),totalWD=wd.length;
   const goneWD=ym<cy?totalWD:ym>cy?0:wd.filter(d=>dkey(d)<=tk).length;
   const timeGone=totalWD?goneWD*100/totalWD:0,achPct=T?ach*100/T:0,base=totalWD?T/totalWD:0;
   let req=null,remDays=0,todayAch=0;
-  if(ym===cy){const before=days.filter(d=>dkey(d)<tk).reduce((a,d)=>a+(+(sales[dkey(d)]||0)),0);todayAch=+(sales[tk]||0);remDays=wd.filter(d=>dkey(d)>=tk).length;req=remDays?Math.max(0,(T-before)/remDays):0}
+  if(ym===cy){const before=days.filter(d=>dkey(d)<tk).reduce((a,d)=>a+dayCtn(id,dkey(d)),0);todayAch=dayCtn(id,tk);remDays=wd.filter(d=>dkey(d)>=tk).length;req=remDays?Math.max(0,(T-before)/remDays):0}
   const avg=goneWD?ach/goneWD:0;
   return{T,ach,rem:Math.max(0,T-ach),achPct,timeGone,base,req,remDays,todayAch,daily,days,wd,totalWD,goneWD,avg,has:T>0};
 }
@@ -638,10 +653,10 @@ function paceTag(c){if(!c.has)return'';const d=c.achPct-c.timeGone;if(c.goneWD==
 function lockChip(ym){return isLocked(ym)?`<span class="lock on">${I('lockc',13,'currentColor',2.2)}Locked</span>`:`<span class="lock off">${I('clock',13,'currentColor',2.2)}Locks ${lockLbl(ym)}</span>`}
 function dashTargetCard(){
   const ym=curYm();
-  if(isAdmin()){let T=0,A=0,n=0;db.employees.forEach(e=>{const c=tcalc(e.id,ym);if(c.has){T+=c.T;A+=c.ach;n++}});
-    const tg=tcalc('__',ym).timeGone,p=T?A*100/T:0;
+  if(isAdmin()){const tt=teamTotals(ym),T=tt.T,A=tt.A,n=tt.n,tg=tt.tg,p=tt.p;
     return `<div class="card"><div class="card-h"><div><h3>Team target · ${ymLabel(ym,true)}</h3><p>${n} of ${db.employees.length} employees have targets</p></div><button class="btn out sm" onclick="tEmp='all';tYm=null;go('targets')">Open</button></div><div class="card-b">
      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px"><span class="big num">${fmtN(A)}</span><span class="muted">/ ${fmtN(T)} CTN</span></div>
+     <div class="req" style="margin-bottom:14px"><div><span>Total per day</span><b class="num">${ctn(Math.ceil(tt.B))}</b></div><div><span>Live daily total</span><b class="num">${ctn(Math.ceil(tt.R))}</b></div><div><span>Today</span><b class="num">${ctn(tt.TD)}</b></div></div>
      ${pbars(p,tg)}</div></div>`}
   const e=me(),c=tcalc(e.id,ym);
   if(!c.has)return `<div class="card"><div class="card-h"><div><h3>My target · ${ymLabel(ym,true)}</h3><p>No target assigned yet</p></div>${I('target',20,'var(--faint)')}</div></div>`;
@@ -662,12 +677,15 @@ function targetsView(){
   else body=empTargets(admin?db.employees.find(e=>e.id===tEmp):me(),ym);
   return bar('Targets',ymLabel(ym)+' · CTN',true)+`<div class="wrap">${filters}${body}</div>`;
 }
+function teamTotals(ym){let T=0,A=0,B=0,R=0,TD=0,n=0;db.employees.forEach(e=>{const c=tcalc(e.id,ym);A+=c.ach;TD+=c.todayAch;if(c.has){n++;T+=c.T;B+=c.base;R+=c.req||0}});return{T,A,B,R,TD,n,tg:tcalc('__',ym).timeGone,p:T?A*100/T:0,cur:ym===curYm()}}
 function teamTargets(ym){
   const rows=db.employees.map(e=>({e,c:tcalc(e.id,ym)}));
-  const withT=rows.filter(r=>r.c.has);let T=0,A=0;withT.forEach(r=>{T+=r.c.T;A+=r.c.ach});
+  const withT=rows.filter(r=>r.c.has);const tt=teamTotals(ym),T=tt.T,A=tt.A;
   const tg=tcalc('__',ym).timeGone,p=T?A*100/T:0;
   const hero=`<div class="idc"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="hello">Team target · ${ymLabel(ym)}</div><div class="big num" style="margin-top:4px">${fmtN(A)} <span style="font-size:15px;font-weight:500;opacity:.7">/ ${fmtN(T)} CTN</span></div></div>${lockChip(ym)}</div>
-   <div class="tgrid"><div><span>Achievement</span><b class="num">${fmtN(p)}%</b></div><div><span>Time gone</span><b class="num">${fmtN(tg)}%</b></div><div><span>Remaining</span><b class="num">${fmtN(Math.max(0,T-A))}</b></div></div></div>`;
+   <div class="tgrid"><div><span>Total target</span><b class="num">${fmtN(T)}</b></div><div><span>Total achieved</span><b class="num">${fmtN(A)}</b></div><div><span>Remaining</span><b class="num">${fmtN(Math.max(0,T-A))}</b></div>
+   <div><span>Total per day</span><b class="num">${Math.ceil(tt.B)}</b></div><div><span>Live daily total</span><b class="num">${tt.cur?Math.ceil(tt.R):'—'}</b></div><div><span>Achieved today</span><b class="num">${tt.cur?fmtN(tt.TD):'—'}</b></div>
+   <div><span>Achievement</span><b class="num">${fmtN(p)}%</b></div><div><span>Time gone</span><b class="num">${fmtN(tg)}%</b></div><div><span>Working days</span><b class="num">${tcalc('__',ym).totalWD}</b></div></div></div>`;
   if(!db.employees.length)return hero+`<div class="card"><div class="empty">${I('users',32)}No employees yet.</div></div>`;
   const chart=withT.length?barChart(withT.map(r=>esc(r.e.name.split(' ')[0]).slice(0,8)),[{name:'Achievement %',color:C.pri,colors:withT.map(r=>r.c.achPct>=tg?C.ok:C.bad),data:withT.map(r=>Math.round(r.c.achPct))}],{min:100,refLine:{v:tg,color:'#64748B'},legend:[{name:'Ahead of time gone',color:C.ok},{name:'Behind',color:C.bad},{name:'Time gone',color:'#64748B'}]}):'<p class="muted" style="font-size:13px">No targets assigned for this month.</p>';
   const list=rows.map(({e,c})=>`<div class="tli" onclick="tEmp='${e.id}';render();window.scrollTo(0,0)">${avatar(e,40,{})}<div class="info"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(e.name)}</b>${c.has?paceTag(c):'<span class="tag absent" style="background:var(--surface2);color:var(--faint)">No target</span>'}</div>
@@ -687,16 +705,16 @@ function empTargets(e,ym){
   let live='';
   if(ym===cy){const r=Math.ceil(c.req),b=c.base,diff=r-b;
     const dTxt=Math.abs(diff)<0.5?`<span class="delta flat">Same as base</span>`:diff<0?`<span class="delta up">${I('down',12,'currentColor',2.6)}${fmtN(Math.abs(diff))} less than base</span>`:`<span class="delta down">${I('up',12,'currentColor',2.6)}${fmtN(diff)} more than base</span>`;
-    live=`<div class="card"><div class="card-h"><div><h3>Live daily target</h3><p>${c.remDays} working day${c.remDays===1?'':'s'} left · Sundays off</p></div>${c.todayAch>=r&&r>0?'<span class="tag present">Done today</span>':''}</div><div class="card-b">
+    live=`<div class="card"><div class="card-h"><div><h3>Live daily target</h3><p>${c.remDays} working day${c.remDays===1?'':'s'} left · Fridays off</p></div>${c.todayAch>=r&&r>0?'<span class="tag present">Done today</span>':''}</div><div class="card-b">
      <div class="req"><div><span>Required per day</span><b class="num">${ctn(r)}</b><div>${dTxt}</div></div><div><span>Base per day</span><b class="num">${ctn(Math.ceil(b))}</b><div class="muted" style="font-size:11.5px">${fmtN(c.T)} ÷ ${c.totalWD} days</div></div></div>
      <div class="prow" style="margin-top:14px"><div class="pl"><span class="muted">Today: ${fmtN(c.todayAch)} of ${r} CTN</span><b class="num">${r?Math.min(999,Math.round(c.todayAch*100/r)):100}%</b></div><div class="pbar"><i style="width:${r?Math.min(100,c.todayAch*100/r):100}%;background:${C.pri}"></i></div></div>
      <div class="note">${I('info',14)}Sell more than the daily target and tomorrow’s target goes down; sell less and it goes up.</div></div></div>`}
-  const entry=locked?'':`<div class="card"><div class="card-h"><div><h3>Record achievement</h3><p>CTNs sold on a day</p></div></div><div class="card-b">
+  const entry=locked?'':!admin?`<div class="card"><div class="srow"><div><b>Achievement is automatic</b><span>CTNs from your Daily Form are added here as soon as you save.</span></div><button class="btn blue sm" onclick="go('dform')">Daily Form</button></div></div>`:`<div class="card"><div class="card-h"><div><h3>Manual adjustment</h3><p>Extra CTNs for a day (added to Daily Form CTNs)</p></div></div><div class="card-b">
      <div class="filters"><div class="fld" style="margin:0"><label>Date</label><input id="sDate" type="date" class="inp num" value="${ym===cy?today():dkey(c.days[c.days.length-1])}" min="${dkey(c.days[0])}" max="${ym===cy?today():dkey(c.days[c.days.length-1])}"></div><div class="fld" style="margin:0"><label>CTNs</label><input id="sCtn" type="number" min="0" step="1" inputmode="numeric" class="inp num" placeholder="0"></div></div>
      <button class="btn" style="margin-top:12px" onclick="saveSale('${e.id}','${ym}')">${I('check',18,'#fff',2.4)}Save</button><p class="hint muted" style="font-size:11.5px;margin-top:8px">Saving a date again replaces its figure. Changes close on ${lockLbl(ym)}.</p></div></div>`;
   const labels=c.days.map(d=>d.getDate());
   let cum=0,exp=0;const cumA=[],expA=[];const tk=today();
-  c.days.forEach((d,i)=>{if(d.getDay()!==0)exp+=c.base;expA.push(+exp.toFixed(1));cum+=c.daily[i];cumA.push(ym===cy&&dkey(d)>tk?null:cum)});
+  c.days.forEach((d,i)=>{if(d.getDay()!==TOFF)exp+=c.base;expA.push(+exp.toFixed(1));cum+=c.daily[i];cumA.push(ym===cy&&dkey(d)>tk?null:cum)});
   const line=lineChart(labels,[{name:'Achieved (cumulative)',color:C.pri,data:cumA,fill:true},{name:'Target pace',color:'#94A3B8',data:expA,dash:true}],{every:5});
   const bars=barChart(labels,[{name:'CTN',color:C.ok,colors:c.daily.map(v=>v>=c.base?C.ok:C.warn),data:c.daily}],{every:5,min:Math.ceil(c.base*1.2)||4,refLine:{v:c.base,color:'#64748B'},legend:[{name:'At or above base',color:C.ok},{name:'Below base',color:C.warn},{name:'Base per day',color:'#64748B'}]});
   const pie=donut([{label:'Achieved',value:Math.round(c.ach),color:C.ok},{label:'Remaining',value:Math.round(c.rem),color:'#CBD5E1'}],fmtN(c.achPct)+'%','achieved');
@@ -757,6 +775,104 @@ function saveTarget(){
 }
 function delTarget(id,ym){if(isLocked(ym))return toast('This month is locked','bad');const e=db.employees.find(x=>x.id===id);confirmBox('Remove target?',`${esc(e.name)}’s target for ${ymLabel(ym)} will be removed.`,()=>{delete db.targets[id][ym];save();toast('Target removed');render()})}
 
+/* ============ Daily Form ============ */
+function areasCard(u){const n=AREA_N[u.category]||3,a=u.areas||[];
+  return `<div class="card"><div class="card-h"><div><h3>My areas</h3><p>${esc(u.category)} · ${n} areas for your Daily Form</p></div>${I('pin',20,'var(--pri)')}</div><div class="card-b">
+  ${Array.from({length:n},(_,i)=>`<div class="fld"><label for="ar${i}">Area ${i+1}</label><input id="ar${i}" class="inp areaIn" value="${esc(a[i]||'')}" placeholder="Area name" autocomplete="off"></div>`).join('')}
+  <button class="btn" onclick="saveAreas()">${I('check',18,'#fff',2.4)}Save areas</button></div></div>`}
+function saveAreas(){const e=me(),v=[...document.querySelectorAll('.areaIn')].map(x=>x.value.trim());
+  if(v.some(x=>!x))return toast('Please fill all '+v.length+' area names','bad');
+  if(new Set(v.map(x=>x.toLowerCase())).size!==v.length)return toast('Area names must be different','bad');
+  e.areas=v;save();toast('Areas saved');render()}
+function myAreas(e){return(e.areas||[]).slice(0,AREA_N[e.category]||3).filter(Boolean)}
+function dashFormCard(){const e=me(),t=today(),f=formsOn(e.id,t);
+  const pr=f.reduce((a,x)=>a+x.prod,0),c=f.reduce((a,x)=>a+x.ctn,0);
+  return `<div class="card"><div class="card-h"><div><h3>Today’s daily form</h3><p>${f.length?`${f.length} area${f.length>1?'s':''} · ${pr} productive · ${fmtN(c)} CTN`:'Nothing submitted yet'}</p></div><button class="btn ${f.length?'out':'blue'} sm" onclick="go('dform')">${f.length?'Open':'Fill form'}</button></div></div>`}
+function dformView(){
+  const e=me(),areas=myAreas(e),t=today(),ym=curYm(),locked=isLocked(ym),f=formsOn(e.id,t);
+  if(!areas.length)return bar('Daily Form',dateLine(),true)+`<div class="wrap"><div class="card"><div class="empty">${I('pin',32)}Set your ${AREA_N[e.category]||3} areas first.<br>Go to Profile → My areas.<div style="margin-top:14px"><button class="btn blue sm" onclick="go('profile')">Open Profile</button></div></div></div></div>`;
+  const form=locked?`<div class="card"><div class="empty">${I('lockc',32)}${ymLabel(ym)} is locked. Daily forms are closed.</div></div>`:`<div class="card"><div class="card-h"><div><h3>Daily form</h3><p>${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</p></div>${I('form',20,'var(--pri)')}</div><div class="card-b">
+   <div class="fld"><label for="fA">Area</label><select id="fA" class="inp" onchange="fillForm()">${areas.map(a=>`<option>${esc(a)}</option>`).join('')}</select></div>
+   <div class="filters"><div class="fld"><label>Total shops</label><input class="inp num ro" value="${SHOPS}" readonly></div><div class="fld"><label for="fP">Productive shops</label><input id="fP" type="number" min="0" max="${SHOPS}" inputmode="numeric" class="inp num" placeholder="0" oninput="fNP()"></div></div>
+   <div class="filters"><div class="fld"><label>Non-productive</label><input id="fN" class="inp num ro" value="${SHOPS}" readonly></div><div class="fld"><label for="fC">CTNs</label><input id="fC" type="number" min="0" step="1" inputmode="numeric" class="inp num" placeholder="0"></div></div>
+   <button class="btn" onclick="saveForm()">${I('check',18,'#fff',2.4)}Save</button><p class="muted" id="fHint" style="font-size:11.5px;margin-top:8px">CTNs are added to your target achievement automatically.</p></div></div>`;
+  const tot=f.reduce((a,x)=>({s:a.s+x.total,p:a.p+x.prod,c:a.c+x.ctn}),{s:0,p:0,c:0});
+  const sum=f.length?`<div style="overflow-x:auto"><table class="tbl tight"><thead><tr><th>Area</th><th style="text-align:right">Shops</th><th style="text-align:right">Prod.</th><th style="text-align:right">Non</th><th style="text-align:right">CTN</th>${locked?'':'<th></th>'}</tr></thead><tbody>
+   ${f.map((x,i)=>`<tr><td>${esc(x.area)}<small>${fmtT(x.ts)}</small></td><td class="num" style="text-align:right">${x.total}</td><td class="num" style="text-align:right;color:var(--ok);font-weight:600">${x.prod}</td><td class="num" style="text-align:right;color:var(--bad)">${x.total-x.prod}</td><td class="num" style="text-align:right;font-weight:600">${fmtN(x.ctn)}</td>${locked?'':`<td style="width:36px"><button class="xb" onclick="delForm(${i})">${I('trash',14)}</button></td>`}</tr>`).join('')}
+   <tr class="sumrow"><td>Total</td><td class="num" style="text-align:right">${tot.s}</td><td class="num" style="text-align:right">${tot.p}</td><td class="num" style="text-align:right">${tot.s-tot.p}</td><td class="num" style="text-align:right">${fmtN(tot.c)}</td>${locked?'':'<td></td>'}</tr></tbody></table></div>`
+   :`<div class="empty" style="padding:18px">No entries today yet.</div>`;
+  let mv=0,ms=0,mp=0,mc=0;monthDates(ym).forEach(d=>formsOn(e.id,dkey(d)).forEach(x=>{mv++;ms+=x.total;mp+=x.prod;mc+=x.ctn}));
+  const c=tcalc(e.id,ym);
+  return bar('Daily Form',dateLine(),true)+`<div class="wrap">${form}
+   <div class="card"><div class="card-h"><div><h3>Daily summary</h3><p>Today · ${f.length} area${f.length===1?'':'s'}</p></div>${tot.s?`<span class="tag present">${Math.round(tot.p*100/tot.s)}% productive</span>`:''}</div>${sum}</div>
+   <div class="kpis">${kpi(fmtN(mc),'CTN this month',c.has?`Target ${fmtN(c.T)} · ${fmtN(c.achPct)}%`:'No target set','box',C.pri,'#2563EB14')}${kpi(mp,'Productive shops',ms?`${Math.round(mp*100/ms)}% of ${ms} shops`:'This month','present',C.ok,'#10B98117')}</div></div>`;
+}
+function fNP(){const p=+$('#fP').value||0;$('#fN').value=Math.max(0,SHOPS-p)}
+function fillForm(){const e=me(),a=$('#fA').value,x=formsOn(e.id,today()).find(z=>z.area===a);$('#fP').value=x?x.prod:'';$('#fC').value=x?x.ctn:'';fNP();$('#fHint').textContent=x?'This area is already saved today — saving will update it.':'CTNs are added to your target achievement automatically.'}
+function saveForm(){
+  const e=me(),t=today();if(isLocked(t.slice(0,7)))return toast('This month is locked','bad');
+  const area=$('#fA').value,pv=$('#fP').value.trim(),cv=$('#fC').value.trim(),p=Number(pv),c=Number(cv);
+  if(pv===''||!Number.isInteger(p)||p<0||p>SHOPS)return toast(`Productive shops must be 0–${SHOPS}`,'bad');
+  if(cv===''||!isFinite(c)||c<0)return toast('Enter CTNs (0 if none)','bad');
+  db.forms[e.id]=db.forms[e.id]||{};const list=db.forms[e.id][t]=db.forms[e.id][t]||[];
+  const rec={area,total:SHOPS,prod:p,ctn:Math.round(c*10)/10,ts:Date.now()},i=list.findIndex(x=>x.area===area);
+  if(i>-1)list[i]=rec;else list.push(rec);
+  if(save()){toast(`${area} saved · ${fmtN(rec.ctn)} CTN added`);render()}
+}
+function delForm(i){const e=me(),t=today(),l=formsOn(e.id,t),x=l[i];if(!x)return;confirmBox('Delete entry?',`${esc(x.area)} · ${fmtN(x.ctn)} CTN will be removed from today and from your achievement.`,()=>{l.splice(i,1);save();toast('Entry deleted');render()})}
+
+/* ============ Analytics (admin) ============ */
+function groupBar(labels,series,opt={}){
+  const W=340,H=200,L=34,R=6,T=10,B=26,cw=W-L-R,ch=H-T-B,n=labels.length||1;
+  let max=Math.max(1,...series.flatMap(s=>s.data));const step=Math.ceil(max/4)||1;max=step*4;let g='';
+  for(let k=0;k<=4;k++){const y=T+ch-ch*k/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line2)"/><text x="${L-8}" y="${y+3.5}" text-anchor="end" font-size="10" fill="var(--faint)">${step*k}</text>`}
+  const slot=cw/n,gw=Math.min(40,slot*.72),bw=gw/series.length;
+  labels.forEach((lb,i)=>{const x0=L+slot*i+(slot-gw)/2;series.forEach((s,si)=>{const v=s.data[i]||0,h=ch*v/max;if(h>0)g+=`<rect x="${x0+bw*si+1}" y="${T+ch-h}" width="${bw-2}" height="${h}" rx="2.5" fill="${s.color}"/>`});
+    g+=`<text x="${L+slot*i+slot/2}" y="${H-8}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${lb}</text>`});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg><div class="legend">${series.map(s=>`<span><i style="background:${s.color}"></i>${s.name}</span>`).join('')}</div>`;
+}
+function analyticsView(){
+  const ym=aYm||curYm(),emps=aEmp==='all'?db.employees:db.employees.filter(e=>e.id===aEmp),days=monthDates(ym),tk=today();
+  const filters=`<div class="card"><div class="card-b" style="padding:12px"><div class="filters"><select class="inp" onchange="aYm=this.value;render()">${monthOptions(ym)}</select><select class="inp" onchange="aEmp=this.value;render()"><option value="all">All bookers</option>${db.employees.map(e=>`<option value="${e.id}" ${aEmp===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}</select></div></div></div>`;
+  const ent=[];emps.forEach(e=>days.forEach(d=>{const k=dkey(d);formsOn(e.id,k).forEach(x=>ent.push({e,k,...x}))}));
+  const S=ent.reduce((a,x)=>a+x.total,0),Pd=ent.reduce((a,x)=>a+x.prod,0),Cf=ent.reduce((a,x)=>a+x.ctn,0),NP=S-Pd,pp=S?Pd*100/S:0;
+  let T=0,A=0;const bk=emps.map(e=>{const c=tcalc(e.id,ym),my=ent.filter(x=>x.e===e),s=my.reduce((a,x)=>a+x.total,0),p=my.reduce((a,x)=>a+x.prod,0),cf=my.reduce((a,x)=>a+x.ctn,0);T+=c.T;A+=c.ach;return{e,c,v:my.length,s,p,cf}});
+  const tg=tcalc('__',ym).timeGone,ap=T?A*100/T:0;
+  const hero=`<div class="idc"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="hello">Analytics · ${ymLabel(ym)}</div><div class="big num" style="margin-top:4px">${fmtN(A)} <span style="font-size:15px;font-weight:500;opacity:.7">/ ${fmtN(T)} CTN</span></div></div>${lockChip(ym)}</div>
+   <div class="tgrid"><div><span>Achievement</span><b class="num">${fmtN(ap)}%</b></div><div><span>Time gone</span><b class="num">${fmtN(tg)}%</b></div><div><span>Bookers</span><b class="num">${emps.length}</b></div>
+   <div><span>Total shops</span><b class="num">${S}</b></div><div><span>Productive</span><b class="num">${Pd}</b></div><div><span>Productivity</span><b class="num">${fmtN(pp)}%</b></div></div></div>`;
+  if(!db.employees.length)return bar('Analytics','Admin only',true)+`<div class="wrap">${filters}${hero}<div class="card"><div class="empty">${I('users',32)}No bookers yet.</div></div></div>`;
+  // area-wise
+  const am={};ent.forEach(x=>{const key=x.e.id+'|'+x.area;const o=am[key]=am[key]||{area:x.area,e:x.e,v:0,s:0,p:0,c:0};o.v++;o.s+=x.total;o.p+=x.prod;o.c+=x.ctn});
+  const areas=Object.values(am).sort((a,b)=>b.s-a.s);
+  const areaBars=areas.length?areas.map(a=>`<div class="ab"><div class="h"><b>${esc(a.area)} <span class="muted" style="font-weight:400">· ${esc(a.e.name.split(' ')[0])}</span></b><span class="num">${a.p}/${a.s} · ${Math.round(a.p*100/a.s)}%</span></div><div class="sbar"><i style="width:${a.p*100/a.s}%;background:${C.ok}"></i><i style="width:${(a.s-a.p)*100/a.s}%;background:${C.bad}"></i></div></div>`).join('')+`<div class="legend"><span><i style="background:${C.ok}"></i>Productive</span><span><i style="background:${C.bad}"></i>Non-productive</span></div>`:'<p class="muted" style="font-size:13px">No daily forms submitted for this month.</p>';
+  const areaTbl=areas.length?`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Area</th><th>Booker</th><th style="text-align:right">Visits</th><th style="text-align:right">Shops</th><th style="text-align:right">Prod.</th><th style="text-align:right">Non</th><th style="text-align:right">Prod %</th><th style="text-align:right">CTN</th></tr></thead><tbody>${areas.map(a=>`<tr><td style="font-weight:600">${esc(a.area)}</td><td>${esc(a.e.name)}</td><td class="num" style="text-align:right">${a.v}</td><td class="num" style="text-align:right">${a.s}</td><td class="num" style="text-align:right;color:var(--ok)">${a.p}</td><td class="num" style="text-align:right;color:var(--bad)">${a.s-a.p}</td><td class="num" style="text-align:right">${Math.round(a.p*100/a.s)}%</td><td class="num" style="text-align:right;font-weight:600">${fmtN(a.c)}</td></tr>`).join('')}</tbody></table></div>`:'';
+  // bookers
+  const lbl=bk.map(b=>esc(b.e.name.split(' ')[0]).slice(0,8));
+  const tva=groupBar(lbl,[{name:'Target',color:'#94A3B8',data:bk.map(b=>b.c.T)},{name:'Achieved',color:C.pri,data:bk.map(b=>b.c.ach)}]);
+  const prodB=groupBar(lbl,[{name:'Productive',color:C.ok,data:bk.map(b=>b.p)},{name:'Non-productive',color:C.bad,data:bk.map(b=>b.s-b.p)}]);
+  const bTbl=`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Booker</th><th style="text-align:right">Target</th><th style="text-align:right">Achieved</th><th style="text-align:right">Ach %</th><th style="text-align:right">Per day</th><th style="text-align:right">Live daily</th><th style="text-align:right">Shops</th><th style="text-align:right">Prod.</th><th style="text-align:right">Prod %</th><th style="text-align:right">CTN/shop</th></tr></thead><tbody>
+   ${bk.map(b=>`<tr><td style="font-weight:600">${esc(b.e.name)}<small>${esc(b.e.category)}</small></td><td class="num" style="text-align:right">${fmtN(b.c.T)}</td><td class="num" style="text-align:right;font-weight:600">${fmtN(b.c.ach)}</td><td style="text-align:right"><span class="delta ${b.c.has?(b.c.achPct>=tg?'up':'down'):'flat'}">${b.c.has?fmtN(b.c.achPct)+'%':'—'}</span></td><td class="num" style="text-align:right">${b.c.has?Math.ceil(b.c.base):'—'}</td><td class="num" style="text-align:right">${b.c.has&&b.c.req!=null?Math.ceil(b.c.req):'—'}</td><td class="num" style="text-align:right">${b.s}</td><td class="num" style="text-align:right">${b.p}</td><td class="num" style="text-align:right">${b.s?Math.round(b.p*100/b.s)+'%':'—'}</td><td class="num" style="text-align:right">${b.p?fmtN(b.cf/b.p):'—'}</td></tr>`).join('')}
+   <tr class="sumrow"><td>Total</td><td class="num" style="text-align:right">${fmtN(T)}</td><td class="num" style="text-align:right">${fmtN(A)}</td><td class="num" style="text-align:right">${fmtN(ap)}%</td><td class="num" style="text-align:right">${Math.ceil(bk.reduce((a,b)=>a+(b.c.has?b.c.base:0),0))}</td><td class="num" style="text-align:right">${ym===curYm()?Math.ceil(bk.reduce((a,b)=>a+(b.c.has?b.c.req||0:0),0)):'—'}</td><td class="num" style="text-align:right">${S}</td><td class="num" style="text-align:right">${Pd}</td><td class="num" style="text-align:right">${S?Math.round(pp)+'%':'—'}</td><td class="num" style="text-align:right">${Pd?fmtN(Cf/Pd):'—'}</td></tr></tbody></table></div>`;
+  // daily trend
+  const labels=days.map(d=>d.getDate()),cy=curYm();
+  const dP=days.map(d=>(dkey(d)>tk&&ym===cy)||d.getDay()===TOFF?null:ent.filter(x=>x.k===dkey(d)).reduce((a,x)=>a+x.prod,0));
+  const dC=days.map(d=>(dkey(d)>tk&&ym===cy)||d.getDay()===TOFF?null:emps.reduce((a,e)=>a+dayCtn(e.id,dkey(d)),0));
+  const trend=lineChart(labels,[{name:'CTN per day',color:C.pri,data:dC,fill:true},{name:'Productive shops',color:C.ok,data:dP}],{every:5});
+  const pie=S?donut([{label:'Productive',value:Pd,color:C.ok},{label:'Non-productive',value:NP,color:C.bad}],Math.round(pp)+'%','productive'):'<p class="muted" style="font-size:13px">No shop data yet.</p>';
+  const split=T?donut([{label:'Achieved',value:Math.round(Math.min(A,T)),color:C.pri},{label:'Remaining',value:Math.round(Math.max(0,T-A)),color:'#CBD5E1'}],fmtN(ap)+'%','of target'):'<p class="muted" style="font-size:13px">No targets assigned.</p>';
+  const card=(t,p,b)=>`<div class="card"><div class="card-h"><div><h3>${t}</h3><p>${p}</p></div></div><div class="card-b">${b}</div></div>`;
+  return bar('Analytics',ymLabel(ym)+' · Admin only',true)+`<div class="wrap">${filters}${hero}
+   ${card('Targets vs achievement','Each booker · CTN',tva)}
+   ${card('Target split',`${fmtN(A)} of ${fmtN(T)} CTN`,split)}
+   ${card('Shops: productive vs non-productive','All areas',pie)}
+   ${card('Area-wise shops','Total shops vs productive vs non-productive',areaBars)}
+   ${card('Bookers: shop productivity','Productive vs non-productive shops',prodB)}
+   ${card('Daily trend','CTN and productive shops per day',trend)}
+   <div class="card"><div class="card-h"><div><h3>All bookers detail</h3><p>Targets, live daily and shop productivity</p></div></div>${bTbl}</div>
+   ${areas.length?`<div class="card"><div class="card-h"><div><h3>Area detail</h3><p>${areas.length} areas</p></div></div>${areaTbl}</div>`:''}</div>`;
+}
+
 /* ============ Employee ============ */
 function empDash(){
   const e=me(),r=(db.att[e.id]||{})[today()],st=empStats(e),s=statusOf(r),live=r&&r.in&&!r.out;
@@ -776,6 +892,7 @@ function empDash(){
   <div class="sec-t"><h2>My attendance</h2><span>Since ${fmtD(e.joined)}</span></div>
   <div class="kpis k3">${kpi(st.p,'Present','','present',C.ok,'#10B98117')}${kpi(st.ab,'Absent','','absent',C.bad,'#EF444417')}${kpi(st.h,'Half Days','','half',C.warn,'#F59E0B17')}</div>
   ${dashTargetCard()}
+  ${dashFormCard()}
   <div class="card"><div class="card-h"><div><h3>My badges</h3><p>Awarded by your administrator</p></div><span class="ic" style="color:var(--warn)">${I('medal',20)}</span></div><div class="card-b">${badgeGrid(e,'No badges yet. Keep up the good work!')}</div></div>
   ${liveCard()}
   ${modulesBlock()}
@@ -806,6 +923,7 @@ function profileView(){
    ${pendingPhoto?'<p class="muted" style="font-size:12px;margin-top:10px">Preview shown — tap Save to apply.</p>':''}
   </div></div>
   ${admin?`<div class="card"><div class="card-h"><div><h3>Display name</h3><p>Shown on your dashboard</p></div></div><div class="card-b"><div class="fld"><input id="aName" class="inp" value="${esc(u.name)}"></div><button class="btn out" onclick="saveAdminName()">Update name</button></div></div>`:''}
+  ${admin?'':areasCard(u)}
   <div class="card"><div class="card-h"><h3>Account details</h3></div>${rows.map(r=>`<div class="srow"><span style="display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px">${I(r[0],17)}${r[1]}</span><b class="num" style="font-size:13.5px">${esc(r[2])}</b></div>`).join('')}</div></div>`;
 }
 function pickPhoto(inp){

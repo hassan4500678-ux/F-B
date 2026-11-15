@@ -166,7 +166,7 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 
 /* Drawer */
 #shade{position:fixed;inset:0;background:rgba(2,8,23,.5);opacity:0;pointer-events:none;transition:.25s;z-index:40}
-#drawer{position:fixed;top:0;left:0;bottom:0;width:288px;max-width:84%;background:var(--navy);color:#fff;z-index:50;transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:calc(20px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom))}
+#drawer{overflow:hidden;position:fixed;top:0;left:0;bottom:0;width:288px;max-width:84%;background:var(--navy);color:#fff;z-index:50;transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:calc(20px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom))}
 body.open #shade{opacity:1;pointer-events:auto}
 body.open #drawer{transform:none}
 .brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px}
@@ -180,7 +180,7 @@ body.open #drawer{transform:none}
 .nav{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:none;background:none;color:rgba(255,255,255,.78);border-radius:9px;font-weight:500;font-size:14px;cursor:pointer;text-align:left}
 .nav.on{background:rgba(255,255,255,.1);color:#fff}
 .nav.on svg{color:#60A5FA}
-.nav.out{margin-top:auto;color:#FCA5A5}
+.nav.out{color:#FCA5A5;flex:none}
 
 /* Modal & toast */
 #modal{position:fixed;inset:0;background:rgba(2,8,23,.55);display:none;align-items:flex-end;justify-content:center;z-index:60}
@@ -215,6 +215,28 @@ body.open #drawer{transform:none}
 .upd .ut{flex:1;min-width:0}.upd .ut b{display:block;font-size:14px;font-weight:600}.upd .ut span{font-size:12px;color:var(--muted)}
 .prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px}.prog i{display:block;height:100%;background:var(--pri);border-radius:3px;transition:width .2s}
 a.btn{text-decoration:none}
+.av .dot{position:absolute;right:1px;bottom:1px;width:28%;height:28%;min-width:9px;min-height:9px;border-radius:50%;border:2px solid var(--surface)}
+.dot.on{background:#10B981}.dot.off{background:#94A3B8}
+.lstrip{display:flex;gap:14px;overflow-x:auto;padding:14px 16px;scrollbar-width:none}.lstrip::-webkit-scrollbar{display:none}
+.lstrip .p{flex:0 0 62px;text-align:center}.lstrip .p .av{margin:0 auto}
+.lstrip .p b{display:block;font-size:11.5px;font-weight:600;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lstrip .p span{font-size:10.5px;color:var(--faint)}.lstrip .p span.a{color:var(--ok);font-weight:600}
+.cnt{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ok)}.cnt::before{content:"";width:7px;height:7px;border-radius:50%;background:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,.2);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.dlive{flex:1;min-height:0;overflow-y:auto;margin:12px 0 8px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}
+.dli{display:flex;align-items:center;gap:10px;padding:7px 12px}.dli .av .dot{border-color:var(--navy)}
+.dli b{font-size:13px;font-weight:500;display:block;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dli span{font-size:11px;color:rgba(255,255,255,.5)}.dli span.a{color:#6EE7B7}
+.bgs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.bg{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface2)}
+.bg .bi{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none;color:#fff}
+.bg b{font-size:12.5px;font-weight:600;line-height:1.25}
+.bpick{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;text-align:left;margin:14px 0 18px;max-height:46vh;overflow:auto}
+.bpick button{display:flex;align-items:center;gap:9px;padding:9px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-size:12.5px;font-weight:600;text-align:left}
+.bpick button.on{border-color:var(--pri);background:var(--pri-soft)}
+.bpick .bi{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:#fff}
+.minib{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}.minib i{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;color:#fff}
+.li.tap{cursor:pointer}.li.tap:active{background:var(--surface2)}
+.gpsline{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:10px}
 .foot-note{text-align:center;font-size:11.5px;color:var(--faint);margin-top:6px}
 </style>
 </head>
@@ -228,16 +250,18 @@ a.btn{text-decoration:none}
 <script>
 /* ============ Data ============ */
 const KEY='fb_erp_v1';
-const fresh=()=>({adminCode:'4321',admin:{name:'Administrator',photo:null},employees:[],att:{},theme:'light',seq:0});
+const fresh=()=>({adminCode:'4321',admin:{name:'Administrator',photo:null},employees:[],att:{},theme:'light',seq:0,settings:{halfAfter:'09:15',office:null,radius:100}});
 let db=null;
 try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!db||!Array.isArray(db.employees))db=fresh();
 if(db.seq==null)db.seq=db.employees.length;
+if(!db.settings)db.settings={halfAfter:'09:15',office:null,radius:100};
+db.employees.forEach(e=>{if(!Array.isArray(e.badges))e.badges=[]});
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){toast('Could not save — storage is full','bad');return false}}
 let session=null;
 try{session=JSON.parse(localStorage.getItem(KEY+'_s'))}catch(e){}
 function setSession(s){session=s;try{s?localStorage.setItem(KEY+'_s',JSON.stringify(s)):localStorage.removeItem(KEY+'_s')}catch(e){}}
-let view='dash',newCat='Core',histFilter='all',pendingPhoto=null;
+let view='dash',newCat='Core',histFilter='all',pendingPhoto=null,editId=null,busy=false;
 
 /* ============ App update (Android) ============ */
 const APK_URL='https://github.com/hassan4500678-ux/F-B/releases/download/erp-latest/FB-ERP.apk';
@@ -279,7 +303,11 @@ const fmtW=k=>new Date(k+'T00:00:00').toLocaleDateString('en-US',{weekday:'short
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isAdmin=()=>session&&session.role==='admin';
 const me=()=>isAdmin()?db.admin:db.employees.find(e=>e.id===session.id);
-function statusOf(r){if(!r||!r.in)return'absent';if(!r.out)return'present';return(r.out-r.in)/36e5<4?'half':'present'}
+function lateMins(ts){const d=new Date(ts),[H,M]=(db.settings.halfAfter||'09:15').split(':').map(Number);return d.getHours()*60+d.getMinutes()-(H*60+M)}
+function isHalf(r){return r.half!=null?r.half:lateMins(r.in)>0}
+function statusOf(r){if(!r||!r.in)return'absent';return isHalf(r)?'half':'present'}
+const cutLbl=()=>{const[H,M]=(db.settings.halfAfter||'09:15').split(':').map(Number);return new Date(2000,0,1,H,M).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})};
+const isLive=e=>{const r=(db.att[e.id]||{})[today()];return!!(r&&r.in&&!r.out)};
 function dur(r){if(!r||!r.in)return'0h 00m';const m=Math.max(0,Math.floor(((r.out||Date.now())-r.in)/6e4));return Math.floor(m/60)+'h '+pad(m%60)+'m'}
 const LBL={present:'Present',absent:'Absent',half:'Half Day'};
 function empStats(e){
@@ -320,6 +348,12 @@ const P={
  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5h.01"/>',
  plus:'<path d="M12 5v14M5 12h14"/>',
+ star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+ heart:'<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
+ shield:'<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M8.8 12l2.2 2.2 4.2-4.4"/>',
+ medal:'<circle cx="12" cy="15" r="5.5"/><path d="M8.5 10.5L6 3h4l2 5 2-5h4l-2.5 7.5"/>',
+ pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+ edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
  dl:'<path d="M12 3v12M7 10l5 5 5-5M5 20h14"/>',
  refresh:'<path d="M20 11a8 8 0 0 0-14.9-3.5M4 4v4h4M4 13a8 8 0 0 0 14.9 3.5M20 20v-4h-4"/>',
  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
@@ -337,11 +371,43 @@ const P={
 function I(n,s,c,w){return `<svg width="${s||20}" height="${s||20}" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="${w||1.8}" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`}
 const MODULES=[['target','Targets','#2563EB'],['tplus','New Targets','#4F46E5'],['form','Daily Forms','#0D9488'],['report','Reports','#475569'],['trophy','Leaderboard','#B45309'],['trend','Analytics','#7C3AED'],['wallet','Salary','#047857'],['gift','Incentives','#BE123C']];
 
+const BADGES=[['star','star','Star Performer','#B45309'],['seller','trophy','Top Seller','#2563EB'],['ontime','clock','Always On Time','#047857'],['target','target','Target Achiever','#7C3AED'],['team','users','Team Player','#0D9488'],['rising','trend','Rising Star','#DB2777'],['hero','heart','Customer Hero','#BE123C'],['reliable','shield','Most Reliable','#1E3A8A']];
+const badgeOf=id=>BADGES.find(b=>b[0]===id);
+function miniBadges(e){const b=(e.badges||[]).map(badgeOf).filter(Boolean);return b.length?`<div class="minib">${b.map(x=>`<i style="background:${x[3]}" title="${x[2]}">${I(x[1],12,'#fff',2.2)}</i>`).join('')}</div>`:''}
+function liveOrder(){return db.employees.slice().sort((a,b)=>(isLive(b)-isLive(a))||a.name.localeCompare(b.name))}
+function liveSub(e){const r=(db.att[e.id]||{})[today()];return r&&r.in&&!r.out?'Active':r&&r.out?'Left '+fmtT(r.out):'Offline'}
+function liveCard(){
+  const list=liveOrder(),n=list.filter(isLive).length;
+  const body=list.length?`<div class="lstrip">${list.map(e=>{const a=isLive(e);return `<div class="p">${avatar(e,48,{dot:a?'on':'off'})}<b>${esc(e.name.split(' ')[0])}</b><span class="${a?'a':''}">${a?'Active':'Offline'}</span></div>`}).join('')}</div>`:`<div class="empty" style="padding:18px">No employees yet.</div>`;
+  return `<div class="card"><div class="card-h"><div><h3>Live office status</h3><p>${n} active · ${list.length-n} offline</p></div>${n?`<span class="cnt">Live</span>`:''}</div>${body}</div>`;
+}
+/* GPS */
+let locCb=null;
+window.erpLocation=function(r){const cb=locCb;locCb=null;if(cb)cb(r||{ok:false})};
+function getLocation(){return new Promise(res=>{
+  if(NATIVE&&NATIVE.requestLocation){locCb=res;setTimeout(()=>{if(locCb===res){locCb=null;res({ok:false,error:'Could not get your location in time. Move near a window or outside and try again.'})}},35000);try{NATIVE.requestLocation()}catch(e){locCb=null;res({ok:false,error:'Location is not available.'})}return}
+  if(!navigator.geolocation)return res({ok:false,error:'Location is not available on this device. Please use the FB ERP Android app.'});
+  navigator.geolocation.getCurrentPosition(p=>res({ok:true,lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy}),()=>res({ok:false,error:'Location permission was denied. Please use the FB ERP Android app and allow location.'}),{enableHighAccuracy:true,timeout:25000,maximumAge:0});
+})}
+function distM(a,b){const R=6371000,t=x=>x*Math.PI/180,dA=t(b.lat-a.lat),dO=t(b.lng-a.lng);const h=Math.sin(dA/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dO/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function gpsError(title,msg){openModal(`<div style="width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:var(--bad-soft);color:var(--bad)">${I('pin',24)}</div><h2>${title}</h2><p style="margin-bottom:20px">${msg}</p><button class="btn" onclick="closeModal()">OK</button>`)}
+async function verifyLocation(){
+  const off=db.settings.office,rad=db.settings.radius||100;
+  if(!off)return{ok:true,loc:null};
+  const r=await getLocation();
+  if(!r.ok){gpsError('Location needed',esc(r.error||'Please turn on location (GPS) and try again.'));return{ok:false}}
+  if(r.mock){gpsError('Fake GPS detected','Please turn off any mock-location app and try again.');return{ok:false}}
+  const d=Math.round(distM(off,r));
+  if(d>rad){gpsError('Outside office area',`You are <b>${d} m</b> away from the office. Check in and check out are allowed only within <b>${rad} m</b>.`);return{ok:false}}
+  return{ok:true,loc:{lat:+r.lat.toFixed(6),lng:+r.lng.toFixed(6),acc:Math.round(r.acc||0),dist:d}};
+}
+function setBusy(on,label){busy=on;document.querySelectorAll('[data-att]').forEach(b=>{b.disabled=on||b.dataset.dis==='1';if(on&&b.dataset.att===label)b.innerHTML=I('pin',18)+'Locating…'})}
 function avatar(u,size,opt={}){
   const inner=u.photo?`<img class="pic" src="${u.photo}" alt="">`:`<div class="pic" style="font-size:${Math.round(size*.36)}px">${initials(u.name)}</div>`;
   const ss=Math.max(16,Math.round(size*.3));
   const seal=opt.seal?`<span class="seal" style="width:${ss}px;height:${ss}px">${I('check',Math.round(ss*.6),'#fff',3)}</span>`:'';
-  return `<div class="av ${opt.ring?'ring':''}" style="width:${size}px;height:${size}px">${inner}${seal}</div>`;
+  const dot=opt.dot?`<span class="dot ${opt.dot}"></span>`:'';
+  return `<div class="av ${opt.ring?'ring':''}" style="width:${size}px;height:${size}px">${inner}${seal}${dot}</div>`;
 }
 const empNo=e=>'FB-'+String(e.no||0).padStart(4,'0');
 
@@ -381,15 +447,18 @@ function closeDrawer(){document.body.classList.remove('open')}
 function renderDrawer(){
   const u=me();if(!u)return;
   const items=[['dash','Dashboard','grid'],['profile','Profile','user'],['settings','Settings','gear'],['history','Attendance History','cal']];
-  if(isAdmin())items.splice(1,0,['add','Add Employee','uadd']);
+  if(isAdmin())items.splice(1,0,['add','Add Employee','uadd'],['badges','Badges','medal']);
+  const list=liveOrder(),n=list.filter(isLive).length;
   $('#drawer').innerHTML=`<div class="brand"><div class="mark">FB</div><div><b>FB ERP</b><span>Workforce Management</span></div></div>
   <div class="dprof">${avatar(u,42,{seal:true})}<div style="min-width:0"><b>${esc(u.name)}</b><span>${isAdmin()?'Administrator':esc(u.category)+' · '+esc(u.branch)}</span></div></div>
   <div class="navl">Menu</div>
-  ${items.map(i=>`<button class="nav ${view===i[0]?'on':''}" onclick="go('${i[0]}')">${I(i[2],19)}${i[1]}</button>`).join('')}
+  ${items.map(i=>`<button class="nav ${view===i[0]||(view==='edit'&&i[0]==='add')?'on':''}" onclick="${i[0]==='add'?'openAdd()':`go('${i[0]}')`}">${I(i[2],19)}${i[1]}</button>`).join('')}
+  <div class="dlive"><div class="navl" style="display:flex;justify-content:space-between"><span>Office status</span><span style="color:#6EE7B7;text-transform:none;letter-spacing:0">${n} active</span></div>
+  ${list.length?list.map(e=>{const a=isLive(e);return `<div class="dli">${avatar(e,32,{dot:a?'on':'off'})}<div style="min-width:0"><b>${esc(e.name)}</b><span class="${a?'a':''}">${liveSub(e)}</span></div></div>`}).join(''):'<div class="dli"><span>No employees yet</span></div>'}</div>
   <button class="nav out" onclick="logout()">${I('logout',19)}Sign out</button>`;
 }
 function go(v){view=v;closeDrawer();pendingPhoto=null;render();window.scrollTo(0,0)}
-window.erpBack=function(){if(document.body.classList.contains('open')){closeDrawer();return true}if($('#modal').classList.contains('show')){closeModal();return true}if(session&&view!=='dash'){go('dash');return true}return false};
+window.erpBack=function(){if(document.body.classList.contains('open')){closeDrawer();return true}if($('#modal').classList.contains('show')){closeModal();return true}if(session&&view==='edit'){go('dash');return true}if(session&&view!=='dash'){go('dash');return true}return false};
 
 /* ============ Auth ============ */
 function login(){
@@ -424,7 +493,7 @@ function render(){
   document.body.classList.toggle('dark',db.theme==='dark');
   const app=$('#app');
   if(!session||!me()){if(session)setSession(null);app.innerHTML=loginView();return}
-  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash}[view]||(isAdmin()?adminDash:empDash);
+  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash,edit:isAdmin()?addView:empDash,badges:isAdmin()?badgesView:empDash}[view]||(isAdmin()?adminDash:empDash);
   app.innerHTML=fn();after();
 }
 function loginView(){
@@ -439,56 +508,94 @@ function loginView(){
 /* ============ Admin ============ */
 function adminDash(){
   const c=todayCounts(),t=today(),pct=c.total?Math.round((c.p+c.h)*100/c.total):0;
-  const rows=c.total?db.employees.map(e=>{const r=(db.att[e.id]||{})[t],s=statusOf(r);return `<div class="li">${avatar(e,40,{})}<div class="info"><b>${esc(e.name)}</b><span>${esc(e.category)} · ${esc(e.branch)} · ${r&&r.in?'In '+fmtT(r.in):'Not checked in'}</span></div><span class="tag ${r&&r.in&&!r.out?'live':s}">${r&&r.in&&!r.out?'Active':LBL[s]}</span><button class="xb" aria-label="Remove" onclick="delEmp('${e.id}')">${I('trash',15)}</button></div>`}).join('')
+  const rows=c.total?db.employees.map(e=>{const r=(db.att[e.id]||{})[t],s=statusOf(r),a=isLive(e);return `<div class="li tap" onclick="editEmp('${e.id}')">${avatar(e,40,{dot:a?'on':'off'})}<div class="info"><b>${esc(e.name)}</b><span>${esc(e.category)} · ${r&&r.in?'In '+fmtT(r.in):'Not checked in'}</span>${miniBadges(e)}</div><span class="tag ${s}">${LBL[s]}</span><span class="xb">${I('edit',15)}</span></div>`}).join('')
    :`<div class="empty">${I('users',32)}No employees yet.<br>Add your first employee to start tracking attendance.</div>`;
-  return bar('Dashboard',dateLine())+`<div class="wrap"><div id="updBanner" style="display:contents"></div>${idCard(db.admin)}
+  const gpsWarn=db.settings.office?'':`<div class="upd" style="background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent)"><span class="ui" style="background:var(--warn)">${I('pin',19,'#fff',2)}</span><div class="ut"><b>Set office location</b><span>GPS check in (100 m) starts after you set it.</span></div><button class="btn sm" onclick="go('settings')">Set</button></div>`;
+  return bar('Dashboard',dateLine())+`<div class="wrap"><div id="updBanner" style="display:contents"></div>${idCard(db.admin)}${gpsWarn}
   <div class="sec-t"><h2>Today’s overview</h2><span>${pct}% attendance</span></div>
-  <div class="kpis">${kpi(c.total,'Total Employees','Active workforce','users',C.navy,'#1E3A8A14')}${kpi(c.p,'Present','Checked in today','present',C.ok,'#10B98117')}${kpi(c.ab,'Absent','Not checked in','absent',C.bad,'#EF444417')}${kpi(c.h,'Half Day','Under 4 hours','half',C.warn,'#F59E0B17')}</div>
+  <div class="kpis">${kpi(c.total,'Total Employees','Active workforce','users',C.navy,'#1E3A8A14')}${kpi(c.p,'Present','On time today','present',C.ok,'#10B98117')}${kpi(c.ab,'Absent','Not checked in','absent',C.bad,'#EF444417')}${kpi(c.h,'Half Day','In after '+cutLbl(),'half',C.warn,'#F59E0B17')}</div>
+  ${liveCard()}
   ${modulesBlock()}
   <div class="card"><div class="card-h"><div><h3>Attendance trend</h3><p>Last 7 days</p></div></div><div class="card-b" id="ch1"></div></div>
   <div class="card"><div class="card-h"><div><h3>Today’s distribution</h3><p>${c.total} employees</p></div></div><div class="card-b" id="ch2"></div></div>
-  <div class="card"><div class="card-h"><div><h3>Employees</h3><p>${c.total} registered</p></div><button class="btn blue sm" onclick="go('add')">${I('plus',15,'#fff',2.4)}Add</button></div>${rows}</div></div>`;
+  <div class="card"><div class="card-h"><div><h3>Employees</h3><p>Tap an employee to edit</p></div><button class="btn blue sm" onclick="openAdd()">${I('plus',15,'#fff',2.4)}Add</button></div>${rows}</div></div>`;
 }
-function delEmp(id){const e=db.employees.find(x=>x.id===id);confirmBox('Remove employee?',`${esc(e.name)} and all of their attendance records will be permanently deleted.`,()=>{db.employees=db.employees.filter(x=>x.id!==id);delete db.att[id];save();toast('Employee removed');render()})}
+function delEmp(id){const e=db.employees.find(x=>x.id===id);if(!e)return;confirmBox('Delete employee?',`${esc(e.name)} and all of their attendance records will be permanently deleted.`,()=>{db.employees=db.employees.filter(x=>x.id!==id);delete db.att[id];save();toast('Employee deleted');editId=null;go('dash')})}
+function openAdd(){editId=null;newCat='Core';go('add')}
+function editEmp(id){const e=db.employees.find(x=>x.id===id);if(!e)return;editId=id;newCat=e.category;go('edit')}
 function addView(){
-  return bar('Add Employee','Create a new employee account',true)+`<div class="wrap"><div class="card"><div class="card-h"><div><h3>Employee details</h3><p>All fields are required</p></div></div><div class="card-b">
-  <div class="fld"><label for="nName">Full name</label><input id="nName" class="inp" placeholder="e.g. Muhammad Ali" autocomplete="off"></div>
+  const e=view==='edit'?db.employees.find(x=>x.id===editId):null;
+  if(view==='edit'&&!e)return adminDash();
+  const v=k=>e?esc(e[k]):'';
+  return bar(e?'Edit Employee':'Add Employee',e?empNo(e)+' · joined '+fmtD(e.joined):'Create a new employee account',true)+`<div class="wrap"><div class="card"><div class="card-h"><div><h3>Employee details</h3><p>All fields are required</p></div>${e?avatar(e,36,{}):''}</div><div class="card-b">
+  <div class="fld"><label for="nName">Full name</label><input id="nName" class="inp" placeholder="e.g. Muhammad Ali" autocomplete="off" value="${v('name')}"></div>
   <div class="fld"><label>Category</label><div class="seg" id="seg">${['Core','Vab','Ws Core'].map(c=>`<button class="${newCat===c?'on':''}" onclick="pickCat(this,'${c}')">${c}</button>`).join('')}</div></div>
   <div class="fld"><label for="nBranch">Branch</label><select id="nBranch" class="inp"><option>Latifabad</option></select></div>
-  <div class="fld"><label for="nCode">Login code</label><input id="nCode" class="inp num" inputmode="numeric" placeholder="e.g. 1122" autocomplete="off"><span class="hint">The employee uses this code to sign in. It must be unique.</span></div>
-  <button class="btn" onclick="addEmp()">${I('check',18,'#fff',2.4)}Save employee</button></div></div></div>`;
+  <div class="fld"><label for="nCode">Login code</label><input id="nCode" class="inp num" inputmode="numeric" placeholder="e.g. 1122" autocomplete="off" value="${v('code')}"><span class="hint">The employee uses this code to sign in. It must be unique.</span></div>
+  <button class="btn" onclick="addEmp()">${I('check',18,'#fff',2.4)}${e?'Save changes':'Save employee'}</button></div></div>
+  ${e?`<div class="card"><div class="card-h"><div><h3>Badges</h3><p>${(e.badges||[]).length} assigned</p></div><button class="btn out sm" onclick="manageBadges('${e.id}')">${I('medal',15)}Manage</button></div><div class="card-b">${badgeGrid(e)}</div></div>
+  <div class="card"><div class="card-b"><button class="btn danger" onclick="delEmp('${e.id}')">${I('trash',17)}Delete employee</button></div></div>`:''}</div>`;
 }
 function pickCat(b,c){newCat=c;document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b))}
 function addEmp(){
   const name=$('#nName').value.trim(),code=$('#nCode').value.trim(),branch=$('#nBranch').value;
+  const e=view==='edit'?db.employees.find(x=>x.id===editId):null;
   if(!name)return toast('Please enter the full name','bad');
   if(!code)return toast('Please set a login code','bad');
-  if(code===db.adminCode||db.employees.some(e=>e.code===code))return toast('This login code is already in use','bad');
+  if(code===db.adminCode||db.employees.some(x=>x.code===code&&x!==e))return toast('This login code is already in use','bad');
+  if(e){Object.assign(e,{name,category:newCat,branch,code});if(save()){toast('Changes saved');go('dash')}return}
   db.seq=(db.seq||0)+1;
-  db.employees.push({id:'e'+Date.now().toString(36),no:db.seq,name,category:newCat,branch,code,photo:null,joined:today()});
+  db.employees.push({id:'e'+Date.now().toString(36),no:db.seq,name,category:newCat,branch,code,photo:null,joined:today(),badges:[]});
   if(save()){toast(name+' added successfully');go('dash')}
 }
-
+/* ============ Badges ============ */
+function badgeGrid(e,emptyMsg){const b=(e.badges||[]).map(badgeOf).filter(Boolean);if(!b.length)return `<p class="muted" style="font-size:13px">${emptyMsg||'No badges assigned yet.'}</p>`;return `<div class="bgs">${b.map(x=>`<div class="bg"><span class="bi" style="background:${x[3]}">${I(x[1],17,'#fff',2)}</span><b>${x[2]}</b></div>`).join('')}</div>`}
+function badgesView(){
+  const rows=db.employees.length?db.employees.map(e=>`<div class="li tap" onclick="manageBadges('${e.id}')">${avatar(e,40,{})}<div class="info"><b>${esc(e.name)}</b><span>${(e.badges||[]).length?(e.badges.length+' badge'+(e.badges.length>1?'s':'')):'No badges'}</span>${miniBadges(e)}</div><span class="btn out sm">${I('medal',15)}Manage</span></div>`).join(''):`<div class="empty">${I('medal',32)}Add employees first to award badges.</div>`;
+  return bar('Badges','Award and remove employee badges',true)+`<div class="wrap">
+  <div class="card"><div class="card-h"><div><h3>Available badges</h3><p>${BADGES.length} badges</p></div></div><div class="card-b"><div class="bgs">${BADGES.map(x=>`<div class="bg"><span class="bi" style="background:${x[3]}">${I(x[1],17,'#fff',2)}</span><b>${x[2]}</b></div>`).join('')}</div></div></div>
+  <div class="card"><div class="card-h"><div><h3>Employees</h3><p>Tap to award or remove</p></div></div>${rows}</div></div>`;
+}
+let pickB=[];
+function manageBadges(id){const e=db.employees.find(x=>x.id===id);if(!e)return;pickB=(e.badges||[]).slice();
+  openModal(`<div style="display:flex;align-items:center;gap:12px">${avatar(e,44,{})}<div style="text-align:left"><h2 style="margin:0">${esc(e.name)}</h2><p>Select the badges to show on their dashboard</p></div></div>
+  <div class="bpick">${BADGES.map(x=>`<button class="${pickB.includes(x[0])?'on':''}" onclick="toggleB(this,'${x[0]}')"><span class="bi" style="background:${x[3]}">${I(x[1],15,'#fff',2)}</span>${x[2]}</button>`).join('')}</div>
+  <div class="g2"><button class="btn out" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveBadges('${e.id}')">Save badges</button></div>`)}
+function toggleB(b,id){const i=pickB.indexOf(id);if(i>-1)pickB.splice(i,1);else pickB.push(id);b.classList.toggle('on',i<0)}
+function saveBadges(id){const e=db.employees.find(x=>x.id===id);if(!e)return;e.badges=BADGES.map(b=>b[0]).filter(k=>pickB.includes(k));save();closeModal();toast('Badges updated for '+e.name);render()}
 /* ============ Employee ============ */
 function empDash(){
   const e=me(),r=(db.att[e.id]||{})[today()],st=empStats(e),s=statusOf(r),live=r&&r.in&&!r.out;
   const now=new Date(),tm=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}).split(' ');
-  const statusTag=live?'<span class="tag live">On duty</span>':r&&r.out?`<span class="tag ${s}">${LBL[s]}</span>`:'<span class="tag absent">Not checked in</span>';
+  const statusTag=!r||!r.in?'<span class="tag absent">Not checked in</span>':`<span class="tag ${s}">${live?(s==='half'?'Half Day · On duty':'Present · On duty'):LBL[s]}</span>`;
+  const off=db.settings.office,late=r&&r.in&&s==='half'?Math.max(1,lateMins(r.in)):0;
+  const gps=off?`${I('pin',14)}GPS check in · within ${db.settings.radius||100} m of office${r&&r.inLoc?` · you were ${r.inLoc.dist} m away`:''}`:`${I('pin',14)}Office location not set by admin yet`;
+  const inOff=r&&r.in;const outOff=!live;
   return bar('Dashboard',dateLine())+`<div class="wrap"><div id="updBanner" style="display:contents"></div>${idCard(e)}
   <div class="card"><div class="card-b">
    <div class="att-top"><div><div class="muted" style="font-size:12px;margin-bottom:4px">Current time</div><div class="clock num" id="clock">${tm[0]}<small>${tm[1]||''}</small></div></div>${statusTag}</div>
    <div class="tl"><div><span>Check in</span><b class="num">${fmtT(r&&r.in)}</b></div><div><span>Check out</span><b class="num">${fmtT(r&&r.out)}</b></div><div><span>Worked</span><b class="num" id="hrs">${dur(r)}</b></div></div>
-   <div class="g2"><button class="btn ok" onclick="checkIn()" ${r&&r.in?'disabled':''}>${I('login',18,'#fff',2)}Check in</button><button class="btn danger" onclick="checkOut()" ${!live?'disabled':''}>${I('logout',18)}Check out</button></div>
-   <div class="note">${I('info',14)}Less than 4 working hours is recorded as a half day.</div></div></div>
+   ${late?`<div class="upd" style="background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent);margin-bottom:12px;padding:10px 12px"><span class="ui" style="background:var(--warn);width:30px;height:30px">${I('clock',16,'#fff',2)}</span><div class="ut"><b style="font-size:13px">Half day marked</b><span>Checked in ${late>=60?Math.floor(late/60)+'h '+(late%60)+'m':late+' min'} after ${cutLbl()}</span></div></div>`:''}
+   <div class="g2"><button class="btn ok" data-att="in" data-dis="${inOff?1:0}" onclick="checkIn()" ${inOff?'disabled':''}>${I('login',18,'#fff',2)}Check in</button><button class="btn danger" data-att="out" data-dis="${outOff?1:0}" onclick="checkOut()" ${outOff?'disabled':''}>${I('logout',18)}Check out</button></div>
+   <div class="note">${I('info',14)}Check in after ${cutLbl()} is recorded as a half day.</div>
+   <div class="gpsline">${gps}</div></div></div>
   <div class="sec-t"><h2>My attendance</h2><span>Since ${fmtD(e.joined)}</span></div>
   <div class="kpis k3">${kpi(st.p,'Present','','present',C.ok,'#10B98117')}${kpi(st.ab,'Absent','','absent',C.bad,'#EF444417')}${kpi(st.h,'Half Days','','half',C.warn,'#F59E0B17')}</div>
+  <div class="card"><div class="card-h"><div><h3>My badges</h3><p>Awarded by your administrator</p></div><span class="ic" style="color:var(--warn)">${I('medal',20)}</span></div><div class="card-b">${badgeGrid(e,'No badges yet. Keep up the good work!')}</div></div>
+  ${liveCard()}
   ${modulesBlock()}
   <div class="card"><div class="card-h"><div><h3>Attendance summary</h3><p>All working days</p></div></div><div class="card-b" id="ch2"></div></div>
   <div class="card"><div class="card-h"><div><h3>Working hours</h3><p>Last 7 days</p></div></div><div class="card-b" id="ch1"></div></div></div>`;
 }
-function checkIn(){const e=me(),t=today();db.att[e.id]=db.att[e.id]||{};if(db.att[e.id][t]&&db.att[e.id][t].in)return;db.att[e.id][t]={in:Date.now(),out:null};save();toast('Checked in at '+fmtT(Date.now()));render()}
-function checkOut(){const e=me(),r=(db.att[e.id]||{})[today()];if(!r||!r.in||r.out)return;confirmBox('Check out now?','You can only check out once per day.',()=>{r.out=Date.now();save();toast('Checked out · '+LBL[statusOf(r)]);render()})}
-
+async function checkIn(){
+  if(busy)return;const e=me(),t=today();db.att[e.id]=db.att[e.id]||{};if(db.att[e.id][t]&&db.att[e.id][t].in)return;
+  setBusy(true,'in');const v=await verifyLocation();setBusy(false);if(!v.ok)return render();
+  const now=Date.now(),half=lateMins(now)>0;
+  db.att[e.id][t]={in:now,out:null,half,inLoc:v.loc};save();
+  toast(half?'Checked in at '+fmtT(now)+' · Half day':'Checked in at '+fmtT(now));render();
+}
+function checkOut(){const e=me(),r=(db.att[e.id]||{})[today()];if(!r||!r.in||r.out||busy)return;
+  confirmBox('Check out now?','You can only check out once per day.',async()=>{setBusy(true,'out');const v=await verifyLocation();setBusy(false);if(!v.ok)return render();r.out=Date.now();r.outLoc=v.loc;save();toast('Checked out · '+LBL[statusOf(r)]);render()})}
 /* ============ Profile ============ */
 function profileView(){
   const u=me(),shown=pendingPhoto?{...u,photo:pendingPhoto}:u,admin=isAdmin();
@@ -521,14 +628,24 @@ function settingsView(){
   return bar('Settings','Preferences & security',true)+`<div class="wrap">
   <div class="card"><div class="card-h"><h3>Appearance</h3></div><div class="srow"><div><b>Dark mode</b><span>Easier on the eyes in low light</span></div><button class="sw ${db.theme==='dark'?'on':''}" aria-label="Dark mode" onclick="db.theme=db.theme==='dark'?'light':'dark';save();render()"></button></div></div>
   <div class="card" id="updBox"></div>
-  ${admin?`<div class="card"><div class="card-h"><div><h3>Admin login code</h3><p>Minimum 4 digits</p></div></div><div class="card-b"><div class="fld"><input id="ac" class="inp num" inputmode="numeric" type="password" placeholder="New code"></div><button class="btn out" onclick="chgAdmin()">Update code</button></div></div>
+  ${admin?`<div class="card"><div class="card-h"><div><h3>Office location (GPS)</h3><p>Check in allowed within ${db.settings.radius||100} m</p></div><span style="color:var(--pri)">${I('pin',20)}</span></div><div class="card-b">
+   ${db.settings.office?`<p style="font-size:13px;margin-bottom:12px"><b>Location saved</b><br><span class="muted num">${db.settings.office.lat.toFixed(5)}, ${db.settings.office.lng.toFixed(5)} · accuracy ±${db.settings.office.acc||0} m</span></p>`:'<p class="muted" style="font-size:13px;margin-bottom:12px">Stand inside the office and tap the button below. Employees will only be able to check in and out within 100 m of this point.</p>'}
+   <div class="${db.settings.office?'g2':''}"><button class="btn" id="setLoc" onclick="setOffice()">${I('pin',18,'#fff',2)}${db.settings.office?'Update':'Use my current location'}</button>${db.settings.office?`<button class="btn out" onclick="confirmBox('Remove office location?','Employees will be able to check in from anywhere.',()=>{db.settings.office=null;save();render()})">Remove</button>`:''}</div></div></div>
+  <div class="card"><div class="card-h"><div><h3>Half day rule</h3><p>Check in after this time = Half Day</p></div></div><div class="card-b"><div class="fld"><input id="halfT" type="time" class="inp num" value="${db.settings.halfAfter||'09:15'}"></div><button class="btn out" onclick="saveHalf()">Save time</button></div></div>
+  <div class="card"><div class="card-h"><div><h3>Admin login code</h3><p>Minimum 4 digits</p></div></div><div class="card-b"><div class="fld"><input id="ac" class="inp num" inputmode="numeric" type="password" placeholder="New code"></div><button class="btn out" onclick="chgAdmin()">Update code</button></div></div>
   <div class="card"><div class="card-h"><div><h3 style="color:var(--bad)">Danger zone</h3><p>This action cannot be undone</p></div></div><div class="card-b"><button class="btn danger" onclick="confirmBox('Reset all data?','All employees and attendance records will be permanently deleted.',resetAll)">${I('trash',17)}Reset all data</button></div></div>`
   :`<div class="card"><div class="srow"><div><b>Login code</b><span>Contact your administrator to change your code.</span></div>${I('lock',18,'var(--faint)')}</div></div>`}
   <div class="card"><div class="card-b"><button class="btn out" onclick="logout()">${I('logout',18)}Sign out</button></div></div>
   <p class="foot-note">FB ERP${appInfo?' · Version '+esc(appInfo.versionName):''}<br>Data is stored securely on this device.</p></div>`;
 }
+async function setOffice(){const b=$('#setLoc');if(b){b.disabled=true;b.innerHTML=I('pin',18,'#fff',2)+'Locating…'}
+  const r=await getLocation();
+  if(!r.ok){render();return gpsError('Location needed',esc(r.error||'Please turn on location (GPS) and try again.'))}
+  if(r.mock){render();return gpsError('Fake GPS detected','Please turn off any mock-location app.')}
+  db.settings.office={lat:r.lat,lng:r.lng,acc:Math.round(r.acc||0),set:Date.now()};save();render();toast('Office location saved'+(r.acc>50?' · accuracy ±'+Math.round(r.acc)+' m':''))}
+function saveHalf(){const v=$('#halfT').value;if(!/^\d{2}:\d{2}$/.test(v))return toast('Choose a valid time','bad');db.settings.halfAfter=v;save();toast('Half day time set to '+cutLbl());render()}
 function chgAdmin(){const c=$('#ac').value.trim();if(!/^\d{4,}$/.test(c))return toast('Use at least 4 digits','bad');if(db.employees.some(e=>e.code===c))return toast('This code belongs to an employee','bad');db.adminCode=c;save();toast('Admin code updated');render()}
-function resetAll(){const t=db.theme;db=fresh();db.theme=t;save();setSession(null);render();toast('All data has been reset')}
+function resetAll(){const t=db.theme,st=db.settings;db=fresh();db.theme=t;db.settings=st;save();setSession(null);render();toast('All data has been reset')}
 
 /* ============ History ============ */
 function empRows(e){
@@ -542,7 +659,7 @@ function historyView(){
   else rows=empRows(me());
   const sum={present:0,half:0,absent:0};rows.forEach(x=>sum[x.s]++);
   const filter=admin?`<div class="card-b" style="padding-bottom:0"><select class="inp" onchange="histFilter=this.value;render()"><option value="all">All employees</option>${db.employees.map(e=>`<option value="${e.id}" ${histFilter===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}</select></div>`:'';
-  const table=rows.length?`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Date</th>${admin?'<th>Employee</th>':''}<th>In</th><th>Out</th><th>Hours</th><th>Status</th></tr></thead><tbody>${rows.map(x=>{const live=x.r&&x.r.in&&!x.r.out;return `<tr><td class="num">${fmtD(x.k)}<small>${fmtW(x.k)}</small></td>${admin?`<td>${esc(x.e.name)}<small>${esc(x.e.category)}</small></td>`:''}<td class="num">${fmtT(x.r&&x.r.in)}</td><td class="num">${fmtT(x.r&&x.r.out)}</td><td class="num">${x.r?dur(x.r):'—'}</td><td><span class="tag ${live?'live':x.s}">${live?'Active':LBL[x.s]}</span></td></tr>`}).join('')}</tbody></table></div>`
+  const table=rows.length?`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Date</th>${admin?'<th>Employee</th>':''}<th>In</th><th>Out</th><th>Hours</th><th>Status</th></tr></thead><tbody>${rows.map(x=>{const live=x.r&&x.r.in&&!x.r.out;return `<tr><td class="num">${fmtD(x.k)}<small>${fmtW(x.k)}</small></td>${admin?`<td>${esc(x.e.name)}<small>${esc(x.e.category)}</small></td>`:''}<td class="num">${fmtT(x.r&&x.r.in)}${x.r&&x.r.inLoc?`<small>${x.r.inLoc.dist} m</small>`:''}</td><td class="num">${fmtT(x.r&&x.r.out)}${x.r&&x.r.outLoc?`<small>${x.r.outLoc.dist} m</small>`:''}</td><td class="num">${x.r?dur(x.r):'—'}</td><td><span class="tag ${x.s}">${LBL[x.s]}</span></td></tr>`}).join('')}</tbody></table></div>`
    :`<div class="empty">${I('cal',32)}No attendance records yet.</div>`;
   return bar('Attendance History','Last 60 days · Sundays off',true)+`<div class="wrap">
   <div class="kpis k3">${kpi(sum.present,'Present','','present',C.ok,'#10B98117')}${kpi(sum.absent,'Absent','','absent',C.bad,'#EF444417')}${kpi(sum.half,'Half Days','','half',C.warn,'#F59E0B17')}</div>

@@ -22,9 +22,17 @@ Settings > App update se khud bhi check kar sakte hain. Pehli dafa phone "Allow 
 
 ## Rules
 
-- Check out par 4 ghante se kam = Half Day.
+- Subah 9:15 ke baad check in = Half Day (admin Settings se time badal sakta hai).
+- GPS: check in / check out sirf office ke 100 meter ke andar. Admin Settings > Office location mein office ki jagah save kare.
+- Fake GPS apps pakdi jati hain.
 - Sunday chutti hai, us din Absent nahi lagta.
 - Saara data isi phone mein save hota hai.
+
+## Badges aur Live status
+
+- Admin sidebar > Badges se har employee ko badges de ya hata sakta hai. Employee ke dashboard par "My badges" mein dikhte hain.
+- Admin dashboard par employee par tap karke edit ya delete karein.
+- Dashboard aur sidebar mein Live office status: kaun Active (check in) hai aur kaun Offline.
 
 ## Files
 

@@ -1,11 +1,19 @@
 package com.fb.erp;
 
 import android.app.Activity;
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -31,6 +39,7 @@ public class MainActivity extends Activity {
     static final String VERSION_URL = BASE + "version.json";
     static final String APK_URL = BASE + "FB-ERP.apk";
     private static final int PICK_PHOTO = 7;
+    private static final int REQ_LOCATION = 21;
 
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
@@ -40,6 +49,13 @@ public class MainActivity extends Activity {
     private int downloadedCode = 0;
     private volatile boolean downloading = false;
     private boolean waitingForPermission = false;
+
+    // GPS
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private Location bestFix;
+    private boolean locating = false;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -104,6 +120,9 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void checkUpdate() { checkForUpdate(); }
+
+        @JavascriptInterface
+        public void requestLocation() { runOnUiThread(new Runnable() { public void run() { startLocation(); } }); }
 
         @JavascriptInterface
         public void installUpdate() { runOnUiThread(new Runnable() { public void run() { startUpdate(); } }); }
@@ -242,6 +261,100 @@ public class MainActivity extends Activity {
             // Fallback: let the browser download it.
             try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(APK_URL))); } catch (Exception ignored) { }
         }
+    }
+
+    // ---------------------------------------------------------------- GPS
+
+    boolean hasLocationPermission() {
+        if (Build.VERSION.SDK_INT < 23) return true;
+        return checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    void sendLocation(String json) {
+        final String js = "window.erpLocation&&window.erpLocation(" + json + ")";
+        runOnUiThread(new Runnable() { public void run() { web.evaluateJavascript(js, null); } });
+    }
+
+    void sendLocationError(String msg) {
+        try {
+            JSONObject o = new JSONObject();
+            o.put("ok", false);
+            o.put("error", msg);
+            sendLocation(o.toString());
+        } catch (Exception ignored) { }
+    }
+
+    void startLocation() {
+        if (locating) return;
+        if (!hasLocationPermission()) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQ_LOCATION);
+            return;
+        }
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean gps = false, net = false;
+        try { gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER); } catch (Exception ignored) { }
+        try { net = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER); } catch (Exception ignored) { }
+        if (!gps && !net) {
+            sendLocationError("Location (GPS) is turned off. Please turn it on and try again.");
+            try { startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)); } catch (Exception ignored) { }
+            return;
+        }
+        locating = true;
+        bestFix = null;
+        locationListener = new LocationListener() {
+            @Override public void onLocationChanged(Location loc) {
+                if (loc == null) return;
+                if (bestFix == null || loc.getAccuracy() < bestFix.getAccuracy()) bestFix = loc;
+                if (loc.getAccuracy() <= 25) finishLocation();
+            }
+            @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
+            @Override public void onProviderEnabled(String provider) { }
+            @Override public void onProviderDisabled(String provider) { }
+        };
+        try {
+            if (gps) locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener, Looper.getMainLooper());
+            if (net) locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener, Looper.getMainLooper());
+        } catch (SecurityException e) {
+            locating = false;
+            sendLocationError("Location permission is required for check in.");
+            return;
+        }
+        // Use the best fix found within 20 seconds.
+        handler.postDelayed(new Runnable() { public void run() { finishLocation(); } }, 20000);
+    }
+
+    void finishLocation() {
+        if (!locating) return;
+        locating = false;
+        handler.removeCallbacksAndMessages(null);
+        try { locationManager.removeUpdates(locationListener); } catch (Exception ignored) { }
+        Location loc = bestFix;
+        if (loc == null) {
+            sendLocationError("Could not get your location. Move near a window or outside and try again.");
+            return;
+        }
+        try {
+            boolean mock = Build.VERSION.SDK_INT >= 31 ? loc.isMock() : (Build.VERSION.SDK_INT >= 18 && loc.isFromMockProvider());
+            JSONObject o = new JSONObject();
+            o.put("ok", true);
+            o.put("lat", loc.getLatitude());
+            o.put("lng", loc.getLongitude());
+            o.put("acc", loc.getAccuracy());
+            o.put("mock", mock);
+            sendLocation(o.toString());
+        } catch (Exception e) {
+            sendLocationError("Could not read your location.");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        super.onRequestPermissionsResult(requestCode, permissions, results);
+        if (requestCode != REQ_LOCATION) return;
+        if (hasLocationPermission()) startLocation();
+        else if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            sendLocationError("Please allow Precise location for FB ERP (phone Settings > Apps > FB ERP > Location).");
+        else sendLocationError("Location permission was denied. Allow location for FB ERP in phone Settings > Apps.");
     }
 
     // ---------------------------------------------------------------- Activity

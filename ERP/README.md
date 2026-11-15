@@ -25,7 +25,7 @@ Settings > App update se khud bhi check kar sakte hain. Pehli dafa phone "Allow 
 - Subah 9:15 ke baad check in = Half Day (admin Settings se time badal sakta hai).
 - GPS: check in / check out sirf office ke 100 meter ke andar. Admin Settings > Office location mein office ki jagah save kare.
 - Fake GPS apps pakdi jati hain.
-- Sunday chutti hai, us din Absent nahi lagta.
+- Friday chutti hai (attendance aur targets dono), us din Absent nahi lagta.
 - Saara data isi phone mein save hota hai.
 
 ## Badges aur Live status
@@ -78,7 +78,7 @@ booker-wise productivity, daily trend, saare bookers ki detail table aur area de
 | Module | Admin | Employee |
 |---|---|---|
 | Target Predictor | Sab | — |
-| Leaderboard | Poori ranking | Sirf apni position |
+| Leaderboard | Poori ranking | Poori ranking + apni position |
 | Area Heatmap | Sab areas | Apne areas |
 | Report Card | Sab | Apna |
 | Comparison | Team / booker | Apna mahina vs mahina |

@@ -388,7 +388,7 @@ function empStats(e){
   const a=db.att[e.id]||{};let p=0,h=0,ab=0;const t=today();
   for(let d=new Date(e.joined+'T00:00:00');dkey(d)<=t;d.setDate(d.getDate()+1)){
     const k=dkey(d),s=statusOf(a[k]);
-    if(s==='present')p++;else if(s==='half')h++;else if(k!==t&&d.getDay()!==0)ab++;
+    if(s==='present')p++;else if(s==='half')h++;else if(k!==t&&d.getDay()!==TOFF)ab++;
   }return{p,h,ab};
 }
 function todayCounts(){const t=today();let p=0,h=0;db.employees.forEach(e=>{const s=statusOf((db.att[e.id]||{})[t]);if(s==='present')p++;else if(s==='half')h++});return{total:db.employees.length,p,h,ab:db.employees.length-p-h}}
@@ -550,7 +550,7 @@ function renderDrawer(){
   const A=isAdmin();
   const groups=[['',[['dash','Dashboard','grid']]],
    ['Sales',A?[['targets','Targets','target'],['newtarget','New Targets','tplus'],['analytics','Analytics','trend'],['predict','Target Predictor','crystal'],['heatmap','Area Heatmap','map']]:[['targets','Targets','target'],['dform','Daily Form','form'],['heatmap','My Area Heatmap','map']]],
-   ['Performance',[['leaderboard',A?'Leaderboard':'My Leaderboard','trophy'],['compare','Comparison','compare'],['reports','Reports','report'],['reportcard','Report Card','card']]],
+   ['Performance',[['leaderboard','Leaderboard','trophy'],['compare','Comparison','compare'],['reports','Reports','report'],['reportcard','Report Card','card']]],
    ['People',A?[['add','Add Employee','uadd'],['badges','Badges','medal'],['history','Attendance History','cal']]:[['history','Attendance History','cal']]],
    ['Account',[['profile','Profile','user'],['settings','Settings','gear']]]];
   const navBtn=i=>`<button class="nav ${view===i[0]||(view==='edit'&&i[0]==='add')?'on':''}" onclick="${i[0]==='add'?'openAdd()':i[0]==='newtarget'?'openNewTarget()':`go('${i[0]}')`}">${I(i[2],19)}${i[1]}</button>`;
@@ -674,7 +674,7 @@ function manageBadges(id){const e=db.employees.find(x=>x.id===id);if(!e)return;p
 function toggleB(b,id){const i=pickB.indexOf(id);if(i>-1)pickB.splice(i,1);else pickB.push(id);b.classList.toggle('on',i<0)}
 function saveBadges(id){const e=db.employees.find(x=>x.id===id);if(!e)return;e.badges=BADGES.map(b=>b[0]).filter(k=>pickB.includes(k));save();closeModal();toast('Badges updated for '+e.name);render()}
 /* ============ Targets ============ */
-const TOFF=5; /* Friday off for targets */
+const TOFF=5; /* Friday off: targets and attendance */
 const SHOPS=45;
 const AREA_N={'Core':3,'Vab':6,'Ws Core':3};
 const ymOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1);
@@ -932,7 +932,7 @@ function analyticsView(){
 }
 
 /* ============ Shared metrics ============ */
-function attMonth(e,ym){const a=db.att[e.id]||{},t=today();let p=0,h=0,ab=0,wd=0;monthDates(ym).forEach(d=>{const k=dkey(d);if(k<e.joined||k>t||d.getDay()===0)return;const s=statusOf(a[k]);if(k===t&&s==='absent')return;wd++;if(s==='present')p++;else if(s==='half')h++;else ab++});return{p,h,ab,wd,pct:wd?(p+h*.5)*100/wd:0}}
+function attMonth(e,ym){const a=db.att[e.id]||{},t=today();let p=0,h=0,ab=0,wd=0;monthDates(ym).forEach(d=>{const k=dkey(d);if(k<e.joined||k>t||d.getDay()===TOFF)return;const s=statusOf(a[k]);if(k===t&&s==='absent')return;wd++;if(s==='present')p++;else if(s==='half')h++;else ab++});return{p,h,ab,wd,pct:wd?(p+h*.5)*100/wd:0}}
 function formStats(e,ym,day){let v=0,s=0,p=0,c=0;const areas=new Set();(day?[new Date(day+'T00:00:00')]:monthDates(ym)).forEach(d=>formsOn(e.id,dkey(d)).forEach(x=>{v++;s+=x.total;p+=x.prod;c+=x.ctn;areas.add(x.area)}));return{v,s,p,c,pct:s?p*100/s:0,areas:[...areas]}}
 function predict(c){
   const cy=curYm(),tk=today(),ym=dkey(c.days[0]).slice(0,7);
@@ -1026,7 +1026,6 @@ const LB=[['ach','Achievement %'],['ctn','CTN'],['prod','Productivity'],['att','
 function lbVal(r,by){return by==='ach'?(r.c.has?r.c.achPct:-1):by==='ctn'?r.c.ach:by==='prod'?(r.f.s?r.f.pct:-1):by==='att'?(r.a.wd?r.a.pct:-1):(r.score==null?-1:r.score)}
 function lbFmt(r,by){const v=lbVal(r,by);if(v<0)return'—';return by==='ctn'?fmtN(v)+' CTN':Math.round(v)+'%'}
 function leaderView(){
-  if(!isAdmin())return myRankView();
   const ym=lbYm||curYm(),rows=db.employees.map(e=>({e,...scoreOf(e,ym)})).sort((a,b)=>lbVal(b,lbBy)-lbVal(a,lbBy));
   const tabs=`<div class="tabs">${LB.map(t=>`<button class="${lbBy===t[0]?'on':''}" onclick="lbBy='${t[0]}';render()">${t[1]}</button>`).join('')}</div>`;
   const filt=`<div class="card"><div class="card-b" style="padding:12px;display:flex;flex-direction:column;gap:10px"><select class="inp" onchange="lbYm=this.value;render()">${monthOptions(ym)}</select>${tabs}</div></div>`;
@@ -1035,7 +1034,8 @@ function leaderView(){
   const pod=`<div class="card" style="overflow:hidden"><div class="card-h"><div><h3>Top performers</h3><p>${LB.find(t=>t[0]===lbBy)[1]} · ${ymLabel(ym)}</p></div>${I('trophy',20,'#D4A017')}</div><div class="podium">${top.map((r,i)=>r?`<div class="pod">${avatar(r.e,i===1?64:52,{seal:i===1})}<b>${esc(r.e.name.split(' ')[0])}</b><small class="num">${lbFmt(r,lbBy)}</small><div class="st" style="height:${hs[i]}px;background:${cols[i]}">${ranks[i]}</div></div>`:'<div></div>').join('')}</div></div>`;
   const meId=isAdmin()?null:session.id;
   const list=rows.map((r,i)=>`<div class="li" style="${r.e.id===meId?'background:var(--pri-soft)':''}"><span class="rk">${i+1}</span>${avatar(r.e,38,{})}<div class="info"><b>${esc(r.e.name)}${r.e.id===meId?' (you)':''}</b><span>${esc(r.e.category)} · grade ${r.grade}</span>${miniBadges(r.e)}</div><b class="num" style="font-size:15px">${lbFmt(r,lbBy)}</b></div>`).join('');
-  return bar('Leaderboard',ymLabel(ym),true)+`<div class="wrap">${filt}${pod}<div class="card"><div class="card-h"><div><h3>Full ranking</h3><p>${rows.length} bookers</p></div></div>${list}</div></div>`;
+  let mineH='';if(!isAdmin()){const i=rows.findIndex(r=>r.e.id===session.id);if(i>-1){const r=rows[i];mineH=`<div class="upd"><span class="ui">${I('trophy',19,'#fff',2)}</span><div class="ut"><b>${lbVal(r,lbBy)<0?'Not ranked yet':`You are #${i+1} of ${rows.length}`}</b><span>${LB.find(t=>t[0]===lbBy)[1]}: ${lbFmt(r,lbBy)} · grade ${r.grade}</span></div></div>`}}
+  return bar('Leaderboard',ymLabel(ym),true)+`<div class="wrap">${filt}${mineH}${pod}<div class="card"><div class="card-h"><div><h3>Full ranking</h3><p>${rows.length} bookers</p></div></div>${list}</div></div>`;
 }
 
 function myRankView(){
@@ -1084,7 +1084,7 @@ function reportData(){
   const admin=isAdmin(),emps=admin?(rpEmp==='all'?db.employees:db.employees.filter(e=>e.id===rpEmp)):[me()];
   if(rpType==='daily'){const d=rpDate||today(),ym=d.slice(0,7);
     const rows=emps.map(e=>{const r=(db.att[e.id]||{})[d],f=formStats(e,ym,d),c=tcalc(e.id,ym);let req=null;if(c.has){const dd=new Date(d+'T00:00:00');const left=c.wd.filter(x=>dkey(x)>=d).length;const before=c.days.filter(x=>dkey(x)<d).reduce((a,x)=>a+dayCtn(e.id,dkey(x)),0);req=left?Math.max(0,(c.T-before)/left):0}
-      return{e,r,st:r&&r.in?statusOf(r):(new Date(d+'T00:00:00').getDay()===0?'off':'absent'),f,ctn:dayCtn(e.id,d),req}});
+      return{e,r,st:r&&r.in?statusOf(r):(new Date(d+'T00:00:00').getDay()===TOFF?'off':'absent'),f,ctn:dayCtn(e.id,d),req}});
     return{type:'daily',label:new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}),rows}}
   const ym=rpYm||curYm();
   const rows=emps.map(e=>{const g=scoreOf(e,ym);g.c.id=e.id;return{e,...g,p:predict(g.c)}});
@@ -1298,7 +1298,7 @@ function resetAll(){const t=db.theme,st=db.settings;db=fresh();db.theme=t;db.set
 /* ============ History ============ */
 function empRows(e){
   const a=db.att[e.id]||{},o=[],t=today(),start=new Date(e.joined+'T00:00:00');
-  for(let i=0;i<60;i++){const d=new Date();d.setDate(d.getDate()-i);if(dkey(d)<e.joined)break;const k=dkey(d),r=a[k];if(!r&&(k===t||d.getDay()===0))continue;o.push({k,e,r,s:statusOf(r)})}
+  for(let i=0;i<60;i++){const d=new Date();d.setDate(d.getDate()-i);if(dkey(d)<e.joined)break;const k=dkey(d),r=a[k];if(!r&&(k===t||d.getDay()===TOFF))continue;o.push({k,e,r,s:statusOf(r)})}
   return o;
 }
 function historyView(){
@@ -1309,7 +1309,7 @@ function historyView(){
   const filter=admin?`<div class="card-b" style="padding-bottom:0"><select class="inp" onchange="histFilter=this.value;render()"><option value="all">All employees</option>${db.employees.map(e=>`<option value="${e.id}" ${histFilter===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}</select></div>`:'';
   const table=rows.length?`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Date</th>${admin?'<th>Employee</th>':''}<th>In</th><th>Out</th><th>Hours</th><th>Status</th></tr></thead><tbody>${rows.map(x=>{const live=x.r&&x.r.in&&!x.r.out;return `<tr><td class="num">${fmtD(x.k)}<small>${fmtW(x.k)}</small></td>${admin?`<td>${esc(x.e.name)}<small>${esc(x.e.category)}</small></td>`:''}<td class="num">${fmtT(x.r&&x.r.in)}${x.r&&x.r.inLoc?`<small>${x.r.inLoc.dist} m</small>`:''}</td><td class="num">${fmtT(x.r&&x.r.out)}${x.r&&x.r.outLoc?`<small>${x.r.outLoc.dist} m</small>`:''}</td><td class="num">${x.r?dur(x.r):'—'}</td><td><span class="tag ${x.s}">${LBL[x.s]}</span></td></tr>`}).join('')}</tbody></table></div>`
    :`<div class="empty">${I('cal',32)}No attendance records yet.</div>`;
-  return bar('Attendance History','Last 60 days · Sundays off',true)+`<div class="wrap">
+  return bar('Attendance History','Last 60 days · Fridays off',true)+`<div class="wrap">
   <div class="kpis k3">${kpi(sum.present,'Present','','present',C.ok,'#10B98117')}${kpi(sum.absent,'Absent','','absent',C.bad,'#EF444417')}${kpi(sum.half,'Half Days','','half',C.warn,'#F59E0B17')}</div>
   <div class="card">${filter}<div style="height:${admin?14:0}px"></div>${table}</div></div>`;
 }
@@ -1330,7 +1330,7 @@ function after(){
   const days=lastDays(7),labels=days.map(d=>d.toLocaleDateString('en-US',{weekday:'short'}));
   if(isAdmin()){
     const P=[],A=[],H=[];
-    days.forEach(d=>{const k=dkey(d);let p=0,a=0,h=0;db.employees.forEach(e=>{if(e.joined>k)return;const s=statusOf((db.att[e.id]||{})[k]);if(s==='present')p++;else if(s==='half')h++;else if(d.getDay()!==0&&k!==today())a++});P.push(p);A.push(a);H.push(h)});
+    days.forEach(d=>{const k=dkey(d);let p=0,a=0,h=0;db.employees.forEach(e=>{if(e.joined>k)return;const s=statusOf((db.att[e.id]||{})[k]);if(s==='present')p++;else if(s==='half')h++;else if(d.getDay()!==TOFF&&k!==today())a++});P.push(p);A.push(a);H.push(h)});
     $('#ch1').innerHTML=barChart(labels,[{name:'Present',color:C.ok,data:P},{name:'Half Day',color:C.warn,data:H},{name:'Absent',color:C.bad,data:A}],{min:4});
     const c=todayCounts();
     $('#ch2').innerHTML=donut([{label:'Present',value:c.p,color:C.ok},{label:'Half Day',value:c.h,color:C.warn},{label:'Absent',value:c.ab,color:C.bad}],c.total?Math.round((c.p+c.h)*100/c.total)+'%':'—','attendance');

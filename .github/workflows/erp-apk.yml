@@ -37,8 +37,11 @@ jobs:
         working-directory: ERP/android
         run: gradle assembleRelease --no-daemon -PvCode=${{ github.run_number }}
 
-      - name: Rename
-        run: cp ERP/android/app/build/outputs/apk/release/app-release.apk FB-ERP.apk
+      - name: Rename and write version file
+        run: |
+          cp ERP/android/app/build/outputs/apk/release/app-release.apk FB-ERP.apk
+          echo '{"versionCode": ${{ github.run_number }}, "versionName": "1.${{ github.run_number }}"}' > version.json
+          cat version.json
 
       - uses: actions/upload-artifact@v4
         with:
@@ -53,7 +56,10 @@ jobs:
           tag_name: erp-latest
           name: FB ERP (latest)
           body: |
-            FB ERP app, build ${{ github.run_number }}.
+            FB ERP app, version 1.${{ github.run_number }}.
             Phone par neeche FB-ERP.apk download karke install karein.
-          files: FB-ERP.apk
+          files: |
+            FB-ERP.apk
+            version.json
+          overwrite_files: true
           make_latest: false

@@ -206,6 +206,11 @@ body.open #drawer{transform:none}
 .srow:last-child{border-bottom:none}
 .srow b{font-weight:600;font-size:14px;display:block}
 .srow span{font-size:12px;color:var(--muted)}
+.upd{display:flex;gap:12px;align-items:center;padding:14px;border-radius:12px;background:var(--pri-soft);border:1px solid color-mix(in srgb,var(--pri) 25%,transparent)}
+.upd .ui{width:38px;height:38px;border-radius:10px;background:var(--pri);color:#fff;display:grid;place-items:center;flex:none}
+.upd .ut{flex:1;min-width:0}.upd .ut b{display:block;font-size:14px;font-weight:600}.upd .ut span{font-size:12px;color:var(--muted)}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px}.prog i{display:block;height:100%;background:var(--pri);border-radius:3px;transition:width .2s}
+a.btn{text-decoration:none}
 .foot-note{text-align:center;font-size:11.5px;color:var(--faint);margin-top:6px}
 </style>
 </head>
@@ -229,6 +234,35 @@ let session=null;
 try{session=JSON.parse(localStorage.getItem(KEY+'_s'))}catch(e){}
 function setSession(s){session=s;try{s?localStorage.setItem(KEY+'_s',JSON.stringify(s)):localStorage.removeItem(KEY+'_s')}catch(e){}}
 let view='dash',newCat='Core',histFilter='all',pendingPhoto=null;
+
+/* ============ App update (Android) ============ */
+const APK_URL='https://github.com/hassan4500678-ux/F-B/releases/download/erp-latest/FB-ERP.apk';
+const NATIVE=window.ErpApp||null;
+let appInfo=null;try{appInfo=NATIVE?JSON.parse(NATIVE.info()):null}catch(e){}
+let upd={status:'idle'};
+window.erpUpdate=function(s){upd=Object.assign({},upd,s||{});paintUpdate()};
+function checkUpdate(){if(!NATIVE)return;upd={status:'checking'};paintUpdate();try{NATIVE.checkUpdate()}catch(e){upd={status:'error'};paintUpdate()}}
+function installUpdate(){if(!NATIVE)return;upd.status='downloading';upd.pct=0;paintUpdate();try{NATIVE.installUpdate()}catch(e){upd={status:'error'};paintUpdate()}}
+function updBanner(){
+  const u=upd,v=esc(u.latestName||'');
+  if(u.status==='available')return `<div class="upd"><span class="ui">${I('dl',19,'#fff',2)}</span><div class="ut"><b>Update available</b><span>Version ${v} is ready to install</span></div><button class="btn blue sm" onclick="installUpdate()">Update now</button></div>`;
+  if(u.status==='downloading')return `<div class="upd"><span class="ui">${I('dl',19,'#fff',2)}</span><div class="ut"><b>Downloading update… <span class="num">${u.pct||0}%</span></b><div class="prog"><i style="width:${u.pct||0}%"></i></div></div></div>`;
+  if(u.status==='permission')return `<div class="upd"><span class="ui">${I('lock',19,'#fff',2)}</span><div class="ut"><b>Allow app updates</b><span>Turn on “Allow from this source” for FB ERP, then come back.</span></div><button class="btn blue sm" onclick="installUpdate()">Retry</button></div>`;
+  if(u.status==='ready')return `<div class="upd"><span class="ui">${I('check',19,'#fff',2.4)}</span><div class="ut"><b>Ready to install</b><span>Tap Install on the next screen. Your data stays safe.</span></div><button class="btn blue sm" onclick="installUpdate()">Install</button></div>`;
+  if(u.status==='failed')return `<div class="upd"><span class="ui">${I('alert',19,'#fff',2)}</span><div class="ut"><b>Update failed</b><span>Check your internet connection and try again.</span></div><button class="btn blue sm" onclick="installUpdate()">Retry</button></div>`;
+  return '';
+}
+function updBox(){
+  if(!NATIVE)return `<div class="card-h"><div><h3>Android app</h3><p>Install FB ERP on your phone</p></div></div><div class="card-b"><a class="btn" href="${APK_URL}" target="_blank" rel="noopener">${I('dl',18,'#fff',2)}Download APK</a></div>`;
+  const u=upd,cur=esc(appInfo?appInfo.versionName:'');
+  let line='',btn=`<button class="btn out" onclick="checkUpdate()">${I('refresh',18)}Check for updates</button>`;
+  if(u.status==='checking'){line='Checking for updates…';btn=`<button class="btn out" disabled>${I('refresh',18)}Checking…</button>`}
+  else if(u.status==='none')line='You are on the latest version.';
+  else if(u.status==='error')line='Could not check. Please check your internet connection.';
+  else if(['available','downloading','permission','ready','failed'].includes(u.status)){line='';btn=updBanner()}
+  return `<div class="card-h"><div><h3>App update</h3><p>Installed version ${cur}</p></div></div><div class="card-b">${line?`<p class="muted" style="font-size:13px;margin-bottom:12px">${line}</p>`:''}${btn}</div>`;
+}
+function paintUpdate(){const b=$('#updBanner');if(b)b.innerHTML=updBanner();const x=$('#updBox');if(x)x.innerHTML=updBox()}
 
 /* ============ Helpers ============ */
 const $=s=>document.querySelector(s);
@@ -282,6 +316,8 @@ const P={
  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5h.01"/>',
  plus:'<path d="M12 5v14M5 12h14"/>',
+ dl:'<path d="M12 3v12M7 10l5 5 5-5M5 20h14"/>',
+ refresh:'<path d="M20 11a8 8 0 0 0-14.9-3.5M4 4v4h4M4 13a8 8 0 0 0 14.9 3.5M20 20v-4h-4"/>',
  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
  tplus:'<circle cx="11" cy="13" r="8"/><circle cx="11" cy="13" r="3.5"/><path d="M19 1.5v6M16 4.5h6"/>',
  form:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.5h6V4M8.5 10h7M8.5 13.5h7M8.5 17h4"/>',
@@ -401,7 +437,7 @@ function adminDash(){
   const c=todayCounts(),t=today(),pct=c.total?Math.round((c.p+c.h)*100/c.total):0;
   const rows=c.total?db.employees.map(e=>{const r=(db.att[e.id]||{})[t],s=statusOf(r);return `<div class="li">${avatar(e,40,{})}<div class="info"><b>${esc(e.name)}</b><span>${esc(e.category)} · ${esc(e.branch)} · ${r&&r.in?'In '+fmtT(r.in):'Not checked in'}</span></div><span class="tag ${r&&r.in&&!r.out?'live':s}">${r&&r.in&&!r.out?'Active':LBL[s]}</span><button class="xb" aria-label="Remove" onclick="delEmp('${e.id}')">${I('trash',15)}</button></div>`}).join('')
    :`<div class="empty">${I('users',32)}No employees yet.<br>Add your first employee to start tracking attendance.</div>`;
-  return bar('Dashboard',dateLine())+`<div class="wrap">${idCard(db.admin)}
+  return bar('Dashboard',dateLine())+`<div class="wrap"><div id="updBanner" style="display:contents"></div>${idCard(db.admin)}
   <div class="sec-t"><h2>Today’s overview</h2><span>${pct}% attendance</span></div>
   <div class="kpis">${kpi(c.total,'Total Employees','Active workforce','users',C.navy,'#1E3A8A14')}${kpi(c.p,'Present','Checked in today','present',C.ok,'#10B98117')}${kpi(c.ab,'Absent','Not checked in','absent',C.bad,'#EF444417')}${kpi(c.h,'Half Day','Under 4 hours','half',C.warn,'#F59E0B17')}</div>
   ${modulesBlock()}
@@ -434,7 +470,7 @@ function empDash(){
   const e=me(),r=(db.att[e.id]||{})[today()],st=empStats(e),s=statusOf(r),live=r&&r.in&&!r.out;
   const now=new Date(),tm=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}).split(' ');
   const statusTag=live?'<span class="tag live">On duty</span>':r&&r.out?`<span class="tag ${s}">${LBL[s]}</span>`:'<span class="tag absent">Not checked in</span>';
-  return bar('Dashboard',dateLine())+`<div class="wrap">${idCard(e)}
+  return bar('Dashboard',dateLine())+`<div class="wrap"><div id="updBanner" style="display:contents"></div>${idCard(e)}
   <div class="card"><div class="card-b">
    <div class="att-top"><div><div class="muted" style="font-size:12px;margin-bottom:4px">Current time</div><div class="clock num" id="clock">${tm[0]}<small>${tm[1]||''}</small></div></div>${statusTag}</div>
    <div class="tl"><div><span>Check in</span><b class="num">${fmtT(r&&r.in)}</b></div><div><span>Check out</span><b class="num">${fmtT(r&&r.out)}</b></div><div><span>Worked</span><b class="num" id="hrs">${dur(r)}</b></div></div>
@@ -480,11 +516,12 @@ function settingsView(){
   const admin=isAdmin();
   return bar('Settings','Preferences & security',true)+`<div class="wrap">
   <div class="card"><div class="card-h"><h3>Appearance</h3></div><div class="srow"><div><b>Dark mode</b><span>Easier on the eyes in low light</span></div><button class="sw ${db.theme==='dark'?'on':''}" aria-label="Dark mode" onclick="db.theme=db.theme==='dark'?'light':'dark';save();render()"></button></div></div>
+  <div class="card" id="updBox"></div>
   ${admin?`<div class="card"><div class="card-h"><div><h3>Admin login code</h3><p>Minimum 4 digits</p></div></div><div class="card-b"><div class="fld"><input id="ac" class="inp num" inputmode="numeric" type="password" placeholder="New code"></div><button class="btn out" onclick="chgAdmin()">Update code</button></div></div>
   <div class="card"><div class="card-h"><div><h3 style="color:var(--bad)">Danger zone</h3><p>This action cannot be undone</p></div></div><div class="card-b"><button class="btn danger" onclick="confirmBox('Reset all data?','All employees and attendance records will be permanently deleted.',resetAll)">${I('trash',17)}Reset all data</button></div></div>`
   :`<div class="card"><div class="srow"><div><b>Login code</b><span>Contact your administrator to change your code.</span></div>${I('lock',18,'var(--faint)')}</div></div>`}
   <div class="card"><div class="card-b"><button class="btn out" onclick="logout()">${I('logout',18)}Sign out</button></div></div>
-  <p class="foot-note">FB ERP · Version 1.0<br>Data is stored securely on this device.</p></div>`;
+  <p class="foot-note">FB ERP${appInfo?' · Version '+esc(appInfo.versionName):''}<br>Data is stored securely on this device.</p></div>`;
 }
 function chgAdmin(){const c=$('#ac').value.trim();if(!/^\d{4,}$/.test(c))return toast('Use at least 4 digits','bad');if(db.employees.some(e=>e.code===c))return toast('This code belongs to an employee','bad');db.adminCode=c;save();toast('Admin code updated');render()}
 function resetAll(){const t=db.theme;db=fresh();db.theme=t;save();setSession(null);render();toast('All data has been reset')}
@@ -510,6 +547,7 @@ function historyView(){
 
 /* ============ After render ============ */
 function after(){
+  paintUpdate();
   const b=$('#bar');if(b){const f=()=>b.classList.toggle('scrolled',window.scrollY>4);window.onscroll=f;f()}
   const car=$('#car');
   if(car){const dots=[...document.querySelectorAll('#dots i')];
@@ -534,6 +572,7 @@ function after(){
 }
 setInterval(()=>{const c=$('#clock');if(c){const t=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}).split(' ');c.innerHTML=t[0]+'<small>'+(t[1]||'')+'</small>'}const h=$('#hrs');if(h&&session&&!isAdmin()){h.textContent=dur((db.att[session.id]||{})[today()])}},1000);
 render();
+if(NATIVE)setTimeout(checkUpdate,1200);
 </script>
 </body>
 </html>

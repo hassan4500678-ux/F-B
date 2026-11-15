@@ -9,6 +9,12 @@ profile photo, attendance history. Targets, Reports, Salary waghera "Coming soon
 
 Phone par link kholein, file download hogi, "Install" dabayein.
 
+## App update
+
+App khulte hi GitHub check karti hai. Naya version ho to Dashboard par **"Update available"** aata hai —
+**Update now** dabayein, APK app ke andar download hogi aur install screen khul jayegi. Data waisa hi rehta hai.
+Settings > App update se khud bhi check kar sakte hain. Pehli dafa phone "Allow from this source" ki ijazat maangega.
+
 ## Login
 
 - Admin code: `4321` (Settings se badal sakte hain)

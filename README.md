@@ -34,3 +34,9 @@ aur usi waqt "WhatsApp par bhejein" ka button aata hai.
 
 - `ClaimsApp/keystore/fb-claims.jks` **kabhi delete ya change na karein**. Isi key ki wajah se har nayi APK
   purani ke upar install hoti hai aur data bacha rehta hai.
+
+---
+
+## FB ERP (attendance app)
+
+Alag app, `ERP/` folder mein. APK: **https://github.com/hassan4500678-ux/F-B/releases/download/erp-latest/FB-ERP.apk**

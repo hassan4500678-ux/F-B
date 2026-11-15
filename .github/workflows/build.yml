@@ -3,6 +3,10 @@ name: Build FB Claims APK
 on:
   push:
     branches: [main]
+    # ERP app ki changes par FB Claims ki nayi APK na bane
+    paths-ignore:
+      - 'ERP/**'
+      - '.github/workflows/erp-apk.yml'
   workflow_dispatch:
 
 permissions:

@@ -66,6 +66,23 @@ booker-wise productivity, daily trend, saare bookers ki detail table aur area de
 - **Report Card**: mahine ka card (attendance, target %, productivity, badges, grade A+ se D) — image share/save.
   Grade = 50% target + 25% attendance + 25% productivity. A+ 90+, A 80+, B 70+, C 60+, D neeche.
 
+## Mazbooti (long term)
+
+- Koi screen error de to app band nahi hoti; dashboard khul jata hai aur error andar note ho jata hai.
+- Purane data ko naye version mein khud update (migrate) kiya jata hai.
+- Settings > Backup & restore: mahine mein kam az kam aik dafa backup WhatsApp/Drive par rakhein.
+- Android 5 se Android 16 tak (Android System WebView updated ho).
+
+## Kaun kya dekhta hai
+
+| Module | Admin | Employee |
+|---|---|---|
+| Target Predictor | Sab | — |
+| Leaderboard | Poori ranking | Sirf apni position |
+| Area Heatmap | Sab areas | Apne areas |
+| Report Card | Sab | Apna |
+| Comparison | Team / booker | Apna mahina vs mahina |
+
 ## Files
 
 - `web/index.html` — poori app (fonts andar hain, internet ke baghair chalti hai).

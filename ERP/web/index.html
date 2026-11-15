@@ -37,7 +37,7 @@ svg{display:block;flex:none}
 #app{max-width:560px;margin:0 auto;padding-bottom:calc(32px + env(safe-area-inset-bottom))}
 
 /* App bar */
-.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid transparent}
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:var(--bg);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid transparent}
 .bar.scrolled{border-bottom-color:var(--line)}
 .bar .t{flex:1;min-width:0}
 .bar .t b{display:block;font-size:16px;font-weight:600;letter-spacing:-.01em}
@@ -165,7 +165,7 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .dl em{font-style:normal;color:var(--faint);font-size:11.5px;width:38px;text-align:right}
 
 /* Drawer */
-#shade{position:fixed;inset:0;background:rgba(2,8,23,.5);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+#shade{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(2,8,23,.5);opacity:0;pointer-events:none;transition:.25s;z-index:40}
 #drawer{overflow:hidden;position:fixed;top:0;left:0;bottom:0;width:288px;max-width:84%;background:var(--navy);color:#fff;z-index:50;transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:calc(20px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom))}
 body.open #shade{opacity:1;pointer-events:auto}
 body.open #drawer{transform:none}
@@ -183,7 +183,7 @@ body.open #drawer{transform:none}
 .nav.out{color:#FCA5A5;flex:none}
 
 /* Modal & toast */
-#modal{position:fixed;inset:0;background:rgba(2,8,23,.55);display:none;align-items:flex-end;justify-content:center;z-index:60}
+#modal{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(2,8,23,.55);display:none;align-items:flex-end;justify-content:center;z-index:60}
 #modal.show{display:flex}
 .mbox{background:var(--surface);border-radius:16px 16px 0 0;padding:22px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:560px;animation:up .25s cubic-bezier(.4,0,.2,1)}
 @media(min-width:600px){#modal{align-items:center;padding:20px}.mbox{border-radius:16px;max-width:380px}}
@@ -315,7 +315,23 @@ if(db.seq==null)db.seq=db.employees.length;
 if(!db.settings)db.settings={halfAfter:'09:15',office:null,radius:100};
 if(!db.targets)db.targets={};if(!db.sales)db.sales={};if(!db.forms)db.forms={};
 db.employees.forEach(e=>{if(!Array.isArray(e.badges))e.badges=[]});
-function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){toast('Could not save — storage is full','bad');return false}}
+function migrate(d){
+  if(!d||typeof d!=='object')d=fresh();
+  ['att','targets','sales','forms'].forEach(k=>{if(!d[k]||typeof d[k]!=='object')d[k]={}});
+  if(!Array.isArray(d.employees))d.employees=[];
+  if(!d.admin)d.admin={name:'Administrator',photo:null};
+  if(!d.adminCode)d.adminCode='4321';
+  d.settings=Object.assign({halfAfter:'09:15',office:null,radius:100},d.settings||{});
+  d.employees.forEach((e,i)=>{if(!Array.isArray(e.badges))e.badges=[];if(!e.joined)e.joined=today();if(!e.no)e.no=i+1;if(!e.category)e.category='Core';if(!e.branch)e.branch='Latifabad'});
+  if(d.seq==null||d.seq<d.employees.length)d.seq=Math.max(d.employees.length,...d.employees.map(e=>e.no||0));
+  d.v=3;return d;
+}
+let lastErrToast=0;
+function logErr(m){try{db.errors=(db.errors||[]).slice(-19);db.errors.push({t:Date.now(),m:String(m).slice(0,240),v:view});localStorage.setItem(KEY,JSON.stringify(db))}catch(x){}
+  if(Date.now()-lastErrToast>4000){lastErrToast=Date.now();try{toast('Something went wrong. Please try again.','bad')}catch(x){}}}
+window.addEventListener('error',e=>logErr((e&&e.message)||'error'));
+window.addEventListener('unhandledrejection',e=>logErr((e&&e.reason)||'promise'));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){toast('Could not save — phone storage for the app is full. Make a backup and remove old photos.','bad');return false}}
 let session=null;
 try{session=JSON.parse(localStorage.getItem(KEY+'_s'))}catch(e){}
 function setSession(s){session=s;try{s?localStorage.setItem(KEY+'_s',JSON.stringify(s)):localStorage.removeItem(KEY+'_s')}catch(e){}}
@@ -358,7 +374,7 @@ const today=()=>dkey(new Date());
 const fmtT=ts=>ts?new Date(ts).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'—';
 const fmtD=k=>new Date(k+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
 const fmtW=k=>new Date(k+'T00:00:00').toLocaleDateString('en-US',{weekday:'short'});
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isAdmin=()=>session&&session.role==='admin';
 const me=()=>isAdmin()?db.admin:db.employees.find(e=>e.id===session.id);
 function lateMins(ts){const d=new Date(ts),[H,M]=(db.settings.halfAfter||'09:15').split(':').map(Number);return d.getHours()*60+d.getMinutes()-(H*60+M)}
@@ -498,7 +514,7 @@ function barChart(labels,series,opt={}){
 }
 function lineChart(labels,series,opt={}){
   const W=340,H=190,L=34,R=8,T=10,B=26,cw=W-L-R,ch=H-T-B,n=labels.length;
-  let max=Math.max(1,...series.flatMap(s=>s.data.filter(v=>v!=null)));const step=Math.ceil(max/4)||1;max=step*4;
+  let max=Math.max.apply(null,[1].concat(...series.map(s=>s.data.filter(v=>v!=null))));const step=Math.ceil(max/4)||1;max=step*4;
   let g='';
   for(let k=0;k<=4;k++){const y=T+ch-ch*k/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line2)"/><text x="${L-8}" y="${y+3.5}" text-anchor="end" font-size="10" fill="var(--faint)">${step*k}</text>`}
   const X=i=>L+(n<2?cw/2:cw*i/(n-1)),Y=v=>T+ch-ch*v/max;
@@ -533,8 +549,8 @@ function renderDrawer(){
   const u=me();if(!u)return;
   const A=isAdmin();
   const groups=[['',[['dash','Dashboard','grid']]],
-   ['Sales',A?[['targets','Targets','target'],['newtarget','New Targets','tplus'],['analytics','Analytics','trend'],['predict','Target Predictor','crystal'],['heatmap','Area Heatmap','map']]:[['targets','Targets','target'],['dform','Daily Form','form'],['predict','Target Predictor','crystal'],['heatmap','Area Heatmap','map']]],
-   ['Performance',[['leaderboard','Leaderboard','trophy'],['compare','Comparison','compare'],['reports','Reports','report'],['reportcard','Report Card','card']]],
+   ['Sales',A?[['targets','Targets','target'],['newtarget','New Targets','tplus'],['analytics','Analytics','trend'],['predict','Target Predictor','crystal'],['heatmap','Area Heatmap','map']]:[['targets','Targets','target'],['dform','Daily Form','form'],['heatmap','My Area Heatmap','map']]],
+   ['Performance',[['leaderboard',A?'Leaderboard':'My Leaderboard','trophy'],['compare','Comparison','compare'],['reports','Reports','report'],['reportcard','Report Card','card']]],
    ['People',A?[['add','Add Employee','uadd'],['badges','Badges','medal'],['history','Attendance History','cal']]:[['history','Attendance History','cal']]],
    ['Account',[['profile','Profile','user'],['settings','Settings','gear']]]];
   const navBtn=i=>`<button class="nav ${view===i[0]||(view==='edit'&&i[0]==='add')?'on':''}" onclick="${i[0]==='add'?'openAdd()':i[0]==='newtarget'?'openNewTarget()':`go('${i[0]}')`}">${I(i[2],19)}${i[1]}</button>`;
@@ -582,8 +598,10 @@ function render(){
   document.body.classList.toggle('dark',db.theme==='dark');
   const app=$('#app');
   if(!session||!me()){if(session)setSession(null);app.innerHTML=loginView();return}
-  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash,edit:isAdmin()?addView:empDash,badges:isAdmin()?badgesView:empDash,targets:targetsView,newtarget:isAdmin()?newTargetView:targetsView,dform:isAdmin()?adminDash:dformView,analytics:isAdmin()?analyticsView:empDash,predict:predictView,heatmap:heatmapView,leaderboard:leaderView,compare:compareView,reports:reportsView,reportcard:reportCardView}[view]||(isAdmin()?adminDash:empDash);
-  app.innerHTML=fn();after();
+  const fn={dash:isAdmin()?adminDash:empDash,profile:profileView,settings:settingsView,history:historyView,add:isAdmin()?addView:empDash,edit:isAdmin()?addView:empDash,badges:isAdmin()?badgesView:empDash,targets:targetsView,newtarget:isAdmin()?newTargetView:targetsView,dform:isAdmin()?adminDash:dformView,analytics:isAdmin()?analyticsView:empDash,predict:isAdmin()?predictView:empDash,heatmap:heatmapView,leaderboard:leaderView,compare:compareView,reports:reportsView,reportcard:reportCardView}[view]||(isAdmin()?adminDash:empDash);
+  try{app.innerHTML=fn()}catch(err){logErr('render '+view+': '+(err&&err.message));view='dash';
+    try{app.innerHTML=(isAdmin()?adminDash:empDash)()}catch(e2){app.innerHTML=`<div class="wrap" style="padding-top:40px"><div class="card"><div class="empty">${I('alert',32)}This screen could not open.<div style="margin-top:14px"><button class="btn sm" onclick="logout()">Sign in again</button></div></div></div></div>`;return}}
+  try{after()}catch(err){logErr('after '+view+': '+(err&&err.message))}
 }
 function loginView(){
   return `<div class="login"><div class="hd"><div class="mark">FB</div><h1>FB ERP</h1><p>Workforce &amp; attendance management</p></div>
@@ -600,7 +618,8 @@ function adminDash(){
   const rows=c.total?db.employees.map(e=>{const r=(db.att[e.id]||{})[t],s=statusOf(r),a=isLive(e);return `<div class="li tap" onclick="editEmp('${e.id}')">${avatar(e,40,{dot:a?'on':'off'})}<div class="info"><b>${esc(e.name)}</b><span>${esc(e.category)} · ${r&&r.in?'In '+fmtT(r.in):'Not checked in'}</span>${miniBadges(e)}</div><span class="tag ${s}">${LBL[s]}</span><span class="xb">${I('edit',15)}</span></div>`}).join('')
    :`<div class="empty">${I('users',32)}No employees yet.<br>Add your first employee to start tracking attendance.</div>`;
   const gpsWarn=db.settings.office?'':`<div class="upd" style="background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent)"><span class="ui" style="background:var(--warn)">${I('pin',19,'#fff',2)}</span><div class="ut"><b>Set office location</b><span>GPS check in (100 m) starts after you set it.</span></div><button class="btn sm" onclick="go('settings')">Set</button></div>`;
-  return bar('Dashboard',dateLine())+`<div class="wrap"><div id="updBanner" style="display:contents"></div>${idCard(db.admin)}${gpsWarn}
+  const bk=db.employees.length&&(!db.lastBackup||Date.now()-db.lastBackup>30*864e5)?`<div class="upd"><span class="ui">${I('shield',19,'#fff',2)}</span><div class="ut"><b>Backup recommended</b><span>${db.lastBackup?'Last backup over 30 days ago':'No backup yet'} — keep your data safe.</span></div><button class="btn blue sm" onclick="backupNow()">Backup</button></div>`:'';
+  return bar('Dashboard',dateLine())+`<div class="wrap"><div id="updBanner" style="display:contents"></div>${idCard(db.admin)}${gpsWarn}${bk}
   <div class="sec-t"><h2>Today’s overview</h2><span>${pct}% attendance</span></div>
   <div class="kpis">${kpi(c.total,'Total Employees','Active workforce','users',C.navy,'#1E3A8A14')}${kpi(c.p,'Present','On time today','present',C.ok,'#10B98117')}${kpi(c.ab,'Absent','Not checked in','absent',C.bad,'#EF444417')}${kpi(c.h,'Half Day','In after '+cutLbl(),'half',C.warn,'#F59E0B17')}</div>
   ${dashTargetCard()}
@@ -698,7 +717,7 @@ function dashTargetCard(){
   if(!c.has)return `<div class="card"><div class="card-h"><div><h3>My target · ${ymLabel(ym,true)}</h3><p>No target assigned yet</p></div>${I('target',20,'var(--faint)')}</div></div>`;
   return `<div class="card"><div class="card-h"><div><h3>My target · ${ymLabel(ym,true)}</h3><p>${fmtN(c.ach)} of ${fmtN(c.T)} CTN achieved</p></div><button class="btn out sm" onclick="go('targets')">Open</button></div><div class="card-b">
    <div class="req" style="margin-bottom:14px"><div><span>Today’s target</span><b class="num">${ctn(Math.ceil(c.req))}</b></div><div><span>Achieved today</span><b class="num" style="color:${c.todayAch>=Math.ceil(c.req)&&c.req>0?'var(--ok)':'var(--text)'}">${ctn(c.todayAch)}</b></div></div>
-   ${pbars(c.achPct,c.timeGone)}${predLine(c)}</div></div>`;
+   ${pbars(c.achPct,c.timeGone)}</div></div>`;
 }
 function pbars(ach,tg){const col=ach>=tg?C.ok:C.bad;
   return `<div class="prow"><div class="pl"><span class="muted">Achievement</span><b class="num" style="color:${col}">${fmtN(ach)}%</b></div><div class="pbar"><i style="width:${Math.min(100,ach)}%;background:${col}"></i><span class="mk" style="left:calc(${Math.min(100,tg)}% - 1px)" title="Time gone"></span></div></div>
@@ -757,7 +776,7 @@ function empTargets(e,ym){
   const tvsa=barChart(['Time gone','Achievement'],[{name:'%',color:C.pri,colors:['#94A3B8',c.achPct>=c.timeGone?C.ok:C.bad],data:[Math.round(c.timeGone),Math.round(c.achPct)]}],{min:100,legend:[{name:'Time gone',color:'#94A3B8'},{name:c.achPct>=c.timeGone?'Achievement (ahead)':'Achievement (behind)',color:c.achPct>=c.timeGone?C.ok:C.bad}]});
   const log=c.days.map((d,i)=>({d,v:c.daily[i]})).filter(x=>x.v>0).reverse();
   const logHtml=log.length?`<table class="tbl"><thead><tr><th>Date</th><th style="text-align:right">CTN</th><th style="text-align:right">vs base</th></tr></thead><tbody>${log.map(x=>`<tr><td class="num">${fmtD(dkey(x.d))}<small>${fmtW(dkey(x.d))}</small></td><td class="num" style="text-align:right;font-weight:600">${fmtN(x.v)}</td><td style="text-align:right"><span class="delta ${x.v>=c.base?'up':'down'}">${x.v>=c.base?'+':'−'}${fmtN(Math.abs(x.v-c.base))}</span></td></tr>`).join('')}</tbody></table>`:`<div class="empty" style="padding:18px">No achievement recorded yet.</div>`;
-  return head+hero+live+(ym===curYm()?predCard(c):'')+entry+
+  return head+hero+live+(admin&&ym===curYm()?predCard(c):'')+entry+
    `<div class="card"><div class="card-h"><div><h3>Time gone vs achievement</h3><p>${paceTag(c)||''}</p></div></div><div class="card-b">${pbars(c.achPct,c.timeGone)}<div style="height:14px"></div>${tvsa}</div></div>
    <div class="card"><div class="card-h"><div><h3>Progress vs target pace</h3><p>Cumulative CTN this month</p></div></div><div class="card-b">${line}</div></div>
    <div class="card"><div class="card-h"><div><h3>Daily achievement</h3><p>CTN per day</p></div></div><div class="card-b">${bars}</div></div>
@@ -863,7 +882,7 @@ function delForm(i){const e=me(),t=today(),l=formsOn(e.id,t),x=l[i];if(!x)return
 /* ============ Analytics (admin) ============ */
 function groupBar(labels,series,opt={}){
   const W=340,H=200,L=34,R=6,T=10,B=26,cw=W-L-R,ch=H-T-B,n=labels.length||1;
-  let max=Math.max(1,...series.flatMap(s=>s.data));const step=Math.ceil(max/4)||1;max=step*4;let g='';
+  let max=Math.max.apply(null,[1].concat(...series.map(s=>s.data)));const step=Math.ceil(max/4)||1;max=step*4;let g='';
   for(let k=0;k<=4;k++){const y=T+ch-ch*k/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line2)"/><text x="${L-8}" y="${y+3.5}" text-anchor="end" font-size="10" fill="var(--faint)">${step*k}</text>`}
   const slot=cw/n,gw=Math.min(40,slot*.72),bw=gw/series.length;
   labels.forEach((lb,i)=>{const x0=L+slot*i+(slot-gw)/2;series.forEach((s,si)=>{const v=s.data[i]||0,h=ch*v/max;if(h>0)g+=`<rect x="${x0+bw*si+1}" y="${T+ch-h}" width="${bw-2}" height="${h}" rx="2.5" fill="${s.color}"/>`});
@@ -963,7 +982,7 @@ function areaAgg(emps,ym){const m={};emps.forEach(e=>{monthDates(ym).forEach(d=>
 const hcol=p=>p==null?'#94A3B8':p>=70?'#10B981':p>=50?'#F59E0B':'#EF4444';
 function heatmapView(){hmZ=view==='heatmap'?hmZ:0;
   const admin=isAdmin(),ym=hmYm||curYm(),emps=admin?(hmEmp==='all'?db.employees:db.employees.filter(e=>e.id===hmEmp)):[me()];
-  const ar=areaAgg(emps,ym).sort((a,b)=>(a.pct??-1)-(b.pct??-1));
+  const ar=areaAgg(emps,ym).sort((a,b)=>(a.pct==null?-1:a.pct)-(b.pct==null?-1:b.pct));
   const filters=`<div class="card"><div class="card-b" style="padding:12px"><div class="${admin?'filters':''}"><select class="inp" onchange="hmYm=this.value;render()">${monthOptions(ym)}</select>${admin?`<select class="inp" onchange="hmEmp=this.value;render()"><option value="all">All bookers</option>${db.employees.map(e=>`<option value="${e.id}" ${hmEmp===e.id?'selected':''}>${esc(e.name)}</option>`).join('')}</select>`:''}</div></div></div>`;
   const leg=`<div class="legend" style="margin-top:0"><span><i style="background:#10B981"></i>70%+ productive</span><span><i style="background:#F59E0B"></i>50–69%</span><span><i style="background:#EF4444"></i>Below 50%</span><span><i style="background:#94A3B8"></i>No data</span></div>`;
   const located=ar.filter(a=>a.loc);
@@ -1004,9 +1023,10 @@ function scoreOf(e,ym){const c=tcalc(e.id,ym),a=attMonth(e,ym),f=formStats(e,ym)
   return{c,a,f,score:sc,grade:sc==null?'—':sc>=90?'A+':sc>=80?'A':sc>=70?'B':sc>=60?'C':'D'}}
 const gcol=g=>({'A+':'#047857','A':'#10B981','B':'#2563EB','C':'#D97706','D':'#DC2626'}[g]||'#94A3B8');
 const LB=[['ach','Achievement %'],['ctn','CTN'],['prod','Productivity'],['att','Attendance'],['score','Overall']];
-function lbVal(r,by){return by==='ach'?(r.c.has?r.c.achPct:-1):by==='ctn'?r.c.ach:by==='prod'?(r.f.s?r.f.pct:-1):by==='att'?(r.a.wd?r.a.pct:-1):(r.score??-1)}
+function lbVal(r,by){return by==='ach'?(r.c.has?r.c.achPct:-1):by==='ctn'?r.c.ach:by==='prod'?(r.f.s?r.f.pct:-1):by==='att'?(r.a.wd?r.a.pct:-1):(r.score==null?-1:r.score)}
 function lbFmt(r,by){const v=lbVal(r,by);if(v<0)return'—';return by==='ctn'?fmtN(v)+' CTN':Math.round(v)+'%'}
 function leaderView(){
+  if(!isAdmin())return myRankView();
   const ym=lbYm||curYm(),rows=db.employees.map(e=>({e,...scoreOf(e,ym)})).sort((a,b)=>lbVal(b,lbBy)-lbVal(a,lbBy));
   const tabs=`<div class="tabs">${LB.map(t=>`<button class="${lbBy===t[0]?'on':''}" onclick="lbBy='${t[0]}';render()">${t[1]}</button>`).join('')}</div>`;
   const filt=`<div class="card"><div class="card-b" style="padding:12px;display:flex;flex-direction:column;gap:10px"><select class="inp" onchange="lbYm=this.value;render()">${monthOptions(ym)}</select>${tabs}</div></div>`;
@@ -1016,6 +1036,18 @@ function leaderView(){
   const meId=isAdmin()?null:session.id;
   const list=rows.map((r,i)=>`<div class="li" style="${r.e.id===meId?'background:var(--pri-soft)':''}"><span class="rk">${i+1}</span>${avatar(r.e,38,{})}<div class="info"><b>${esc(r.e.name)}${r.e.id===meId?' (you)':''}</b><span>${esc(r.e.category)} · grade ${r.grade}</span>${miniBadges(r.e)}</div><b class="num" style="font-size:15px">${lbFmt(r,lbBy)}</b></div>`).join('');
   return bar('Leaderboard',ymLabel(ym),true)+`<div class="wrap">${filt}${pod}<div class="card"><div class="card-h"><div><h3>Full ranking</h3><p>${rows.length} bookers</p></div></div>${list}</div></div>`;
+}
+
+function myRankView(){
+  const ym=lbYm||curYm(),e=me(),all=db.employees.map(x=>({e:x,...scoreOf(x,ym)})),mine=all.find(r=>r.e.id===e.id);
+  const filt=`<div class="card"><div class="card-b" style="padding:12px"><select class="inp" onchange="lbYm=this.value;render()">${monthOptions(ym)}</select></div></div>`;
+  const rankOf=by=>{const v=lbVal(mine,by);if(v<0)return null;return 1+all.filter(r=>lbVal(r,by)>v).length};
+  const ov=rankOf('score');
+  const hero=`<div class="idc"><div class="row">${avatar(e,64,{seal:true,ring:true})}<div><div class="hello">My position · ${ymLabel(ym)}</div><div class="big num" style="margin-top:2px">${ov?'#'+ov:'—'} <span style="font-size:15px;font-weight:500;opacity:.7">of ${all.length} overall</span></div><div class="chips" style="margin-top:6px"><span class="chip-d">Grade ${mine.grade}</span></div></div></div></div>`;
+  const rows=LB.map(t=>{const r=rankOf(t[0]);const medal=r===1?'#D4A017':r===2?'#94A3B8':r===3?'#B87333':'var(--line)';
+    return `<div class="li"><span class="grade" style="width:40px;height:40px;font-size:14px;background:${medal};color:${r&&r<=3?'#fff':'var(--muted)'}">${r?'#'+r:'—'}</span><div class="info"><b>${t[1]}</b><span>${r?(r===1?'You are leading':'Rank '+r+' of '+all.length):'No data yet'}</span></div><b class="num" style="font-size:15px">${lbFmt(mine,t[0])}</b></div>`}).join('');
+  return bar('My Leaderboard',ymLabel(ym),true)+`<div class="wrap">${filt}${hero}<div class="card"><div class="card-h"><div><h3>My ranks</h3><p>Your position in each category</p></div>${I('trophy',20,'#D4A017')}</div>${rows}</div>
+   <div class="note" style="justify-content:center">${I('info',14)}Only your own results are shown here.</div></div>`;
 }
 
 /* ============ Comparison ============ */
@@ -1070,7 +1102,7 @@ function reportText(R){
   else{let T=0,A=0;R.rows.forEach(x=>{T+=x.c.T;A+=x.c.ach;
       L.push('*'+x.e.name+'* ('+x.e.category+') — Grade '+x.grade);
       L.push('Target: '+fmtN(x.c.T)+' · Achieved: '+fmtN(x.c.ach)+(x.c.has?' ('+fmtN(x.c.achPct)+'%)':''));
-      if(x.p&&!x.p.final)L.push('Predicted finish: '+Math.round(x.p.recentPct)+'%');
+      if(isAdmin()&&x.p&&!x.p.final)L.push('Predicted finish: '+Math.round(x.p.recentPct)+'%');
       L.push('Attendance: P '+x.a.p+' · H '+x.a.h+' · A '+x.a.ab+(x.a.wd?' ('+Math.round(x.a.pct)+'%)':''));
       L.push('Shops: '+x.f.s+' · Productive: '+x.f.p+(x.f.s?' ('+Math.round(x.f.pct)+'%)':''));L.push('')});
     if(R.rows.length>1){L.push('*TEAM TOTAL*');L.push('Target: '+fmtN(T)+' · Achieved: '+fmtN(A)+(T?' ('+fmtN(A*100/T)+'%)':''))}}
@@ -1088,7 +1120,7 @@ function reportsView(){
     `<div class="card rpt">${R.rows.map(x=>`<div class="blk"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">${avatar(x.e,34,{})}<div style="flex:1;min-width:0"><h4>${esc(x.e.name)}</h4><span class="muted" style="font-size:12px">${esc(x.e.category)}</span></div><span class="tag ${x.st==='off'?'live':x.st}">${x.st==='off'?'Day off':LBL[x.st]}</span></div>
      <div class="kv">Check in / out<b class="num">${fmtT(x.r&&x.r.in)} – ${fmtT(x.r&&x.r.out)}</b></div><div class="kv">Areas<b>${x.f.areas.length?esc(x.f.areas.join(', ')):'—'}</b></div><div class="kv">Shops · productive<b class="num">${x.f.s} · ${x.f.p}${x.f.s?` (${Math.round(x.f.pct)}%)`:''}</b></div><div class="kv">CTN vs day target<b class="num">${fmtN(x.ctn)}${x.req!=null?' / '+Math.ceil(x.req):''}</b></div></div>`).join('')}</div>`}
   else{body=`<div class="card rpt">${R.rows.map(x=>`<div class="blk"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">${avatar(x.e,34,{})}<div style="flex:1;min-width:0"><h4>${esc(x.e.name)}</h4><span class="muted" style="font-size:12px">${esc(x.e.category)}</span></div><span class="grade" style="background:${gcol(x.grade)};width:36px;height:36px;font-size:14px">${x.grade}</span></div>
-     <div class="kv">Target · achieved<b class="num">${fmtN(x.c.T)} · ${fmtN(x.c.ach)}${x.c.has?` (${fmtN(x.c.achPct)}%)`:''}</b></div>${x.p&&!x.p.final?`<div class="kv">Predicted finish<b class="num" style="color:${pcol(x.p.recentPct)}">${Math.round(x.p.recentPct)}%</b></div>`:''}<div class="kv">Attendance (P/H/A)<b class="num">${x.a.p} / ${x.a.h} / ${x.a.ab}${x.a.wd?` · ${Math.round(x.a.pct)}%`:''}</b></div><div class="kv">Shops · productive<b class="num">${x.f.s} · ${x.f.p}${x.f.s?` (${Math.round(x.f.pct)}%)`:''}</b></div></div>`).join('')}</div>`}
+     <div class="kv">Target · achieved<b class="num">${fmtN(x.c.T)} · ${fmtN(x.c.ach)}${x.c.has?` (${fmtN(x.c.achPct)}%)`:''}</b></div>${isAdmin()&&x.p&&!x.p.final?`<div class="kv">Predicted finish<b class="num" style="color:${pcol(x.p.recentPct)}">${Math.round(x.p.recentPct)}%</b></div>`:''}<div class="kv">Attendance (P/H/A)<b class="num">${x.a.p} / ${x.a.h} / ${x.a.ab}${x.a.wd?` · ${Math.round(x.a.pct)}%`:''}</b></div><div class="kv">Shops · productive<b class="num">${x.f.s} · ${x.f.p}${x.f.s?` (${Math.round(x.f.pct)}%)`:''}</b></div></div>`).join('')}</div>`}
   return bar('Reports',R.label,true)+`<div class="wrap">${filt}
    <div class="g2"><button class="btn ok" onclick="shareText(reportText(reportData()))">${I('share',18,'#fff',2)}Share on WhatsApp</button><button class="btn out" onclick="copyReport()">${I('copy',18)}Copy text</button></div>${body}</div>`;
 }
@@ -1231,6 +1263,10 @@ function settingsView(){
    <div class="${db.settings.office?'g2':''}"><button class="btn" id="setLoc" onclick="setOffice()">${I('pin',18,'#fff',2)}${db.settings.office?'Update':'Use my current location'}</button>${db.settings.office?`<button class="btn out" onclick="confirmBox('Remove office location?','Employees will be able to check in from anywhere.',()=>{db.settings.office=null;save();render()})">Remove</button>`:''}</div></div></div>
   <div class="card"><div class="card-h"><div><h3>Half day rule</h3><p>Check in after this time = Half Day</p></div></div><div class="card-b"><div class="fld"><input id="halfT" type="time" class="inp num" value="${db.settings.halfAfter||'09:15'}"></div><button class="btn out" onclick="saveHalf()">Save time</button></div></div>
   <div class="card"><div class="card-h"><div><h3>Admin login code</h3><p>Minimum 4 digits</p></div></div><div class="card-b"><div class="fld"><input id="ac" class="inp num" inputmode="numeric" type="password" placeholder="New code"></div><button class="btn out" onclick="chgAdmin()">Update code</button></div></div>
+  <div class="card"><div class="card-h"><div><h3>Backup &amp; restore</h3><p>Last backup: ${db.lastBackup?new Date(db.lastBackup).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'never'} · data ${kb()} KB</p></div>${I('shield',20,'var(--pri)')}</div><div class="card-b">
+   <p class="muted" style="font-size:12.5px;margin-bottom:12px">Keep a backup on WhatsApp or Google Drive at least once a month. If the phone is lost or the app is removed, restore it here.</p>
+   <input type="file" id="rf" accept=".json,application/json,text/plain" hidden onchange="restorePick(this)">
+   <div class="g2"><button class="btn" onclick="backupNow()">${I('dl',18,'#fff',2)}Backup now</button><button class="btn out" onclick="$('#rf').click()">${I('refresh',18)}Restore</button></div></div></div>
   <div class="card"><div class="card-h"><div><h3 style="color:var(--bad)">Danger zone</h3><p>This action cannot be undone</p></div></div><div class="card-b"><button class="btn danger" onclick="confirmBox('Reset all data?','All employees and attendance records will be permanently deleted.',resetAll)">${I('trash',17)}Reset all data</button></div></div>`
   :`<div class="card"><div class="srow"><div><b>Login code</b><span>Contact your administrator to change your code.</span></div>${I('lock',18,'var(--faint)')}</div></div>`}
   <div class="card"><div class="card-b"><button class="btn out" onclick="logout()">${I('logout',18)}Sign out</button></div></div>
@@ -1242,6 +1278,20 @@ async function setOffice(){const b=$('#setLoc');if(b){b.disabled=true;b.innerHTM
   if(r.mock){render();return gpsError('Fake GPS detected','Please turn off any mock-location app.')}
   db.settings.office={lat:r.lat,lng:r.lng,acc:Math.round(r.acc||0),set:Date.now()};save();render();toast('Office location saved'+(r.acc>50?' · accuracy ±'+Math.round(r.acc)+' m':''))}
 function saveHalf(){const v=$('#halfT').value;if(!/^\d{2}:\d{2}$/.test(v))return toast('Choose a valid time','bad');db.settings.halfAfter=v;save();toast('Half day time set to '+cutLbl());render()}
+function backupNow(){
+  const d=new Date(),name='FB-ERP-backup-'+dkey(d)+'.json',txt=JSON.stringify(db);
+  db.lastBackup=Date.now();save();
+  if(NATIVE&&NATIVE.shareFile){try{NATIVE.shareFile(txt,name);toast('Choose WhatsApp or Drive to keep the backup');render();return}catch(e){}}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast('Backup copied — paste it into a note or chat to keep it'),()=>toast('Backup is available in the Android app','bad'))}
+  render();
+}
+function restorePick(inp){const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{let d;try{d=JSON.parse(r.result)}catch(e){return toast('This is not a valid FB ERP backup file','bad')}
+    if(!d||!Array.isArray(d.employees)||typeof d.att!=='object')return toast('This is not a valid FB ERP backup file','bad');
+    confirmBox('Restore backup?',`This replaces all data on this phone with the backup (${d.employees.length} employees). Current data will be lost.`,()=>{db=migrate(d);if(save()){toast('Backup restored');setSession(null);render()}})};
+  r.onerror=()=>toast('Could not read the file','bad');r.readAsText(f);inp.value='';
+}
+const kb=()=>{try{return Math.round(JSON.stringify(db).length/1024)}catch(e){return 0}};
 function chgAdmin(){const c=$('#ac').value.trim();if(!/^\d{4,}$/.test(c))return toast('Use at least 4 digits','bad');if(db.employees.some(e=>e.code===c))return toast('This code belongs to an employee','bad');db.adminCode=c;save();toast('Admin code updated');render()}
 function resetAll(){const t=db.theme,st=db.settings;db=fresh();db.theme=t;db.settings=st;save();setSession(null);render();toast('All data has been reset')}
 
@@ -1292,6 +1342,7 @@ function after(){
   }
 }
 setInterval(()=>{const c=$('#clock');if(c){const t=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}).split(' ');c.innerHTML=t[0]+'<small>'+(t[1]||'')+'</small>'}const h=$('#hrs');if(h&&session&&!isAdmin()){h.textContent=dur((db.att[session.id]||{})[today()])}},1000);
+try{db=migrate(db)}catch(e){logErr('migrate: '+e.message)}
 render();
 if(NATIVE)setTimeout(checkUpdate,1200);
 </script>

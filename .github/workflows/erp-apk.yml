@@ -57,7 +57,13 @@ jobs:
           name: FB ERP (latest)
           body: |
             FB ERP app, version 1.${{ github.run_number }}.
-            Phone par neeche FB-ERP.apk download karke install karein.
+
+            Pehli dafa install:
+            1. Neeche FB-ERP.apk par tap karein, download hogi.
+            2. Download khol kar Install dabayein. Phone "unknown apps" ki ijazat maange to Allow karein.
+            3. Play Protect ka message aaye to "More details" > "Install anyway" dabayein.
+
+            Aage ke updates app ke andar "Update now" se hote hain. Data mehfooz rehta hai.
           files: |
             FB-ERP.apk
             version.json

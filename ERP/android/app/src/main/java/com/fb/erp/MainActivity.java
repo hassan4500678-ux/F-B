@@ -95,9 +95,14 @@ public class MainActivity extends Activity {
                 fileCallback = callback;
                 Intent pick = new Intent(Intent.ACTION_GET_CONTENT);
                 pick.addCategory(Intent.CATEGORY_OPENABLE);
-                pick.setType("image/*");
+                String type = "*/*";
                 try {
-                    startActivityForResult(Intent.createChooser(pick, "Select photo"), PICK_PHOTO);
+                    String[] acc = params.getAcceptTypes();
+                    if (acc != null) for (String t : acc) if (t != null && t.startsWith("image")) type = "image/*";
+                } catch (Exception ignored) { }
+                pick.setType(type);
+                try {
+                    startActivityForResult(Intent.createChooser(pick, "image/*".equals(type) ? "Select photo" : "Select backup file"), PICK_PHOTO);
                 } catch (Exception e) {
                     fileCallback = null;
                     return false;
@@ -164,6 +169,33 @@ public class MainActivity extends Activity {
                     } });
                 } catch (Exception e) {
                     toast("Could not share the image");
+                }
+            } }).start();
+        }
+
+        /** Shares a text file (used for data backups). */
+        @JavascriptInterface
+        public void shareFile(final String text, final String name) {
+            new Thread(new Runnable() { public void run() {
+                try {
+                    File dir = new File(getCacheDir(), "share");
+                    dir.mkdirs();
+                    String n = (name == null ? "backup.json" : name).replaceAll("[^A-Za-z0-9._-]", "_");
+                    File f = new File(dir, n);
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(text.getBytes("UTF-8"));
+                    fo.close();
+                    final Uri uri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", f);
+                    runOnUiThread(new Runnable() { public void run() {
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("application/json");
+                        i.putExtra(Intent.EXTRA_STREAM, uri);
+                        i.putExtra(Intent.EXTRA_SUBJECT, "FB ERP backup");
+                        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        try { startActivity(Intent.createChooser(i, "Save backup")); } catch (Exception ignored) { }
+                    } });
+                } catch (Exception e) {
+                    toast("Could not create the backup");
                 }
             } }).start();
         }
